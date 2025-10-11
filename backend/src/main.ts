@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { SERVER_PORT } from './config/constants';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -24,7 +25,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   // server port: convertir string a número con Number()
-  const port = Number(configService.get<string>('SERVER_PORT')) || 3000;
+  const port = Number(configService.get<string>(SERVER_PORT)) || 3000;
 
   await app.listen(port);
   console.log("Servidor corriendo en http://localhost:"+port);

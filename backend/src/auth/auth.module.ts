@@ -12,6 +12,9 @@ import { UsuarioModule } from 'src/usuario/usuario.module';
 import { Creador } from 'src/creador/entity/creador.entity';
 import { Voluntario } from 'src/voluntario/entity/voluntario.entity';
 import { Administrador } from 'src/administrador/entity/administrador.entity';
+import { TokenModule } from 'src/token/token.module';
+import { MailModule } from 'src/mail/mail.module';
+import { JwtRecoveryStrategy } from './strategies/jwt-recovery.strategy';
 
 
 
@@ -29,8 +32,10 @@ import { Administrador } from 'src/administrador/entity/administrador.entity';
     }),
     TypeOrmModule.forFeature([Usuario,Creador,Voluntario,Administrador]),
     UsuarioModule,
+    TokenModule,
+    MailModule
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy,JwtRecoveryStrategy],
   controllers: [AuthController],
   exports: [AuthService]
 })

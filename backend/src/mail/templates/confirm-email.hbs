@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Correo</title>
+  </head>
+  <body style="font-family: Arial, sans-serif; background-color: #f4f7fa; padding: 20px; margin: 0;">
+    <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+      
+      <!-- Header -->
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="color: #007bff; margin: 0; font-size: 26px;">¡Bienvenido a Voluntariado!</h1>
+      </div>
+
+      <!-- Content -->
+      <div style="color: #333; line-height: 1.6;">
+        <p style="font-size: 16px;">Hola <strong>{{nombre}}</strong>,</p>
+        <p>Gracias por registrarte en nuestra plataforma de voluntariado.</p>
+        <p>Para completar tu registro y verificar tu correo electrónico, ingresa el siguiente código de confirmación:</p>
+      </div>
+
+      <!-- Code Box -->
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px; border-radius: 10px; text-align: center; margin: 30px 0;">
+        <p style="color: #fff; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Tu Código de Verificación</p>
+        <div style="background-color: #fff; padding: 15px; border-radius: 8px; display: inline-block;">
+          <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #667eea;">{{codigo}}</span>
+        </div>
+      </div>
+
+      <!-- Instructions -->
+      <div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #007bff; border-radius: 4px; margin: 20px 0;">
+        <p style="margin: 0; color: #555; font-size: 14px;">
+          <strong>📌 Importante:</strong> Este código expirará en <strong>10 minutos</strong>.
+        </p>
+      </div>
+
+      <p style="color: #666; font-size: 14px; margin-top: 20px;">
+        Si no creaste esta cuenta, puedes ignorar este correo de forma segura.
+      </p>
+
+      <!-- Footer -->
+      <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center;">
+        <p style="color: #999; font-size: 12px; margin: 5px 0;">
+          Este es un correo automático, por favor no respondas a este mensaje.
+        </p>
+        <p style="color: #007bff; font-size: 14px; margin: 10px 0;">
+          <strong>El equipo de Voluntariado</strong>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

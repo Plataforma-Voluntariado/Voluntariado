@@ -1,8 +1,11 @@
-import { Controller, Post, Body, Res, HttpCode, HttpStatus, Get, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, Res, HttpCode, HttpStatus, Get, UseGuards, Req, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { InicioSesionDto } from './dto/inicio-sesion.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { JwtRecoveryGuard } from './guards/jwt-recovery.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -20,9 +23,9 @@ export class AuthController {
     // Guardar JWT en cookie segura
     res.cookie('jwt', access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Solo HTTPS en prod
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
+      maxAge: 1 * 60 * 60 * 1000, // 1 h
     });
 
     return {
@@ -53,4 +56,19 @@ export class AuthController {
       message: 'Sesión cerrada exitosamente',
     };
   }
+
+  @Post('recuperar')
+  async solicitarRecuperacion(@Body() ForgotPasswordDto: ForgotPasswordDto) {
+    return this.authService.solicitarRecuperacion(ForgotPasswordDto);
+  }
+
+  @Post('restablecer')
+  @UseGuards(JwtRecoveryGuard)
+  async restablecerContrasena(
+    @Request() { user }: any,
+    @Body() dto: ResetPasswordDto,
+  ) {
+    return this.authService.restablecerContrasena(dto, user.sub);
+  }
+
 }
