@@ -28,7 +28,7 @@ async function bootstrap() {
   const port = Number(configService.get<string>(SERVER_PORT)) || 3000;
 
   await app.listen(port);
-  console.log(`Servidor corriendo en el puerto ${port}`);
+  console.log("Servidor corriendo en http://localhost:"+port);
 }
 
 bootstrap();
