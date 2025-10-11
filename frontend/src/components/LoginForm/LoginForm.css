@@ -1,0 +1,111 @@
+.login-form {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 2rem 2.5rem;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-large);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+  transition: all var(--transition);
+}
+
+.login-form-title {
+  width: 100%;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 0.25rem;
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+
+.login-form-logo-img {
+  width: 300px;
+  height: auto;
+  margin: 0 auto 1.5rem auto;
+  display: block;
+}
+
+.login-form-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #2a2a2a;
+  margin-top: 0.5rem;
+}
+
+.login-form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-medium);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  outline: none;
+  transition: all var(--transition);
+}
+
+.login-form-input::placeholder {
+  color: #6b6b6b;
+}
+
+.login-form-input:focus {
+  border-color: var(--color-primary);
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.login-form-button {
+  margin-top: 1rem;
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border: none;
+  border-radius: var(--radius-medium);
+  background-color: var(--color-primary);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  /* Sombra más suave y difusa */
+  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+  transition: all var(--transition);
+}
+
+.login-form-button:hover {
+  background-color: #0051d5;
+  box-shadow: 0 6px 24px rgba(0, 122, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.login-form-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+.login-form-no-account {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  width: 100%;
+  text-align: center;
+  color: #4a4a4a;
+}
+
+.login-form-no-account-link {
+  color: var(--color-primary);
+  font-weight: 500;
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+.login-form-no-account-link:hover {
+  color: #0051d5;
+  text-decoration: underline;
+}

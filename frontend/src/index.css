@@ -1,0 +1,47 @@
+:root {
+  /* Colores adaptados al estilo iOS liquid glass con tonos más suaves y translúcidos */
+  --color-primary: #007aff;
+  --color-primary-light: #e3f2ff;
+  --color-secondary: #8e8e93;
+  --color-bg: #f2f2f7;
+  --color-surface: rgba(255, 255, 255, 0.7);
+  --color-text: #1c1c1e;
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-success: #34c759;
+  --color-error: #ff3b30;
+
+  /* Border radius más redondeados estilo iOS */
+  --radius-large: 24px;
+  --radius-medium: 16px;
+  --radius-small: 12px;
+
+  /* Transición más suave con cubic-bezier */
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Sombras más difusas estilo iOS */
+  --shadow-sm: 0 2px 16px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+/* Modo oscuro opcional */
+[data-theme="dark"] {
+  --color-bg: #000000;
+  --color-surface: rgba(28, 28, 30, 0.7);
+  --color-text: #f2f2f7;
+  --color-secondary: #98989d;
+  --color-border: rgba(255, 255, 255, 0.1);
+}
+
+/* Aplicación global del tema */
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
+  width: 100vw;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  transition: background-color var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+}
+
