@@ -9,10 +9,11 @@ import { CiudadModule } from './ciudad/ciudad.module';
 import { DepartamentoModule } from './departamento/departamento.module';
 import { AuthModule } from './auth/auth.module';
 import { CreadorModule } from './creador/creador.module';
-
 import { VoluntarioModule } from './voluntario/voluntario.module';
 import { AdministradorModule } from './administrador/administrador.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { TokenModule } from './token/token.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -42,6 +43,8 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
   VoluntarioModule,
   AdministradorModule,
   CloudinaryModule,
+  TokenModule,
+  MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

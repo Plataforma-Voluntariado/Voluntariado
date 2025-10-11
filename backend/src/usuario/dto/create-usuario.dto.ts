@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsNotEmpty, IsOptional, IsEnum, IsDate, IsNumber, Length, ValidateIf } from 'class-validator';
+import { IsString, IsEmail, IsNotEmpty, IsOptional, IsEnum, IsDate, IsNumber, Length, ValidateIf, Matches } from 'class-validator';
 import { Type } from 'class-transformer';
 import { RolUsuario } from '../entity/usuario.entity';
 import { TipoEntidad } from 'src/creador/entity/creador.entity';
@@ -35,8 +35,16 @@ export class CreateUsuarioDto {
   correo: string;
 
   @IsString({ message: 'La contraseña debe ser una cadena de texto' })
-  @IsNotEmpty({ message: 'el campo contraseña es obligatoria' })
+  @IsNotEmpty({ message: 'El campo contraseña es obligatorio' })
+  @Matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+    {
+      message:
+        'La contraseña debe tener al menos 8 caracteres e incluir: una letra mayúscula, una letra minúscula, un número y un símbolo (por ejemplo: @, #, $, !, %).'
+    },
+  )
   contrasena: string;
+
 
   @IsString({ message: 'El teléfono debe ser una cadena de texto' })
   @IsNotEmpty({ message: 'El campo teléfono es obligatorio' })
@@ -53,7 +61,7 @@ export class CreateUsuarioDto {
 
   // rol siempre oblihatorio
   @IsEnum(RolUsuario, { message: 'El rol no es válido' })
-  @IsNotEmpty({message:'El campo rol es obligatorio'})
+  @IsNotEmpty({ message: 'El campo rol es obligatorio' })
   rol: RolUsuario;
 
   @IsNumber({}, { message: 'La ciudad debe ser un número válido' })

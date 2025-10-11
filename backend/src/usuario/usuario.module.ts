@@ -7,12 +7,12 @@ import { Creador } from 'src/creador/entity/creador.entity';
 import { Voluntario } from 'src/voluntario/entity/voluntario.entity';
 import { Administrador } from 'src/administrador/entity/administrador.entity';
 import { Usuario } from './entity/usuario.entity';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
+import { Token } from 'src/token/entity/token.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Ciudad,Voluntario,Administrador,Creador,Usuario]) ,
+    TypeOrmModule.forFeature([Ciudad,Voluntario,Administrador,Creador,Usuario,Token]) ,
     CloudinaryModule,
   ],
   controllers: [UsuarioController],
