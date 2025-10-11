@@ -1,8 +1,9 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToOne, OneToMany } from 'typeorm';
 import { Ciudad } from 'src/ciudad/entity/ciudad.entity';
 import { Creador } from 'src/creador/entity/creador.entity';
 import { Voluntario } from 'src/voluntario/entity/voluntario.entity';
 import { Administrador } from 'src/administrador/entity/administrador.entity';
+import { Token } from 'src/token/entity/token.entity';
 
 export enum RolUsuario {
   ADMIN = 'ADMIN',
@@ -65,5 +66,9 @@ export class Usuario {
 
   @OneToOne(() => Administrador, (admin) => admin.usuario)
   admin?: Administrador;
+
+  @OneToMany(() => Token, (token) => token.usuario)
+  tokens: Token[];
+
 }
 

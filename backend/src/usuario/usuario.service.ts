@@ -9,6 +9,7 @@ import { Administrador } from 'src/administrador/entity/administrador.entity';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { Ciudad } from 'src/ciudad/entity/ciudad.entity';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { verificarDominioCorreo } from 'src/utils/email.utils';
 
 @Injectable()
 export class UsuarioService {
@@ -32,6 +33,12 @@ export class UsuarioService {
     let avatarUrl: string | undefined = undefined;
     const { correo, contrasena, rol, tipo_entidad, nombre_entidad, ...rest } = createUsuarioDto;
 
+    // 🔹 Verificar que el dominio del correo tenga registros MX válidos
+    const dominioValido = await verificarDominioCorreo(createUsuarioDto.correo);
+    if (!dominioValido) {
+      throw new BadRequestException('El dominio del correo no es válido o no puede recibir correos.');
+    }
+
     // Validar correo único
     if (await this.usuarioRepository.findOne({ where: { correo } })) {
       throw new BadRequestException('El correo ya está registrado');
@@ -51,7 +58,7 @@ export class UsuarioService {
 
 
     // Hashear la contraseña
-    const hashedPassword = await bcrypt.hash(contrasena, 10);
+    const hashedPassword = await this.hashedPassword(contrasena);
 
     // Generar avatar automático y subir a Cloudinary
     let nameForAvatar = rol === RolUsuario.CREADOR ? nombre_entidad : `${createUsuarioDto.nombre} ${createUsuarioDto.apellido}`;
@@ -141,8 +148,12 @@ export class UsuarioService {
   async findUserByEmail(correo: string): Promise<Usuario | null> {
     return this.usuarioRepository.findOne({
       where: { correo },
-      relations: ['ciudad', 'creador', 'voluntario', 'admin','ciudad.departamento'],
+      relations: ['ciudad', 'creador', 'voluntario', 'admin', 'ciudad.departamento'],
     });
+  }
+
+  async hashedPassword(contrasena: string): Promise<string> {
+    return bcrypt.hash(contrasena, 10);
   }
 
 }
