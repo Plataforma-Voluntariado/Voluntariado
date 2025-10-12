@@ -48,8 +48,6 @@ function LoginForm() {
           message: data.message || "Credenciales inválidas o error en el servidor",
         });
       }
-
-      // ✅ Obtener el perfil con el token
       const perfilRes = await fetch("http://localhost:5560/auth/perfil", {
         headers: {
           Authorization: `Bearer ${data.access_token}`,
