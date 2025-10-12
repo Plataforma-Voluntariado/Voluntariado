@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./RegisterFormVolunteer.css";
 import WrongAlert from "../alerts/WrongAlert.jsx";
-import { ValidatePasswordFormat } from "../../services/ValidatePasswordFormat.jsx";
+import { ValidatePasswordFormat } from "../../services/validators/ValidatePasswordFormat.jsx";
 import axios from "axios";
 import SuccessAlert from "../alerts/SuccessAlert.jsx";
 
@@ -59,6 +59,17 @@ function RegisterFormVolunteer() {
         `,
       });
     }
+    const objetoUsuario = {
+        correo: formData.correo,
+        contrasena: formData.contrasena,
+        nombre: formData.nombre,
+        apellido: formData.apellido,
+        telefono: formData.telefono,
+        fecha_nacimiento: formData.fechaNacimiento,
+        id_ciudad: parseInt(formData.idCiudad),
+        rol: "VOLUNTARIO",
+    }
+    console.log(objetoUsuario)
     try {
       const response = await axios.post(URI, {
         correo: formData.correo,

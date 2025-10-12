@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./RegisterFormCreator.css";
 import WrongAlert from "../alerts/WrongAlert.jsx";
-import { ValidatePasswordFormat } from "../../services/ValidatePasswordFormat.jsx";
+import { ValidatePasswordFormat } from "../../services/validators/ValidatePasswordFormat.jsx";
 import axios from "axios";
 import SuccessAlert from "../alerts/SuccessAlert.jsx";
 const URI =
