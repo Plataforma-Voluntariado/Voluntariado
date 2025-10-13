@@ -7,8 +7,15 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { SERVER_PORT } from './config/constants';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
-  
+  const app = await NestFactory.create(AppModule);
+
+  // Configuracion de cors
+  app.enableCors({
+    origin: ['http://localhost:3000'],
+    credentials: true, 
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  });
+
   // Registrar filtro global
   app.useGlobalFilters(new AllExceptionsFilter());
 
@@ -28,7 +35,7 @@ async function bootstrap() {
   const port = Number(configService.get<string>(SERVER_PORT)) || 3000;
 
   await app.listen(port);
-  console.log("Servidor corriendo en http://localhost:"+port);
+  console.log("Servidor corriendo en http://localhost:" + port);
 }
 
 bootstrap();
