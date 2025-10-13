@@ -1,15 +1,19 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Usuario, RolUsuario, EstadoUsuario } from './entity/usuario.entity';
-import { Creador, TipoEntidad } from 'src/creador/entity/creador.entity';
+import { Creador } from 'src/creador/entity/creador.entity';
 import { Voluntario } from 'src/voluntario/entity/voluntario.entity';
 import { Administrador } from 'src/administrador/entity/administrador.entity';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { Ciudad } from 'src/ciudad/entity/ciudad.entity';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { verificarDominioCorreo } from 'src/utils/email.utils';
+import { TokenService } from 'src/token/token.service';
+import { TipoToken } from 'src/token/entity/token.entity';
+import { MailService } from 'src/mail/mail.service';
+import { VerificacionCorreoDto } from './dto/validar-codigo-verificacion.dto';
+import { solicitudVerificacionCorreoDto } from './dto/solicitud-verificacion-correo.dto';
 
 @Injectable()
 export class UsuarioService {
@@ -25,8 +29,8 @@ export class UsuarioService {
 
     @InjectRepository(Administrador)
     private adminRepository: Repository<Administrador>,
-
-    private readonly cloudinaryService: CloudinaryService,
+    private tokenService: TokenService,
+    private mailService: MailService
   ) { }
 
   async create(createUsuarioDto: CreateUsuarioDto): Promise<void> {
@@ -156,4 +160,56 @@ export class UsuarioService {
     return bcrypt.hash(contrasena, 10);
   }
 
+  // Generar y enviar token de verificacion de correo
+  async solicitarVerificacionCorreo(dto: solicitudVerificacionCorreoDto) {
+
+    const usuario = await this.findUserByEmail(dto.correo);
+    if (!usuario) throw new NotFoundException('No existe un usuario con ese correo.');
+
+    // Generar token corto de verificación
+    const token = await this.tokenService.generarToken(usuario, TipoToken.CONFIRMAR_CORREO);
+
+    // Enviar correo con el código
+    try {
+      await this.mailService.sendTemplateMail(
+        usuario.correo,
+        'Verificacion de Correo',
+        'confirm-email',
+        {
+          nombre: usuario.nombre,
+          codigo: token.token,
+        },
+      );
+    } catch (error) {
+      console.error('Error al enviar correo:', error.message);
+      throw new InternalServerErrorException('Error al enviar el correo de verificacion');
+    }
+
+    return {
+      message: 'Se ha enviado un correo con las instrucciones para verificar tu correo!.'
+    };
+  }
+
+  // Validación de código de verificación de correo
+  async validarCodigoVerificacionCorreo(dto: VerificacionCorreoDto) {
+    const { token, userId } = dto;
+
+    // Validar token del tipo CONFIRMAR_CORREO
+    const tokenValido = await this.tokenService.validarToken(
+      token,
+      TipoToken.CONFIRMAR_CORREO,
+      userId,
+    );
+
+    const usuario = tokenValido.usuario;
+
+    // Marcar el correo como verificado
+    usuario.correo_verificado = true;
+    await this.usuarioRepository.save(usuario);
+
+    // Marcar el token como usado
+    await this.tokenService.marcarComoUsado(tokenValido);
+
+    return { message: 'Correo verificado correctamente.' };
+  }
 }
