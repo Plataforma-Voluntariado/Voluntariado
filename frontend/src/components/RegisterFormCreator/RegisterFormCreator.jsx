@@ -4,9 +4,10 @@ import WrongAlert from "../alerts/WrongAlert.jsx";
 import { ValidatePasswordFormat } from "../../services/validators/ValidatePasswordFormat.jsx";
 import axios from "axios";
 import SuccessAlert from "../alerts/SuccessAlert.jsx";
-const URI =
-  process.env.REACT_APP_URL_SERVER_VOLUNTARIADO + "/usuarios/registro";
+import { register } from "../../services/auth/AuthService.jsx";
+import { useNavigate } from "react-router";
 function RegisterFormCreator() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     correo: "",
     contrasena: "",
@@ -21,7 +22,6 @@ function RegisterFormCreator() {
     confirmarContrasena: "",
   });
 
-  // Manejar cambio de input
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -30,10 +30,8 @@ function RegisterFormCreator() {
     });
   };
 
-  // Manejar envío
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Datos del formulario:", formData);
     const allFields = validateFields(formData);
     if (!allFields) {
       return WrongAlert({
@@ -56,7 +54,7 @@ function RegisterFormCreator() {
       });
     }
     try {
-      const response = await axios.post(URI, {
+      const userData = {
         correo: formData.correo,
         contrasena: formData.contrasena,
         nombre_entidad: formData.nombreEntidad,
@@ -67,23 +65,13 @@ function RegisterFormCreator() {
         direccion: formData.direccion,
         descripcion: formData.descripcion,
         sitio_web: formData.sitioWeb,
-      });
-      console.log({
-        correo: formData.correo,
-        contrasena: formData.contrasena,
-        nombre_entidad: formData.nombreEntidad,
-        telefono: formData.telefono,
-        id_ciudad: parseInt(formData.idCiudad),
-        rol: "CREADOR",
-        tipo_entidad: formData.tipoEntidad,
-        direccion: formData.direccion,
-        descripcion: formData.descripcion,
-        sitio_web: formData.sitioWeb,
-      });
+      };
+      const response = await register(userData);
       SuccessAlert({
         title: "Bien Hecho!!",
         message: "Te has registrado correctamente",
       });
+      navigate("login")
     } catch (error) {
       console.error("Error al registrar voluntario:", error);
       WrongAlert({

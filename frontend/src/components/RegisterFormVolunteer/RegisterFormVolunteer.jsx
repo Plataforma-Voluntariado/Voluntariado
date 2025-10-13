@@ -4,11 +4,14 @@ import WrongAlert from "../alerts/WrongAlert.jsx";
 import { ValidatePasswordFormat } from "../../services/validators/ValidatePasswordFormat.jsx";
 import axios from "axios";
 import SuccessAlert from "../alerts/SuccessAlert.jsx";
+import { register } from "../../services/auth/AuthService.jsx";
+import { useNavigate } from "react-router";
 
 const URI =
   process.env.REACT_APP_URL_SERVER_VOLUNTARIADO + "/usuarios/registro";
 
 function RegisterFormVolunteer() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     correo: "",
     contrasena: "",
@@ -59,7 +62,7 @@ function RegisterFormVolunteer() {
         `,
       });
     }
-    const objetoUsuario = {
+    const userData = {
         correo: formData.correo,
         contrasena: formData.contrasena,
         nombre: formData.nombre,
@@ -69,22 +72,13 @@ function RegisterFormVolunteer() {
         id_ciudad: parseInt(formData.idCiudad),
         rol: "VOLUNTARIO",
     }
-    console.log(objetoUsuario)
     try {
-      const response = await axios.post(URI, {
-        correo: formData.correo,
-        contrasena: formData.contrasena,
-        nombre: formData.nombre,
-        apellido: formData.apellido,
-        telefono: formData.telefono,
-        fecha_nacimiento: formData.fechaNacimiento,
-        id_ciudad: parseInt(formData.idCiudad),
-        rol: "VOLUNTARIO",
-      });
+      const response = await register(userData);
       SuccessAlert({
         title: "Bien Hecho!!",
         message: "Te has registrado correctamente",
       });
+      navigate("login")
     } catch (error) {
       console.error("Error al registrar voluntario:", error);
       WrongAlert({
