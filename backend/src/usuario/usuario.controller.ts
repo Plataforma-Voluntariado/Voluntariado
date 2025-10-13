@@ -1,10 +1,13 @@
 import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
+import { solicitudVerificacionCorreoDto } from './dto/solicitud-verificacion-correo.dto';
+import { VerificacionCorreoDto } from './dto/validar-codigo-verificacion.dto';
+
 
 @Controller('usuarios')
 export class UsuarioController {
-  constructor(private readonly usuarioService: UsuarioService) {}
+  constructor(private readonly usuarioService: UsuarioService) { }
 
   @Post('registro')
   @HttpCode(HttpStatus.CREATED)
@@ -15,5 +18,15 @@ export class UsuarioController {
       statusCode: HttpStatus.CREATED,
       message: 'Usuario creado exitosamente',
     };
+  }
+
+  @Post('solicitud-verificacion-correo')
+  async solicitarRecuperacion(@Body() solicitudVerificacionCorreoDto:solicitudVerificacionCorreoDto) {
+    return this.usuarioService.solicitarVerificacionCorreo(solicitudVerificacionCorreoDto);
+  }
+
+  @Post('verificacion-correo')
+  async verificacionCorreo(@Body() verificacionCorreodto: VerificacionCorreoDto) {
+    return this.usuarioService.validarCodigoVerificacionCorreo(verificacionCorreodto);
   }
 }

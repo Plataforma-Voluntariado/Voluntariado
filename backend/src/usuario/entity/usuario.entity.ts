@@ -58,6 +58,10 @@ export class Usuario {
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP', name: 'fecha_registro' })
   fecha_Registro: Date;
 
+  @Column({ type: 'boolean', default: false })
+  correo_verificado: boolean;
+
+
   @OneToOne(() => Creador, (creador) => creador.usuario)
   creador?: Creador;
 

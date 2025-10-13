@@ -3,9 +3,10 @@ import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { InicioSesionDto } from './dto/inicio-sesion.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtRecoveryGuard } from './guards/jwt-recovery.guard';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+
 
 @Controller('auth')
 export class AuthController {

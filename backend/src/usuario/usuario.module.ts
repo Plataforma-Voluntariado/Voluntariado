@@ -9,11 +9,15 @@ import { Administrador } from 'src/administrador/entity/administrador.entity';
 import { Usuario } from './entity/usuario.entity';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import { Token } from 'src/token/entity/token.entity';
+import { TokenModule } from 'src/token/token.module';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Ciudad,Voluntario,Administrador,Creador,Usuario,Token]) ,
     CloudinaryModule,
+    TokenModule,
+    MailModule
   ],
   controllers: [UsuarioController],
   providers: [UsuarioService],
