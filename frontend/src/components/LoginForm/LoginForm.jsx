@@ -5,10 +5,10 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import WrongAlert from "../../components/alerts/WrongAlert";
 import SuccessAlert from "../../components/alerts/SuccessAlert";
+import { getUserData, login } from "../../services/auth/AuthService";
 
 function LoginForm() {
-  const navigate = useNavigate();
-  const { login } = useAuth();
+  const Navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     correo: "",
@@ -25,59 +25,17 @@ function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!formData.correo || !formData.contrasena) {
-      return WrongAlert({
-        title: "Campos incompletos",
-        message: "Por favor ingresa tu correo y contraseña",
-      });
-    }
-
     try {
-      const res = await fetch("http://localhost:5560/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || !data.access_token) {
-        return WrongAlert({
-          title: "Error al iniciar sesión",
-          message: data.message || "Credenciales inválidas o error en el servidor",
-        });
-      }
-      const perfilRes = await fetch("http://localhost:5560/auth/perfil", {
-        headers: {
-          Authorization: `Bearer ${data.access_token}`,
-        },
-      });
-
-      const perfilData = await perfilRes.json();
-
-      if (!perfilRes.ok) {
-        return WrongAlert({
-          title: "Error al obtener perfil",
-          message: perfilData.message || "No se pudo cargar la información del usuario",
-        });
-      }
-
-      // ✅ Guardar datos en el contexto
-      login(perfilData, data.access_token);
-
-      await SuccessAlert({
-        title: "Inicio de sesión exitoso",
-        message: "Bienvenido de nuevo 👋",
-      });
-
-      navigate("/home");
-
+      const response = await login(formData.correo, formData.contrasena);
+      console.log(response)
+      if(response)
+      Navigate("/home")
     } catch (error) {
       console.error(error);
       WrongAlert({
         title: "Error de conexión",
-        message: "No se pudo conectar con el servidor. Intenta de nuevo más tarde.",
+        message:
+          "No se pudo conectar con el servidor. Intenta de nuevo más tarde.",
       });
     }
   };
