@@ -16,37 +16,40 @@ import { TokenModule } from './token/token.module';
 import { MailModule } from './mail/mail.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({
-    envFilePath: '.env',
-    isGlobal: true
-  }),
-  TypeOrmModule.forRootAsync({
-    imports: [ConfigModule],
-    useFactory: (configService: ConfigService) => ({
-      type: 'mariadb',
-      host: configService.get<string>(DB_HOST),
-      port: +(configService.get<number>(DB_PORT) ?? 3306),
-      username: configService.get<string>(DB_USER),
-      password: configService.get<string>(DB_PASSWORD),
-      database: configService.get<string>(DB_DATABASE),
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: false,
-      logging: false
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+      isGlobal: true,
     }),
-    inject: [ConfigService],
-  }),
-  UsuarioModule,
-  CiudadModule,
-  DepartamentoModule,
-  AuthModule,
-  CreadorModule,
-  VoluntarioModule,
-  AdministradorModule,
-  CloudinaryModule,
-  TokenModule,
-  MailModule,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'mariadb',
+        host: configService.get<string>(DB_HOST),
+        port: +(configService.get<number>(DB_PORT) ?? 3306),
+        username: configService.get<string>(DB_USER),
+        password: configService.get<string>(DB_PASSWORD),
+        database: configService.get<string>(DB_DATABASE),
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        synchronize: false,
+        logging: false,
+        migrations: [__dirname + '/database/migrations/*{.ts,.js}'],
+        migrationsRun: true, 
+      }),
+      inject: [ConfigService],
+    }),
+    UsuarioModule,
+    CiudadModule,
+    DepartamentoModule,
+    AuthModule,
+    CreadorModule,
+    VoluntarioModule,
+    AdministradorModule,
+    CloudinaryModule,
+    TokenModule,
+    MailModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService], 
 })
 export class AppModule { }

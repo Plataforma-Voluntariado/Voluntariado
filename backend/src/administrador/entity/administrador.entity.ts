@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, OneToOne, JoinColumn } from 'typeorm';
-import { Usuario } from 'src/usuario/entity/usuario.entity';
+import { Usuario } from '../../usuario/entity/usuario.entity';
 
 @Entity('Administrador')
 export class Administrador {

@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { CiudadController } from './ciudad.controller';
 import { CiudadService } from './ciudad.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Usuario } from 'src/usuario/entity/usuario.entity';
+import { Ciudad } from './entity/ciudad.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Usuario])
-  ],
+  imports: [TypeOrmModule.forFeature([Ciudad])], // ✅ aquí va Ciudad
   controllers: [CiudadController],
-  providers: [CiudadService]
+  providers: [CiudadService],
+  exports: [TypeOrmModule], // ✅ permite que otros módulos usen el repo
 })
-export class CiudadModule { }
+export class CiudadModule {}
+

@@ -1,9 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToOne, OneToMany } from 'typeorm';
-import { Ciudad } from 'src/ciudad/entity/ciudad.entity';
-import { Creador } from 'src/creador/entity/creador.entity';
-import { Voluntario } from 'src/voluntario/entity/voluntario.entity';
-import { Administrador } from 'src/administrador/entity/administrador.entity';
-import { Token } from 'src/token/entity/token.entity';
+import { Ciudad } from '../../ciudad/entity/ciudad.entity';
+import { Creador } from '../../creador/entity/creador.entity';
+import { Voluntario } from '../../voluntario/entity/voluntario.entity';
+import { Administrador } from '../../administrador/entity/administrador.entity';
+import { Token } from '../../token/entity/token.entity';
 
 export enum RolUsuario {
   ADMIN = 'ADMIN',
