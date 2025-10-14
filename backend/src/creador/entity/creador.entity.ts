@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
-import { Usuario } from 'src/usuario/entity/usuario.entity';
+import { Usuario } from '../../usuario/entity/usuario.entity';
 
 export enum TipoEntidad {
   PUBLICA = 'PUBLICA',

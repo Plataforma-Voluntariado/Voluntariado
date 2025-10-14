@@ -1,5 +1,5 @@
 import {Entity,PrimaryGeneratedColumn,Column,ManyToOne,CreateDateColumn, JoinColumn} from 'typeorm';
-import { Usuario } from 'src/usuario/entity/usuario.entity';
+import { Usuario } from '../../usuario/entity/usuario.entity';
 
 export enum TipoToken {
   RECUPERAR_CONTRASENA = 'RECUPERAR_CONTRASENA',
