@@ -2,13 +2,9 @@ import React, { useState } from "react";
 import "./RegisterFormVolunteer.css";
 import WrongAlert from "../alerts/WrongAlert.jsx";
 import { ValidatePasswordFormat } from "../../services/validators/ValidatePasswordFormat.jsx";
-import axios from "axios";
 import SuccessAlert from "../alerts/SuccessAlert.jsx";
 import { register } from "../../services/auth/AuthService.jsx";
 import { useNavigate } from "react-router";
-
-const URI =
-  process.env.REACT_APP_URL_SERVER_VOLUNTARIADO + "/usuarios/registro";
 
 function RegisterFormVolunteer() {
   const navigate = useNavigate();
@@ -49,6 +45,7 @@ function RegisterFormVolunteer() {
         message: "Por favor asegúrate de que ambas contraseñas sean iguales.",
       });
     }
+
     const passwordFormat = ValidatePasswordFormat(formData.contrasena);
     if (!passwordFormat.valid) {
       return WrongAlert({
@@ -62,23 +59,25 @@ function RegisterFormVolunteer() {
         `,
       });
     }
+
     const userData = {
-        correo: formData.correo,
-        contrasena: formData.contrasena,
-        nombre: formData.nombre,
-        apellido: formData.apellido,
-        telefono: formData.telefono,
-        fecha_nacimiento: formData.fechaNacimiento,
-        id_ciudad: parseInt(formData.idCiudad),
-        rol: "VOLUNTARIO",
-    }
+      correo: formData.correo,
+      contrasena: formData.contrasena,
+      nombre: formData.nombre,
+      apellido: formData.apellido,
+      telefono: formData.telefono,
+      fecha_nacimiento: formData.fechaNacimiento,
+      id_ciudad: parseInt(formData.idCiudad),
+      rol: "VOLUNTARIO",
+    };
+
     try {
-      const response = await register(userData);
+      await register(userData);
       SuccessAlert({
-        title: "Bien Hecho!!",
+        title: "¡Bien hecho!",
         message: "Te has registrado correctamente",
       });
-      navigate("login")
+      navigate("login");
     } catch (error) {
       console.error("Error al registrar voluntario:", error);
       WrongAlert({
@@ -88,7 +87,6 @@ function RegisterFormVolunteer() {
     }
   };
 
-  // Función de validación general
   function validateFields(data) {
     for (const key in data) {
       if (data[key].toString().trim() === "") {
@@ -100,7 +98,8 @@ function RegisterFormVolunteer() {
 
   return (
     <form className="register-form-volunteer" onSubmit={handleSubmit}>
-      <section className="register-form-left">
+      {/*  Nombres */}
+      <div className="register-form-input-container">
         <label className="register-form-label">Nombres</label>
         <input
           className="register-form-input"
@@ -110,7 +109,23 @@ function RegisterFormVolunteer() {
           onChange={handleChange}
           placeholder="Juan"
         />
+      </div>
 
+      {/* Apellidos */}
+      <div className="register-form-input-container">
+        <label className="register-form-label">Apellidos</label>
+        <input
+          className="register-form-input"
+          type="text"
+          name="apellido"
+          value={formData.apellido}
+          onChange={handleChange}
+          placeholder="Pérez"
+        />
+      </div>
+
+      {/*  Correo */}
+      <div className="register-form-input-container">
         <label className="register-form-label">Correo</label>
         <input
           className="register-form-input"
@@ -120,7 +135,23 @@ function RegisterFormVolunteer() {
           onChange={handleChange}
           placeholder="ejemplo@ejemplo.com"
         />
+      </div>
 
+      {/* Teléfono */}
+      <div className="register-form-input-container">
+        <label className="register-form-label">Teléfono</label>
+        <input
+          className="register-form-input"
+          type="text"
+          name="telefono"
+          value={formData.telefono}
+          onChange={handleChange}
+          placeholder="Número de 10 dígitos"
+        />
+      </div>
+
+      {/* Ciudad */}
+      <div className="register-form-input-container">
         <label className="register-form-label">Ciudad</label>
         <select
           className="register-form-select"
@@ -145,7 +176,22 @@ function RegisterFormVolunteer() {
           <option value="12">Valle del Guamuez</option>
           <option value="13">Villagarzón</option>
         </select>
+      </div>
 
+      {/* Fecha de nacimiento */}
+      <div className="register-form-input-container">
+        <label className="register-form-label">Fecha de nacimiento</label>
+        <input
+          className="register-form-input"
+          type="date"
+          name="fechaNacimiento"
+          value={formData.fechaNacimiento}
+          onChange={handleChange}
+        />
+      </div>
+
+      {/* Contraseña */}
+      <div className="register-form-input-container">
         <label className="register-form-label">Contraseña</label>
         <input
           className="register-form-input"
@@ -155,38 +201,10 @@ function RegisterFormVolunteer() {
           onChange={handleChange}
           placeholder="Contraseña"
         />
-      </section>
+      </div>
 
-      <section className="register-form-right">
-        <label className="register-form-label">Apellidos</label>
-        <input
-          className="register-form-input"
-          type="text"
-          name="apellido"
-          value={formData.apellido}
-          onChange={handleChange}
-          placeholder="Pérez"
-        />
-
-        <label className="register-form-label">Teléfono</label>
-        <input
-          className="register-form-input"
-          type="text"
-          name="telefono"
-          value={formData.telefono}
-          onChange={handleChange}
-          placeholder="Número de 10 dígitos"
-        />
-
-        <label className="register-form-label">Fecha de nacimiento</label>
-        <input
-          className="register-form-input"
-          type="date"
-          name="fechaNacimiento"
-          value={formData.fechaNacimiento}
-          onChange={handleChange}
-        />
-
+      {/* Confirmar Contraseña */}
+      <div className="register-form-input-container">
         <label className="register-form-label">Confirmar Contraseña</label>
         <input
           className="register-form-input"
@@ -196,7 +214,7 @@ function RegisterFormVolunteer() {
           onChange={handleChange}
           placeholder="Contraseña"
         />
-      </section>
+      </div>
 
       <button className="register-form-button" type="submit">
         Registrarse

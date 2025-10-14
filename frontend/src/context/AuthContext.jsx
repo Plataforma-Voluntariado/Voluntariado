@@ -13,7 +13,6 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -36,8 +35,6 @@ export const AuthProvider = ({ children }) => {
       } catch (err) {
         console.error("Error al obtener el perfil del usuario:", err);
         setUser(null);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -45,7 +42,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser, loading }}>
+    <AuthContext.Provider value={{ user, setUser}}>
       {children}
     </AuthContext.Provider>
   );

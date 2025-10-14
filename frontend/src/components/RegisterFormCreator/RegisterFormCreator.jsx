@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import "./RegisterFormCreator.css";
 import WrongAlert from "../alerts/WrongAlert.jsx";
 import { ValidatePasswordFormat } from "../../services/validators/ValidatePasswordFormat.jsx";
-import axios from "axios";
 import SuccessAlert from "../alerts/SuccessAlert.jsx";
 import { register } from "../../services/auth/AuthService.jsx";
 import { useNavigate } from "react-router";
+
 function RegisterFormCreator() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -32,27 +32,36 @@ function RegisterFormCreator() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const allFields = validateFields(formData);
     if (!allFields) {
       return WrongAlert({
         title: "No se pudo registrar",
-        message: "No has rellenado todos los campos",
+        message: "Por favor completa todos los campos.",
       });
     }
-    const passwordsMatch = formData.contrasena == formData.confirmarContrasena;
-    if (!passwordsMatch) {
+
+    if (formData.contrasena !== formData.confirmarContrasena) {
       return WrongAlert({
         title: "Contraseñas no coinciden",
-        message: "Por favor, asegúrate de que ambas contraseñas sean iguales.",
+        message: "Por favor asegúrate de que ambas contraseñas sean iguales.",
       });
     }
+
     const passwordFormat = ValidatePasswordFormat(formData.contrasena);
     if (!passwordFormat.valid) {
       return WrongAlert({
         title: "Contraseña insegura",
-        message: `Tu contraseña debe cumplir con los siguientes requisitos: • Mínimo 8 caracteres • Al menos una letra mayúscula y una minúscula • Al menos un número • Al menos un carácter especial (como !, @, #, $, %, etc.)`,
+        message: `
+          Tu contraseña debe cumplir con los siguientes requisitos:
+          • Mínimo 8 caracteres
+          • Al menos una letra mayúscula y una minúscula
+          • Al menos un número
+          • Al menos un carácter especial (!, @, #, $, %, etc.)
+        `,
       });
     }
+
     try {
       const userData = {
         correo: formData.correo,
@@ -66,24 +75,27 @@ function RegisterFormCreator() {
         descripcion: formData.descripcion,
         sitio_web: formData.sitioWeb,
       };
-      const response = await register(userData);
+
+      await register(userData);
+
       SuccessAlert({
-        title: "Bien Hecho!!",
-        message: "Te has registrado correctamente",
+        title: "¡Bien Hecho!",
+        message: "Te has registrado correctamente.",
       });
-      navigate("login")
+
+      navigate("login");
     } catch (error) {
-      console.error("Error al registrar voluntario:", error);
+      console.error("Error al registrar creador:", error);
       WrongAlert({
         title: "Error al registrar",
-        message: "Ocurrió un problema al intentar registrar al voluntario.",
+        message: "Ocurrió un problema al intentar registrar la entidad.",
       });
     }
   };
 
   function validateFields(data) {
     for (const key in data) {
-      if (data[key].trim() === "") {
+      if (data[key].toString().trim() === "") {
         return false;
       }
     }
@@ -92,7 +104,8 @@ function RegisterFormCreator() {
 
   return (
     <form className="register-form-volunteer" onSubmit={handleSubmit}>
-      <section className="register-form-left">
+      {/* 1️⃣ Nombre Entidad */}
+      <div className="register-form-input-container">
         <label className="register-form-label">Nombre entidad</label>
         <input
           className="register-form-input"
@@ -102,8 +115,11 @@ function RegisterFormCreator() {
           onChange={handleChange}
           placeholder="Nombre de la entidad"
         />
+      </div>
 
-        <label className="register-form-label">Tipo Entidad</label>
+      {/* 2️⃣ Tipo Entidad */}
+      <div className="register-form-input-container">
+        <label className="register-form-label">Tipo entidad</label>
         <select
           className="register-form-select"
           name="tipoEntidad"
@@ -116,7 +132,10 @@ function RegisterFormCreator() {
           <option value="PRIVADA">Privada</option>
           <option value="PUBLICA">Pública</option>
         </select>
+      </div>
 
+      {/* 3️⃣ Correo */}
+      <div className="register-form-input-container">
         <label className="register-form-label">Correo</label>
         <input
           className="register-form-input"
@@ -126,7 +145,23 @@ function RegisterFormCreator() {
           onChange={handleChange}
           placeholder="ejemplo@ejemplo.com"
         />
+      </div>
 
+      {/* 4️⃣ Teléfono */}
+      <div className="register-form-input-container">
+        <label className="register-form-label">Teléfono</label>
+        <input
+          className="register-form-input"
+          type="text"
+          name="telefono"
+          value={formData.telefono}
+          onChange={handleChange}
+          placeholder="Número de 10 dígitos"
+        />
+      </div>
+
+      {/* 5️⃣ Ciudad */}
+      <div className="register-form-input-container">
         <label className="register-form-label">Ciudad</label>
         <select
           className="register-form-select"
@@ -151,49 +186,10 @@ function RegisterFormCreator() {
           <option value="12">Valle del Guamuez</option>
           <option value="13">Villagarzón</option>
         </select>
+      </div>
 
-        <label className="register-form-label">Contraseña</label>
-        <input
-          className="register-form-input"
-          type="password"
-          name="contrasena"
-          value={formData.contrasena}
-          onChange={handleChange}
-          placeholder="Contraseña"
-        />
-      </section>
-
-      <section className="register-form-right">
-        <label className="register-form-label">Descripción</label>
-        <input
-          className="register-form-input"
-          type="text"
-          name="descripcion"
-          value={formData.descripcion}
-          onChange={handleChange}
-          placeholder="Descripción de la entidad"
-        />
-
-        <label className="register-form-label">Sitio Web</label>
-        <input
-          className="register-form-input"
-          type="text"
-          name="sitioWeb"
-          value={formData.sitioWeb}
-          onChange={handleChange}
-          placeholder="www.tusitioweb.com"
-        />
-
-        <label className="register-form-label">Teléfono</label>
-        <input
-          className="register-form-input"
-          type="text"
-          name="telefono"
-          value={formData.telefono}
-          onChange={handleChange}
-          placeholder="Número de 10 dígitos"
-        />
-
+      {/* 6️⃣ Dirección */}
+      <div className="register-form-input-container">
         <label className="register-form-label">Dirección</label>
         <input
           className="register-form-input"
@@ -203,8 +199,50 @@ function RegisterFormCreator() {
           onChange={handleChange}
           placeholder="Carrera #. No #"
         />
+      </div>
 
-        <label className="register-form-label">Confirmar Contraseña</label>
+      {/* 7️⃣ Sitio Web */}
+      <div className="register-form-input-container">
+        <label className="register-form-label">Sitio web</label>
+        <input
+          className="register-form-input"
+          type="text"
+          name="sitioWeb"
+          value={formData.sitioWeb}
+          onChange={handleChange}
+          placeholder="www.tusitioweb.com"
+        />
+      </div>
+
+      {/* 8️⃣ Descripción */}
+      <div className="register-form-input-container">
+        <label className="register-form-label">Descripción</label>
+        <input
+          className="register-form-input"
+          type="text"
+          name="descripcion"
+          value={formData.descripcion}
+          onChange={handleChange}
+          placeholder="Descripción de la entidad"
+        />
+      </div>
+
+      {/* 9️⃣ Contraseña */}
+      <div className="register-form-input-container">
+        <label className="register-form-label">Contraseña</label>
+        <input
+          className="register-form-input"
+          type="password"
+          name="contrasena"
+          value={formData.contrasena}
+          onChange={handleChange}
+          placeholder="Contraseña"
+        />
+      </div>
+
+      {/* 🔟 Confirmar Contraseña */}
+      <div className="register-form-input-container">
+        <label className="register-form-label">Confirmar contraseña</label>
         <input
           className="register-form-input"
           type="password"
@@ -213,7 +251,7 @@ function RegisterFormCreator() {
           onChange={handleChange}
           placeholder="Contraseña"
         />
-      </section>
+      </div>
 
       <button className="register-form-button" type="submit">
         Registrarse

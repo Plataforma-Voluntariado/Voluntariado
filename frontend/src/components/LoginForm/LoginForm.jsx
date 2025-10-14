@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import WrongAlert from "../../components/alerts/WrongAlert";
 import SuccessAlert from "../../components/alerts/SuccessAlert";
 import { getUserData, login } from "../../services/auth/AuthService";
+import RedirectAlert from "../alerts/RedirectAlert";
 
 function LoginForm() {
   const Navigate = useNavigate();
@@ -25,17 +26,46 @@ function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       const response = await login(formData.correo, formData.contrasena);
-      console.log(response)
-      if(response)
-      Navigate("/home")
+
+      // Si el backend devuelve un objeto con 'status' o 'message', se valida:
+      if (response?.status === 401 || response?.response?.status === 401) {
+        WrongAlert({
+          title: "Credenciales inválidas",
+          message: "El correo o la contraseña no son correctos.",
+        });
+        return;
+      }
+
+      if (response?.status >= 500 || response?.response?.status >= 500) {
+        WrongAlert({
+          title: "Error del servidor",
+          message: "Hubo un problema interno. Intenta más tarde.",
+        });
+        return;
+      }
+
+      if (!response || response?.response) {
+        WrongAlert({
+          title: "Error de conexión",
+          message: "No se pudo conectar con el servidor.",
+        });
+        return;
+      }
+      const confirmed = await RedirectAlert({
+        title: "¡Inicio de sesión exitoso!",
+        message: "Serás redirigido al inicio.",
+      });
+      if (confirmed) {
+        Navigate("/home"); // 👈 redirige solo si el usuario confirma
+      }
     } catch (error) {
-      console.error(error);
+      console.error("Error en login:", error);
       WrongAlert({
-        title: "Error de conexión",
-        message:
-          "No se pudo conectar con el servidor. Intenta de nuevo más tarde.",
+        title: "Error inesperado",
+        message: "Ocurrió un problema. Por favor, intenta de nuevo.",
       });
     }
   };
