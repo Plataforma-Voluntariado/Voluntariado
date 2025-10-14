@@ -48,7 +48,7 @@ export const login = async (correo, contrasena) => {
         });
         return response.data;
     } catch (error) {
-        throw error;
+        return error;
     }
 }
 
