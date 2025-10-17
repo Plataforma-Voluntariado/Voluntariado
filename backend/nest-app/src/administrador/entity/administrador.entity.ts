@@ -1,5 +1,6 @@
-import { Entity, PrimaryColumn, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryColumn, OneToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Usuario } from '../../usuario/entity/usuario.entity';
+import { Verificacion } from 'src/verificacion/entity/verificacion.entity';
 
 @Entity('Administrador')
 export class Administrador {
@@ -9,4 +10,8 @@ export class Administrador {
   @OneToOne(() => Usuario)
   @JoinColumn({ name: 'id_usuario' })
   usuario: Usuario;
+
+  @OneToMany(() => Verificacion, (verificacion) => verificacion.admin)
+  verificacionesRevisadas: Verificacion[];
+
 }

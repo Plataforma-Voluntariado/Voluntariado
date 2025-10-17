@@ -4,6 +4,7 @@ import { Creador } from '../../creador/entity/creador.entity';
 import { Voluntario } from '../../voluntario/entity/voluntario.entity';
 import { Administrador } from '../../administrador/entity/administrador.entity';
 import { Token } from '../../token/entity/token.entity';
+import { Verificacion } from 'src/verificacion/entity/verificacion.entity';
 
 export enum RolUsuario {
   ADMIN = 'ADMIN',
@@ -73,6 +74,9 @@ export class Usuario {
 
   @OneToMany(() => Token, (token) => token.usuario)
   tokens: Token[];
+
+  @OneToOne(() => Verificacion, (verificacion) => verificacion.usuario)
+  verificacion: Verificacion;
 
 }
 
