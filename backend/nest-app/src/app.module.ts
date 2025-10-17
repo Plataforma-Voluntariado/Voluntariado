@@ -14,6 +14,8 @@ import { AdministradorModule } from './administrador/administrador.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { TokenModule } from './token/token.module';
 import { MailModule } from './mail/mail.module';
+import { VerificacionModule } from './verificacion/verificacion.module';
+import { VerificacionArchivoModule } from './verificacion/verificacion_archivo/verificacion_archivo.module';
 
 @Module({
   imports: [
@@ -34,7 +36,7 @@ import { MailModule } from './mail/mail.module';
         synchronize: false,
         logging: false,
         migrations: [__dirname + '/database/migrations/*{.ts,.js}'],
-        migrationsRun: true, 
+        migrationsRun: false, 
       }),
       inject: [ConfigService],
     }),
@@ -48,6 +50,8 @@ import { MailModule } from './mail/mail.module';
     CloudinaryModule,
     TokenModule,
     MailModule,
+    VerificacionModule,
+    VerificacionArchivoModule,
   ],
   controllers: [AppController],
   providers: [AppService], 

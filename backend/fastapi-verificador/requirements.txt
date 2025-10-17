@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pdf2image
+pytesseract
+Pillow
+numpy
+roboflow
+python-multipart
