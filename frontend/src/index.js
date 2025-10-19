@@ -8,6 +8,7 @@ import HomePage from "./pages/HomePage/HomePage";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import RegisterPage from "./pages/RegisterPage/RegisterPage";
 import PasswordRecoveryPage from "./pages/PasswordRecoveryPage/PasswordRecoveryPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage/ResetPasswordPage";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -25,7 +26,8 @@ root.render(
 
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
-        <Route path="recover" element={<PasswordRecoveryPage />} />
+        <Route path="recuperar-contrasena" element={<PasswordRecoveryPage />} />
+        <Route path="reset-password" element={<ResetPasswordPage />} />
 
         <Route path="*" element={<LoginPage />} />
       </Routes>
