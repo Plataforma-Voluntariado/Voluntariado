@@ -90,8 +90,33 @@
   box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
 }
 
+
+.login-form-recovery-link {
+  margin-top: 0rem;
+  width: 100%;
+  text-align: center;
+}
+
+.login-form-recovery-link p {
+  font-size: 0.9rem;
+  color: #4a4a4a;
+}
+
+.login-form-recovery-link a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all var(--transition);
+}
+
+.login-form-recovery-link a:hover {
+  text-decoration: underline;
+  color: #0051d5;
+}
+
+
 .login-form-no-account {
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   font-size: 0.9rem;
   width: 100%;
   text-align: center;

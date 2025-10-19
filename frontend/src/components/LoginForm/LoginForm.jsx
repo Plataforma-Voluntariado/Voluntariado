@@ -94,9 +94,15 @@ function LoginForm() {
         placeholder="Contraseña"
       />
 
+      <div className="login-form-recovery-link">
+        <p>¿Olvidaste tu contraseña? <a href="/recuperar-contrasena">Recupérala aquí</a></p>
+      </div>
+      
       <button className="login-form-button" type="submit">
         Iniciar Sesión
       </button>
+
+
 
       <p className="login-form-no-account">
         ¿No tienes una cuenta?{" "}
