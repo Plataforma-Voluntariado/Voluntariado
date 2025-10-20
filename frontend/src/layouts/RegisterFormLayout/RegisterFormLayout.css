@@ -70,7 +70,12 @@
   width: 48%;
   display: flex;
   flex-wrap: wrap;
+}
 
+.register-form-text-area-container{
+  width: 98%;
+  display: flex;
+  flex-wrap: wrap;
 }
 .register-form-label {
   width: 100%;
@@ -106,6 +111,20 @@
   box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
   transform: translateY(-1px);
 }
+.register-form-text-area{
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-medium);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  outline: none;
+  transition: all var(--transition);
+  margin-top: 0.4rem;
+}
 .register-form-select {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -118,13 +137,12 @@
   color: #1a1a1a;
   outline: none;
   transition: all var(--transition);
-  padding: 10px 2.5rem 10px 1rem;
+
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
   cursor: pointer;
-
-  /* Flecha personalizada (azul tipo iOS) */
+ margin-top: 0.4rem;
   background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23007AFF' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 1rem center;
@@ -164,6 +182,7 @@
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
+  margin-top: 0.5rem;
   box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
   transition: all var(--transition);
 }
@@ -199,20 +218,11 @@
   text-decoration: underline;
 }
 
-.register-form-left {
-  width: 49%;
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.register-form-right {
-  width: 49%;
-  display: flex;
-  flex-wrap: wrap;
-}
-
 @media screen and (max-width: 880px) {
   .register-form-input-container{
+    width: 100%;
+  }
+    .register-form-text-area-container{
     width: 100%;
   }
 }
