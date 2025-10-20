@@ -42,22 +42,29 @@
   color: var(--color-primary-dark, #1a1a1a);
   transition: color 0.3s ease, transform 0.2s ease;
 }
-
+.navigation-bar-notifications-button {
+  font-size: 2rem;
+  color: var(--color-primary);
+}
 .navigation-bar-list-item:hover {
   color: var(--color-accent, #007bff);
   transform: translateY(-2px);
 }
 
-.create-event-button{
-    border-radius: var(--radius-small);
-    background: var(--color-primary);
-    color: white;
-    padding: 1rem 1.5rem;
+.navigation-bar-create-event-button {
+  border-radius: var(--radius-small);
+  background: var(--color-primary);
+  color: white;
+  padding: 1rem 1.5rem;
 }
-
-.create-event-button:hover{
-
-    color: rgb(215, 215, 215);
+.navigation-bar-user-photo {
+  height: 50px;
+  border-radius: 50%;
+  border: 3px solid var(--color-primary);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+.create-event-button:hover {
+  color: rgb(215, 215, 215);
 }
 
 @media screen and (max-width: 900px) {
