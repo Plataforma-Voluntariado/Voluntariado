@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./RegisterFormCreator.css";
 import WrongAlert from "../alerts/WrongAlert.jsx";
 import { ValidatePasswordFormat } from "../../services/validators/ValidatePasswordFormat.jsx";
 import SuccessAlert from "../alerts/SuccessAlert.jsx";
 import { register } from "../../services/auth/AuthService.jsx";
 import { useNavigate } from "react-router";
+import { GetDepartments } from "../../services/DepartmentService.jsx";
+import { GetCities } from "../../services/CityService.jsx";
 
 function RegisterFormCreator() {
   const navigate = useNavigate();
@@ -22,12 +24,48 @@ function RegisterFormCreator() {
     confirmarContrasena: "",
   });
 
+  const [departments, setDepartments] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const data = await GetDepartments();
+        setDepartments(data.data);
+      } catch (error) {
+        console.error("Error al obtener departamentos:", error);
+      }
+    };
+    fetchDepartments();
+  }, []);
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      if (!selectedDepartment) return;
+      try {
+        const data = await GetCities(selectedDepartment);
+        setCities(data.data);
+      } catch (error) {
+        console.error("Error al obtener ciudades:", error);
+      }
+    };
+    fetchCities();
+  }, [selectedDepartment]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value,
     });
+  };
+
+  const handleDepartmentChange = (e) => {
+    const deptId = e.target.value;
+    setSelectedDepartment(deptId);
+    setCities([]);
+    setFormData({ ...formData, idCiudad: "" });
   };
 
   const handleSubmit = async (e) => {
@@ -104,7 +142,6 @@ function RegisterFormCreator() {
 
   return (
     <form className="register-form-volunteer" onSubmit={handleSubmit}>
-      {/* 1️⃣ Nombre Entidad */}
       <div className="register-form-input-container">
         <label className="register-form-label">Nombre entidad</label>
         <input
@@ -117,7 +154,6 @@ function RegisterFormCreator() {
         />
       </div>
 
-      {/* 2️⃣ Tipo Entidad */}
       <div className="register-form-input-container">
         <label className="register-form-label">Tipo entidad</label>
         <select
@@ -134,7 +170,17 @@ function RegisterFormCreator() {
         </select>
       </div>
 
-      {/* 3️⃣ Correo */}
+      <div className="register-form-text-area-container">
+        <label className="register-form-label">Descripción</label>
+        <textarea
+          className="register-form-text-area"
+          name="descripcion"
+          value={formData.descripcion}
+          onChange={handleChange}
+          placeholder="Descripción de la entidad"
+        />
+      </div>
+
       <div className="register-form-input-container">
         <label className="register-form-label">Correo</label>
         <input
@@ -147,7 +193,6 @@ function RegisterFormCreator() {
         />
       </div>
 
-      {/* 4️⃣ Teléfono */}
       <div className="register-form-input-container">
         <label className="register-form-label">Teléfono</label>
         <input
@@ -159,8 +204,24 @@ function RegisterFormCreator() {
           placeholder="Número de 10 dígitos"
         />
       </div>
-
-      {/* 5️⃣ Ciudad */}
+      <div className="register-form-input-container">
+        <label className="register-form-label">Departamento</label>
+        <select
+          className="register-form-select"
+          name="departamento"
+          value={selectedDepartment}
+          onChange={handleDepartmentChange}
+        >
+          <option value="" disabled hidden>
+            Departamento de ubicación
+          </option>
+          {departments.map((dep) => (
+            <option key={dep.id_departamento} value={dep.id_departamento}>
+              {dep.departamento}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="register-form-input-container">
         <label className="register-form-label">Ciudad</label>
         <select
@@ -168,27 +229,21 @@ function RegisterFormCreator() {
           name="idCiudad"
           value={formData.idCiudad}
           onChange={handleChange}
+          disabled={!selectedDepartment}
         >
           <option value="" disabled hidden>
-            Ciudad de ubicación
+            {selectedDepartment
+              ? "Ciudad de ubicación"
+              : "Seleccione un departamento"}
           </option>
-          <option value="1">Mocoa</option>
-          <option value="2">Colón</option>
-          <option value="3">Orito</option>
-          <option value="4">Puerto Asís</option>
-          <option value="5">Puerto Caicedo</option>
-          <option value="6">Puerto Guzmán</option>
-          <option value="7">Puerto Leguízamo</option>
-          <option value="8">San Francisco</option>
-          <option value="9">San Miguel</option>
-          <option value="10">Santiago</option>
-          <option value="11">Sibundoy</option>
-          <option value="12">Valle del Guamuez</option>
-          <option value="13">Villagarzón</option>
+          {cities.map((city) => (
+            <option key={city.id_ciudad} value={city.id_ciudad}>
+              {city.ciudad}
+            </option>
+          ))}
         </select>
       </div>
 
-      {/* 6️⃣ Dirección */}
       <div className="register-form-input-container">
         <label className="register-form-label">Dirección</label>
         <input
@@ -201,7 +256,6 @@ function RegisterFormCreator() {
         />
       </div>
 
-      {/* 7️⃣ Sitio Web */}
       <div className="register-form-input-container">
         <label className="register-form-label">Sitio web</label>
         <input
@@ -214,20 +268,6 @@ function RegisterFormCreator() {
         />
       </div>
 
-      {/* 8️⃣ Descripción */}
-      <div className="register-form-input-container">
-        <label className="register-form-label">Descripción</label>
-        <input
-          className="register-form-input"
-          type="text"
-          name="descripcion"
-          value={formData.descripcion}
-          onChange={handleChange}
-          placeholder="Descripción de la entidad"
-        />
-      </div>
-
-      {/* 9️⃣ Contraseña */}
       <div className="register-form-input-container">
         <label className="register-form-label">Contraseña</label>
         <input
@@ -240,7 +280,6 @@ function RegisterFormCreator() {
         />
       </div>
 
-      {/* 🔟 Confirmar Contraseña */}
       <div className="register-form-input-container">
         <label className="register-form-label">Confirmar contraseña</label>
         <input

@@ -2,10 +2,8 @@ import React, { useState } from "react";
 import "./LoginForm.css";
 import VoluntariadoLogo from "../../assets/photos/logo.png";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
 import WrongAlert from "../../components/alerts/WrongAlert";
-import SuccessAlert from "../../components/alerts/SuccessAlert";
-import { getUserData, login } from "../../services/auth/AuthService";
+import { login } from "../../services/auth/AuthService";
 import RedirectAlert from "../alerts/RedirectAlert";
 
 function LoginForm() {
@@ -59,7 +57,7 @@ function LoginForm() {
         message: "Serás redirigido al inicio.",
       });
       if (confirmed) {
-        Navigate("/home"); // 👈 redirige solo si el usuario confirma
+        Navigate("/home");
       }
     } catch (error) {
       console.error("Error en login:", error);
@@ -93,16 +91,13 @@ function LoginForm() {
         onChange={handleChange}
         placeholder="Contraseña"
       />
-
       <div className="login-form-recovery-link">
-        <p>¿Olvidaste tu contraseña? <a href="/recuperar-contrasena">Recupérala aquí</a></p>
+        {" "}
+        <a href="/recuperar-contrasena">¿Olvidaste tu contraseña?</a>
       </div>
-      
       <button className="login-form-button" type="submit">
         Iniciar Sesión
       </button>
-
-
 
       <p className="login-form-no-account">
         ¿No tienes una cuenta?{" "}

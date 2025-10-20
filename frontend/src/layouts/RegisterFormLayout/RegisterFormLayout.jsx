@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./RegisterFormLayout.css";
 import VoluntariadoLogo from "../../assets/photos/logo.png";
 import RegisterFormVolunteer from "../../components/RegisterFormVolunteer/RegisterFormVolunteer";

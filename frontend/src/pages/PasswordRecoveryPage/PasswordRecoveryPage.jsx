@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import WrongAlert from "../../components/alerts/WrongAlert";
 import SuccessAlert from "../../components/alerts/SuccessAlert";
 import { requestPasswordRecovery } from "../../services/auth/authPasswordRecovery";
+import VoluntariadoLogo from "../../assets/photos/logo.png";
 
 function PasswordRecoveryPage() {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ function PasswordRecoveryPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!email) {
       WrongAlert({
         title: "Campo requerido",
@@ -31,14 +32,15 @@ function PasswordRecoveryPage() {
       if (response.status === 200) {
         SuccessAlert({
           title: "Correo enviado",
-          message: "Se ha enviado un enlace de recuperación a tu correo electrónico",
+          message:
+            "Se ha enviado un enlace de recuperación a tu correo electrónico",
         }).then(() => {
           navigate("/login");
         });
       }
     } catch (error) {
       console.error("Error al solicitar recuperación:", error);
-      
+
       if (error.response?.status === 404) {
         WrongAlert({
           title: "Correo no encontrado",
@@ -47,7 +49,8 @@ function PasswordRecoveryPage() {
       } else {
         WrongAlert({
           title: "Error",
-          message: "Ocurrió un problema al procesar tu solicitud. Intenta nuevamente más tarde.",
+          message:
+            "Ocurrió un problema al procesar tu solicitud. Intenta nuevamente más tarde.",
         });
       }
     } finally {
@@ -67,11 +70,14 @@ function PasswordRecoveryPage() {
       <div className="password-recovery-form">
         <h1 className="password-recovery-form-title">Recuperar Contraseña</h1>
         <p className="password-recovery-form-description">
-          Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
+          Ingresa tu correo electrónico y te enviaremos un enlace para
+          restablecer tu contraseña.
         </p>
 
         <form onSubmit={handleSubmit}>
-          <label className="password-recovery-form-label">Correo Electrónico</label>
+          <label className="password-recovery-form-label">
+            Correo Electrónico
+          </label>
           <input
             className="password-recovery-form-input"
             type="email"
@@ -81,8 +87,8 @@ function PasswordRecoveryPage() {
             required
           />
 
-          <button 
-            className="password-recovery-form-button" 
+          <button
+            className="password-recovery-form-button"
             type="submit"
             disabled={loading}
           >
@@ -94,6 +100,11 @@ function PasswordRecoveryPage() {
               <a href="/login">Volver al inicio de sesión</a>
             </p>
           </div>
+          <img
+            className="login-form-logo-img"
+            src={VoluntariadoLogo}
+            alt="Voluntariado Logo"
+          />
         </form>
       </div>
     </section>

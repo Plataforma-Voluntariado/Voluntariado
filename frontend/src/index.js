@@ -9,6 +9,7 @@ import LoginPage from "./pages/LoginPage/LoginPage";
 import RegisterPage from "./pages/RegisterPage/RegisterPage";
 import PasswordRecoveryPage from "./pages/PasswordRecoveryPage/PasswordRecoveryPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage/ResetPasswordPage";
+import ProfilePage from "./pages/ProfilePage/ProfilePage";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -23,7 +24,14 @@ root.render(
             </ProtectedRoute>
           }
         />
-
+        <Route
+          path="profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="recuperar-contrasena" element={<PasswordRecoveryPage />} />
