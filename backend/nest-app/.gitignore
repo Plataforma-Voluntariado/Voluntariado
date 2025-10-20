@@ -2,6 +2,9 @@
 /dist
 /node_modules
 /build
+/uploads/
+__pycache__/
+
 
 # Logs
 logs

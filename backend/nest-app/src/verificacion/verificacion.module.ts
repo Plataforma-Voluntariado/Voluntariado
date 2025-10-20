@@ -3,15 +3,16 @@ import { VerificacionController } from './verificacion.controller';
 import { VerificacionService } from './verificacion.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Usuario } from 'src/usuario/entity/usuario.entity';
-import { VerificacionArchivoModule } from 'src/verificacion/verificacion_archivo/verificacion_archivo.module';
 import { Verificacion } from './entity/verificacion.entity';
+import { VerificacionArchivo } from './verificacion_archivo/entity/verificacion-archivo.entity';
+import { Creador } from 'src/creador/entity/creador.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Usuario,Verificacion]),
-    VerificacionArchivoModule
+    TypeOrmModule.forFeature([Usuario,Verificacion,VerificacionArchivo]),
   ],
   controllers: [VerificacionController],
-  providers: [VerificacionService]
+  providers: [VerificacionService],
+  exports:[VerificacionService]
 })
 export class VerificacionModule { }
