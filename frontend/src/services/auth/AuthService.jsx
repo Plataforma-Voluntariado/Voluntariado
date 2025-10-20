@@ -34,6 +34,7 @@ export const register = async(data) => {
 export const logout = async () => {
   try {
     const response = await api.post("/auth/logout");
+    console.log(response)
     return response.status === 200;
   } catch (error) {
     console.error("Error cerrando sesión:", error);
