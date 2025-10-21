@@ -7,12 +7,14 @@ import { mensajesPorTipo } from './mensajes.util';
 
 export async function validarSubidaArchivo(archivoRepo: Repository<VerificacionArchivo>, usuario: Usuario, verificacion: Verificacion, tipoDocumento: TipoDocumento,): Promise<void> {
 
-    // Validaciones por rol
-    if (usuario.rol === RolUsuario.VOLUNTARIO) {
-        if (tipoDocumento !== TipoDocumento.CEDULA) {
-            throw new BadRequestException('Solo puedes subir un archivo de tipo cédula.');
-        }
+    // Validaciones por rol (aplican siempre)
+    if (usuario.rol === RolUsuario.VOLUNTARIO && tipoDocumento !== TipoDocumento.CEDULA) {
+        throw new BadRequestException('Solo puedes subir un archivo de tipo cédula.');
     }
+
+    // Si la verificación aún no existe en BD (verificación temporal)
+    if (!verificacion.idVerificacion) return;
+
 
     if (usuario.rol === RolUsuario.CREADOR) {
         const activos = await archivoRepo.count({
@@ -28,7 +30,7 @@ export async function validarSubidaArchivo(archivoRepo: Repository<VerificacionA
             );
         }
     }
-    
+
     //Buscar si ya existe un archivo del mismo tipo activo (pendiente o aprobado)
     const existente = await archivoRepo.findOne({
         where: [
@@ -46,6 +48,8 @@ export async function validarSubidaArchivo(archivoRepo: Repository<VerificacionA
     });
 
     const texto = mensajesPorTipo[tipoDocumento] ?? 'del documento';
+
+    console.log("esto es la respuesta", existente)
 
     if (existente) {
         if (existente.estado === EstadoArchivo.APROBADO) {
