@@ -23,11 +23,15 @@ export const AuthProvider = ({ children }) => {
             userId: profile.id_usuario,
             nombreCompleto: `${profile.nombre} ${profile.apellido}`,
             email: profile.correo,
+            correo: profile.correo,
             rol: profile.rol,
             verificado: profile.verificado,
+            correo_verificado: profile.correo_verificado,
             urlImage: profile.url_imagen,
             ciudad: profile.ciudad?.ciudad,
             departamento: profile.ciudad?.departamento?.departamento,
+            telefono: profile.telefono,
+            fecha_nacimiento: profile.fecha_nacimiento,
           });
         } else {
           setUser(null);

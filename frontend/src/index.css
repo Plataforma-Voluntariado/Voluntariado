@@ -38,11 +38,47 @@ body {
   background-color: var(--color-bg);
   color: var(--color-text);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
-  width: 100vw;
-  display: flex;
+  width: 100%;
   margin: 0;
   padding: 0;
+  overflow-x: hidden; /* Eliminar scroll horizontal */
   transition: background-color var(--transition), color var(--transition);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Estilos personalizados para SweetAlert2 */
+.swal2-popup-custom {
+  border-radius: var(--radius-large) !important;
+  padding: 2rem !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+}
+
+.swal2-title-custom {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: var(--color-text) !important;
+  margin-bottom: 1rem !important;
+}
+
+.swal2-content-custom {
+  font-size: 1rem !important;
+  color: #4a4a4a !important;
+  line-height: 1.5 !important;
+}
+
+.swal2-confirm-custom {
+  background-color: var(--color-success) !important;
+  border: none !important;
+  border-radius: var(--radius-medium) !important;
+  padding: 0.75rem 2rem !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  transition: all var(--transition) !important;
+}
+
+.swal2-confirm-custom:hover {
+  background-color: #2d8f47 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3) !important;
 }
 

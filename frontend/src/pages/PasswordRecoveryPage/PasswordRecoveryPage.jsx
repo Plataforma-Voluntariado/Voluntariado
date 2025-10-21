@@ -4,7 +4,7 @@ import ImgHandsBackground from "../../assets/photos/manos-voluntariado-bg.jpg";
 import { useNavigate } from "react-router-dom";
 import WrongAlert from "../../components/alerts/WrongAlert";
 import SuccessAlert from "../../components/alerts/SuccessAlert";
-import { requestPasswordRecovery } from "../../services/auth/authPasswordRecovery";
+import { requestPasswordRecovery } from "../../services/auth/authPasswordRecoveryService";
 import VoluntariadoLogo from "../../assets/photos/logo.png";
 
 function PasswordRecoveryPage() {
@@ -28,14 +28,26 @@ function PasswordRecoveryPage() {
     try {
       // Usar el servicio de recuperación de contraseña
       const response = await requestPasswordRecovery(email);
+      console.log("Respuesta del servidor:", response);
 
-      if (response.status === 200) {
+      // Mostrar alerta de éxito si la petición fue exitosa (cualquier status 2xx)
+      if (response.status >= 200 && response.status < 300) {
+        console.log("Mostrando alerta de éxito");
+        
+        // Solo usar SweetAlert2
         SuccessAlert({
-          title: "Correo enviado",
+          title: "¡Enlace enviado exitosamente!",
           message:
-            "Se ha enviado un enlace de recuperación a tu correo electrónico",
+            "Se ha enviado un enlace de recuperación a tu correo electrónico. Revisa tu bandeja de entrada y sigue las instrucciones para restablecer tu contraseña.",
         }).then(() => {
+          console.log("SweetAlert completado, navegando al login");
           navigate("/login");
+        });
+      } else {
+        console.log("Status no exitoso:", response.status);
+        WrongAlert({
+          title: "Error",
+          message: "No se pudo enviar el correo. Intenta nuevamente más tarde.",
         });
       }
     } catch (error) {

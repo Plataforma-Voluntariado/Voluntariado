@@ -10,6 +10,7 @@ import RegisterPage from "./pages/RegisterPage/RegisterPage";
 import PasswordRecoveryPage from "./pages/PasswordRecoveryPage/PasswordRecoveryPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage/ResetPasswordPage";
 import ProfilePage from "./pages/ProfilePage/ProfilePage";
+import EmailVerificationPage from "./pages/EmailVerificationPage/EmailVerificationPage";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -29,6 +30,14 @@ root.render(
           element={
             <ProtectedRoute>
               <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="verificar-correo"
+          element={
+            <ProtectedRoute>
+              <EmailVerificationPage />
             </ProtectedRoute>
           }
         />

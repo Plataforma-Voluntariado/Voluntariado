@@ -1,0 +1,97 @@
+.profile-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+}
+
+.profile-info-item {
+  flex: 1;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-info-item h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.profile-info-item p {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.email-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.verification-badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  align-self: flex-start;
+}
+
+.verification-badge.verified {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.verification-badge.not-verified {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.verification-badge.not-verified:hover {
+  background-color: #ffeaa7;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.verification-badge.not-verified:active {
+  transform: translateY(0);
+}
+
+/* Tarjeta centrada para fecha de nacimiento */
+.profile-info-item-centered {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .profile-info {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .profile-info-item {
+    padding: 1rem;
+  }
+
+  .profile-info-item-centered {
+    max-width: 100%;
+  }
+}
