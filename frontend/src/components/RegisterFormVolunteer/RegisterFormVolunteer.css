@@ -5,3 +5,38 @@
     justify-content: center;
     gap: 1rem;
 }
+.register-form-volunteer {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* Contenedor específico para los selects de react-select */
+.register-form-select-container {
+  width: 48%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.register-form-select-container .register-form-label {
+  width: 100%;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #2a2a2a;
+  margin-bottom: 0.4rem;
+}
+
+/* Estilos para react-select */
+.register-form-react-select {
+  width: 100% !important;
+}
+
+@media screen and (max-width: 880px) {
+  .register-form-input-container,
+  .register-form-select-container,
+  .register-form-text-area-container {
+    width: 100%;
+  }
+}

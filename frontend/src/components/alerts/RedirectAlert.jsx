@@ -1,23 +1,27 @@
 import Swal from "sweetalert2";
 
-const RedirectAlert = async ({
-  title = "¡Éxito!",
-  message = "Redirigiéndote correctamente",
-}) => {
-  const result = await Swal.fire({
-    icon: "success",
+const RedirectAlert = async (props) => {
+  const {
+    title = "¡Éxito!",
+    message = "Redirigiéndote correctamente",
+    timer = 2000,
+    position = "top-end",
+    icon = "success",
+  } = props;
+
+  await Swal.fire({
+    toast: true,
+    position,
+    icon,
     title,
     text: message,
-    confirmButtonColor: "#28a745",
-    confirmButtonText: "Aceptar",
+    showConfirmButton: false,
+    timer,
+    timerProgressBar: true,
   });
 
-  if (result.isConfirmed) {
-    return true;
-  }
-
-  return false;
+  // Retorna true después de que desaparece
+  return true;
 };
 
 export default RedirectAlert;
-

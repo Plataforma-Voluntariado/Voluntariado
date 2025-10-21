@@ -8,45 +8,40 @@ import ConfirmAlert from "../alerts/ConfirmAlert";
 import { useNavigate } from "react-router-dom";
 
 function ProfileLogout() {
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
 
-  async function handleLogout() {
-    const confirmLogout = await ConfirmAlert({
+  const handleLogout = async () => {
+    // Confirmación
+    const confirm = await ConfirmAlert({
       title: "¿Estás seguro de cerrar sesión?",
       message: "",
       confirmText: "Sí, confirmar",
       cancelText: "No, cancelar",
     });
 
-    if (!confirmLogout) return;
+    if (!confirm) return;
 
     try {
-      const response = await logout();
+      const success = await logout();
 
-      document.cookie =
-        "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax;";
+      await RedirectAlert({
+        title: success ? "Has cerrado sesión" : "Error al cerrar sesión",
+        message: success
+          ? "Esperamos que vuelvas pronto"
+          : "No se pudo finalizar tu sesión correctamente",
+        position: "top-end",
+        timer: 1500,
+      });
 
-      if (response) {
-        const confirmed = await RedirectAlert({
-          title: "Has cerrado sesión",
-          message: "Esperamos que vuelvas pronto",
-        });
-
-        if (confirmed) Navigate("/login");
-      } else {
-        WrongAlert({
-          title: "Error al cerrar sesión",
-          message: "No se pudo finalizar tu sesión correctamente.",
-        });
-      }
-    } catch (error) {
-      console.error("Error en handleLogout:", error);
-      WrongAlert({
+      navigate("/login");
+    } catch (err) {
+      console.error("Error en handleLogout:", err);
+      await WrongAlert({
         title: "Error inesperado",
         message: "Ocurrió un problema al cerrar sesión.",
       });
     }
-  }
+  };
 
   return (
     <div className="profile-logout">

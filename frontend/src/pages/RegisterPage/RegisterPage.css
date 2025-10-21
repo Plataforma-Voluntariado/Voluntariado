@@ -1,25 +1,32 @@
 .register-page {
   position: relative;
-  width: 100vw;
-  min-height: 100vh; /* usa min-height para permitir crecimiento con zoom */
-  overflow-y: auto; /* permite scroll vertical si el contenido se sale */
+  width: 100%;
+  min-height: 100vh; 
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow-x: hidden;       
+  overflow-y: hidden;      
+  padding: 0 1rem;          
+  box-sizing: border-box;
 }
 
-/* Fondo aislado, con overflow controlado */
-.register-page::before {
-  content: "";
-  position: fixed; /* se mantiene fijo, cubriendo todo el viewport */
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-image: url("../../assets/photos/manos-voluntariado-bg.jpg"); /* ajusta la ruta */
-  background-size: cover;
-  background-position: center;
-  filter: brightness(0.7);
-  z-index: -1;
-  overflow: hidden;
+.register-page-image-wrapper {
+  position: fixed;           
+  inset: 0;                  
+  z-index: -2;              
+  pointer-events: none;      
 }
+
+.register-page-background-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: brightness(0.7);
+}
+
+
+
+
+
