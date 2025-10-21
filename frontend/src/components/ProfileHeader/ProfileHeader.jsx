@@ -2,6 +2,9 @@ import React from "react";
 import "./ProfileHeader.css";
 
 function ProfileHeader({ user }) {
+  // Verificamos si el campo verificado es 1 (verificado) o 0 (no verificado)
+  const isVerified = user.verificado === 1 || user.verificado === "1" || user.verificado === true;
+  
   return (
     <header className="profile-header">
       <img
@@ -13,8 +16,8 @@ function ProfileHeader({ user }) {
       <p className="profile-role">
         {user.rol.charAt(0).toUpperCase() + user.rol.slice(1).toLowerCase()}
       </p>
-      <p className={`profile-status ${user.verificado ? "verified" : "unverified"}`}>
-        {user.verificado ? "Cuenta verificada" : "Cuenta no verificada"}
+      <p className={`profile-status ${isVerified ? "verified" : "unverified"}`}>
+        {isVerified ? "Cuenta verificada" : "Cuenta no verificada"}
       </p>
     </header>
   );

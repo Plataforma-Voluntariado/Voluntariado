@@ -4,7 +4,7 @@ import ImgHandsBackground from "../../assets/photos/manos-voluntariado-bg.jpg";
 import { useNavigate, useLocation } from "react-router-dom";
 import WrongAlert from "../../components/alerts/WrongAlert";
 import SuccessAlert from "../../components/alerts/SuccessAlert";
-import { resetPassword } from "../../services/auth/authResetPassword";
+import { resetPassword } from "../../services/auth/authResetPasswordService";
 
 function ResetPasswordPage() {
   const [code, setCode] = useState("");

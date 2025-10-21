@@ -15,19 +15,30 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      const profile = await getUserData();
-      if (profile) {
-        setUser({
-          userId: profile.id_usuario,
-          nombreCompleto: `${profile.nombre} ${profile.apellido}`,
-          email: profile.correo,
-          rol: profile.rol,
-          verificado: profile.verificado,
-          urlImage: profile.url_imagen,
-          ciudad: profile.ciudad?.ciudad,
-          departamento: profile.ciudad?.departamento?.departamento,
-        });
-      } else {
+
+      try {
+        const profile = await getUserData();
+        if (profile) {
+          setUser({
+            userId: profile.id_usuario,
+            nombreCompleto: `${profile.nombre} ${profile.apellido}`,
+            email: profile.correo,
+            correo: profile.correo,
+            rol: profile.rol,
+            verificado: profile.verificado,
+            correo_verificado: profile.correo_verificado,
+            urlImage: profile.url_imagen,
+            ciudad: profile.ciudad?.ciudad,
+            departamento: profile.ciudad?.departamento?.departamento,
+            telefono: profile.telefono,
+            fecha_nacimiento: profile.fecha_nacimiento,
+          });
+        } else {
+          setUser(null);
+        }
+      } catch (err) {
+        console.error("Error al obtener el perfil del usuario:", err);
+
         setUser(null);
       }
       setLoading(false);

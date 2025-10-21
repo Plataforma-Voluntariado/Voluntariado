@@ -10,11 +10,13 @@ import LoginPage from "./pages/LoginPage/LoginPage";
 import RegisterPage from "./pages/RegisterPage/RegisterPage";
 import PasswordRecoveryPage from "./pages/PasswordRecoveryPage/PasswordRecoveryPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage/ResetPasswordPage";
+import EmailVerificationPage from "./pages/EmailVerificationPage/EmailVerificationPage";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <BrowserRouter>
+
     <Routes>
       <Route
         element={
