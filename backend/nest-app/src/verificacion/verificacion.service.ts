@@ -5,7 +5,7 @@ import { Verificacion, EstadoVerificacion } from './entity/verificacion.entity';
 import { VerificacionArchivo, EstadoArchivo, TipoDocumento } from './verificacion_archivo/entity/verificacion-archivo.entity';
 import { Usuario, RolUsuario } from 'src/usuario/entity/usuario.entity';
 import { Administrador } from 'src/administrador/entity/administrador.entity';
-import { Creador } from 'src/creador/entity/creador.entity';
+import { Creador } from '../creador/entity/creador.entity'; // 👈 Importación añadida
 
 @Injectable()
 export class VerificacionService {
@@ -16,6 +16,8 @@ export class VerificacionService {
         private readonly archivoRepo: Repository<VerificacionArchivo>,
         @InjectRepository(Usuario)
         private readonly usuarioRepository: Repository<Usuario>,
+        @InjectRepository(Creador)
+        private readonly creadorRepo: Repository<Creador>, // 👈 Nuevo repositorio
     ) { }
 
     async validarVerificacionCompleta(usuario: Usuario, admin: Administrador): Promise<Verificacion> {
@@ -78,6 +80,81 @@ export class VerificacionService {
             default:
                 return [];
         }
+    }
+    // 🟢 1️⃣ Obtener lista de verificaciones pendientes
+    async obtenerVerificacionesPendientes() {
+        const verificaciones = await this.verificacionRepo.find({
+            where: { estado: EstadoVerificacion.PENDIENTE },
+            relations: ['usuario'],
+            select: {
+                idVerificacion: true,
+                usuario: {
+                    id_usuario: true,
+                    nombre: true,
+                    apellido: true,
+                },
+            },
+        });
+
+        if (!verificaciones.length) {
+            throw new NotFoundException('No hay verificaciones pendientes.');
+        }
+
+        // 🔄 Mapeo con verificación de si es creador
+        const resultados = await Promise.all(
+            verificaciones.map(async (v) => {
+                const creador = await this.creadorRepo.findOne({
+                    where: { id_usuario: v.usuario.id_usuario },
+                    select: ['nombre_entidad'],
+                });
+
+                return {
+                    idVerificacion: v.idVerificacion,
+                    nombre:
+                        creador?.nombre_entidad ??
+                        `${v.usuario?.nombre ?? 'Sin nombre'} ${v.usuario?.apellido ?? ''}`.trim(),
+                };
+            }),
+        );
+
+        return resultados
+
+            ;
+    }
+
+    // 🟢 2️⃣ Obtener el último archivo por tipo de documento dentro de una verificación
+    async obtenerArchivosPendientesPorVerificacion(idVerificacion: number) {
+        // Traemos todos los archivos de esa verificación
+        const archivos = await this.archivoRepo.find({
+            where: {
+                verificacion: { idVerificacion },
+            },
+            select: [
+                'idVerificacionArchivo',
+                'tipoDocumento',
+                'estado',
+                'rutaArchivo',
+            ],
+            order: {
+                idVerificacionArchivo: 'DESC', // 🔹 Ordenamos de más reciente a más antiguo
+            },
+        });
+
+        if (!archivos.length) {
+            throw new NotFoundException('No hay archivos para esta verificación.');
+        }
+
+        // 🔹 Usamos un mapa para quedarnos solo con el último archivo de cada tipoDocumento
+        const ultimosPorTipo = new Map<string, typeof archivos[0]>();
+
+        for (const archivo of archivos) {
+            if (!ultimosPorTipo.has(archivo.tipoDocumento)) {
+                ultimosPorTipo.set(archivo.tipoDocumento, archivo);
+            }
+        }
+
+        // 🔹 Devolvemos solo los más recientes por tipo
+        return Array.from(ultimosPorTipo.values());
     }
 
 }
