@@ -1,6 +1,9 @@
+/* ===========================
+   Login Form Base Styles
+=========================== */
 .login-form {
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
   display: flex;
   flex-wrap: wrap;
   gap: 0.6rem;
@@ -12,6 +15,8 @@
   border-radius: var(--radius-large);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
   transition: all var(--transition);
+  margin: 1rem auto;
+  box-sizing: border-box;
 }
 
 .login-form-title {
@@ -26,6 +31,7 @@
 
 .login-form-logo-img {
   width: 300px;
+  max-width: 80%;
   height: auto;
   margin: 0 auto 1.5rem auto;
   display: block;
@@ -74,7 +80,6 @@
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  /* Sombra más suave y difusa */
   box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
   transition: all var(--transition);
 }
@@ -90,17 +95,13 @@
   box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
 }
 
-
 .login-form-recovery-link {
-  margin-top: 0.5rem;
+  margin-top: 0.2rem;
   width: 100%;
-  text-align: center;
-
 }
 
-
 .login-form-recovery-link a {
-  font-size: 0.9rem;
+  font-size: 0.78rem;
   color: var(--color-primary);
   text-decoration: none;
   font-weight: 500;
@@ -111,7 +112,6 @@
   text-decoration: underline;
   color: #0051d5;
 }
-
 
 .login-form-no-account {
   margin-top: 1rem;
@@ -132,4 +132,58 @@
 .login-form-no-account-link:hover {
   color: #0051d5;
   text-decoration: underline;
+}
+
+
+@media screen and (max-width: 600px) {
+  .login-form {
+    padding: 1.5rem 1.5rem;
+    max-width: 85%;
+  }
+
+  .login-form-title {
+    font-size: 1.6rem;
+  }
+
+  .login-form-label {
+    font-size: 0.85rem;
+  }
+
+  .login-form-input {
+    font-size: 0.9rem;
+    padding: 0.65rem 0.85rem;
+  }
+
+  .login-form-button {
+    font-size: 0.95rem;
+    padding: 0.75rem 0.85rem;
+  }
+
+  .login-form-logo-img {
+    width: 90%;
+    max-width: 250px;
+  }
+
+  .login-form-recovery-link a,
+  .login-form-no-account-link {
+    font-size: 0.75rem;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .login-form-title {
+    font-size: 1.4rem;
+  }
+
+  .login-form-input {
+    font-size: 0.85rem;
+  }
+
+  .login-form-button {
+    font-size: 0.9rem;
+  }
+
+  .login-form-logo-img {
+    max-width: 200px;
+  }
 }
