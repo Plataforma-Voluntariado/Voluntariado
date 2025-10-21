@@ -12,6 +12,7 @@
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
 .profile-info-item h4 {
@@ -80,6 +81,22 @@
   margin: 0 auto;
 }
 
+/* Estilos para los iconos */
+.profile-info-icon {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.profile-info-icon:hover {
+  opacity: 1;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .profile-info {
@@ -93,5 +110,12 @@
 
   .profile-info-item-centered {
     max-width: 100%;
+  }
+
+  .profile-info-icon {
+    width: 20px;
+    height: 20px;
+    top: 0.75rem;
+    right: 0.75rem;
   }
 }
