@@ -1,44 +1,44 @@
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./routes/ProtectedRoute";
-
+import { AuthProvider } from "./context/AuthContext";
+import NavbarLayout from "./layouts/NavbarLayout/NavbarLayout";
 import HomePage from "./pages/HomePage/HomePage";
+import ProfilePage from "./pages/ProfilePage/ProfilePage";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import RegisterPage from "./pages/RegisterPage/RegisterPage";
 import PasswordRecoveryPage from "./pages/PasswordRecoveryPage/PasswordRecoveryPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage/ResetPasswordPage";
-import ProfilePage from "./pages/ProfilePage/ProfilePage";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
+
 root.render(
   <BrowserRouter>
-    <AuthProvider>
-      <Routes>
-        <Route
-          path="home"
-          element={
-            <ProtectedRoute>
-              <HomePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="profile"
-          element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="login" element={<LoginPage />} />
-        <Route path="register" element={<RegisterPage />} />
-        <Route path="recuperar-contrasena" element={<PasswordRecoveryPage />} />
-        <Route path="reset-password" element={<ResetPasswordPage />} />
+    <Routes>
+      <Route
+        element={
+          <AuthProvider>
+            <ProtectedRoute />
+          </AuthProvider>
+        }
+      >
+        <Route element={<NavbarLayout />}>
+          <Route path="home" element={<HomePage />} />
+          <Route path="profile" element={<ProfilePage />} />
+        </Route>
+      </Route>
 
-        <Route path="*" element={<LoginPage />} />
-      </Routes>
-    </AuthProvider>
+
+      {/* Rutas públicas */}
+      <Route path="login" element={<LoginPage />} />
+      <Route path="register" element={<RegisterPage />} />
+      <Route path="recuperar-contrasena" element={<PasswordRecoveryPage />} />
+      <Route path="reset-password" element={<ResetPasswordPage />} />
+
+      {/* Ruta fallback */}
+      <Route path="*" element={<LoginPage />} />
+    </Routes>
+
   </BrowserRouter>
 );

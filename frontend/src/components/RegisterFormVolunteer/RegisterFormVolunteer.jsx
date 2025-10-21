@@ -1,31 +1,35 @@
 import React, { useState, useEffect } from "react";
 import "./RegisterFormVolunteer.css";
 import WrongAlert from "../alerts/WrongAlert.jsx";
-import { ValidatePasswordFormat } from "../../services/validators/ValidatePasswordFormat.jsx";
-import SuccessAlert from "../alerts/SuccessAlert.jsx";
+import RedirectAlert from "../alerts/RedirectAlert.jsx";
 import { register } from "../../services/auth/AuthService.jsx";
 import { useNavigate } from "react-router";
-import { GetDepartments } from "../../services/DepartmentService.jsx";
-import { GetCities } from "../../services/CityService.jsx";
+import { GetDepartments,GetCities } from "../../services/auth/LocationService.jsx";
+import { ValidatePasswordFormat } from "../../services/validators/ValidatePasswordFormat.jsx";
+import { customSelectStyles } from "../../styles/selectStyles.js";
+import Select from "react-select";
+
+// Configuración inicial del formulario
+const initialFormData = {
+  correo: "",
+  contrasena: "",
+  confirmarContrasena: "",
+  nombre: "",
+  apellido: "",
+  telefono: "",
+  fechaNacimiento: "",
+  idCiudad: "",
+  rol: "VOLUNTARIO",
+};
 
 function RegisterFormVolunteer() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    correo: "",
-    contrasena: "",
-    confirmarContrasena: "",
-    nombre: "",
-    apellido: "",
-    telefono: "",
-    fechaNacimiento: "",
-    idCiudad: "",
-    rol: "VOLUNTARIO",
-  });
-
+  const [formData, setFormData] = useState(initialFormData);
   const [departments, setDepartments] = useState([]);
   const [cities, setCities] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState("");
 
+  // Cargar departamentos al montar el componente
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
@@ -38,6 +42,7 @@ function RegisterFormVolunteer() {
     fetchDepartments();
   }, []);
 
+  // Cargar ciudades cuando se selecciona un departamento
   useEffect(() => {
     const fetchCities = async () => {
       if (!selectedDepartment) return;
@@ -51,51 +56,64 @@ function RegisterFormVolunteer() {
     fetchCities();
   }, [selectedDepartment]);
 
-  const handleChange = (e) => {
+  // Manejadores de cambios
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleDepartmentChange = (e) => {
-    const deptId = e.target.value;
+  const handleDepartmentChange = (selected) => {
+    const deptId = selected ? selected.value : "";
     setSelectedDepartment(deptId);
     setCities([]);
-    setFormData({ ...formData, idCiudad: "" });
+    setFormData(prev => ({ ...prev, idCiudad: "" }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const allFields = validateFields(formData);
-    if (!allFields) {
-      return WrongAlert({
-        title: "No se pudo registrar",
-        message: "Por favor completa todos los campos.",
-      });
-    }
+  const handleCityChange = (selected) => {
+    setFormData(prev => ({ ...prev, idCiudad: selected ? selected.value : "" }));
+  };
 
+  // Utilidades de alertas
+  const showError = async (error) => {
+    let message = "Ocurrió un problema. Por favor intenta de nuevo.";
+    
+    if (Array.isArray(error)) message = error.join("\n");
+    else if (typeof error === "string") message = error;
+    else if (error?.response?.data?.message) message = error.response.data.message;
+    
+    await WrongAlert({ title: "Error al registrar", message });
+  };
+
+  const validateForm = () => {
     if (formData.contrasena !== formData.confirmarContrasena) {
-      return WrongAlert({
+      WrongAlert({
         title: "Contraseñas no coinciden",
         message: "Por favor asegúrate de que ambas contraseñas sean iguales.",
       });
+      return false;
     }
 
     const passwordFormat = ValidatePasswordFormat(formData.contrasena);
     if (!passwordFormat.valid) {
-      return WrongAlert({
+      WrongAlert({
         title: "Contraseña insegura",
         message: `
-      Tu contraseña debe cumplir con los siguientes requisitos:
-      • Mínimo 8 caracteres
-      • Al menos una letra mayúscula y una minúscula
-      • Al menos un número
-      • Al menos un carácter especial (!, @, #, $, %, etc.)
-    `,
+          Tu contraseña debe cumplir con:
+          • Mínimo 8 caracteres
+          • Mayúscula, minúscula, número y carácter especial
+        `,
+        timer: 4000,
       });
+      return false;
     }
+
+    return true;
+  };
+
+  // Envío del formulario
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
 
     const userData = {
       correo: formData.correo,
@@ -109,152 +127,132 @@ function RegisterFormVolunteer() {
     };
 
     try {
-      await register(userData);
-      SuccessAlert({
-        title: "¡Bien hecho!",
-        message: "Te has registrado correctamente",
-      });
-      navigate("login");
+      const response = await register(userData);
+      if (response?.status === 201 || response?.statusCode === 201) {
+        await RedirectAlert({
+          title: "¡Registro exitoso!",
+          message: "Voluntario creado correctamente.",
+        });
+        navigate("/login");
+      } else {
+        await showError("Ocurrió un problema al intentar registrar al voluntario.");
+      }
     } catch (error) {
-      console.error("Error al registrar voluntario:", error);
-      WrongAlert({
-        title: "Error al registrar",
-        message: "Ocurrió un problema al intentar registrar al voluntario.",
-      });
+      await showError(error);
     }
   };
 
-  function validateFields(data) {
-    for (const key in data) {
-      if (data[key].toString().trim() === "") {
-        return false;
-      }
-    }
-    return true;
-  }
+  // Configuración de selects
+  const departmentOptions = departments.map(dep => ({ 
+    value: dep.id_departamento, 
+    label: dep.departamento 
+  }));
+
+  const cityOptions = cities.map(city => ({ 
+    value: city.id_ciudad, 
+    label: city.ciudad 
+  }));
+
+  const selectedDeptValue = selectedDepartment ? { 
+    value: selectedDepartment, 
+    label: departments.find(dep => dep.id_departamento === selectedDepartment)?.departamento 
+  } : null;
+
+  const selectedCityValue = formData.idCiudad ? { 
+    value: formData.idCiudad, 
+    label: cities.find(city => city.id_ciudad === formData.idCiudad)?.ciudad 
+  } : null;
+
+  // Campos del formulario para hacerlo más mantenible
+  const formFields = [
+    { label: "Nombres", name: "nombre", type: "text", placeholder: "Juan" },
+    { label: "Apellidos", name: "apellido", type: "text", placeholder: "Pérez" },
+    { label: "Correo", name: "correo", type: "email", placeholder: "ejemplo@ejemplo.com" },
+    { label: "Teléfono", name: "telefono", type: "text", placeholder: "Número de 10 dígitos" },
+  ];
 
   return (
     <form className="register-form-volunteer" onSubmit={handleSubmit}>
-      <div className="register-form-input-container">
-        <label className="register-form-label">Nombres</label>
-        <input
-          className="register-form-input"
-          type="text"
-          name="nombre"
-          value={formData.nombre}
-          onChange={handleChange}
-          placeholder="Juan"
-        />
-      </div>
-      <div className="register-form-input-container">
-        <label className="register-form-label">Apellidos</label>
-        <input
-          className="register-form-input"
-          type="text"
-          name="apellido"
-          value={formData.apellido}
-          onChange={handleChange}
-          placeholder="Pérez"
-        />
-      </div>
+      {/* Campos de texto normales */}
+      {formFields.map(field => (
+        <div key={field.name} className="register-form-input-container">
+          <label className="register-form-label">{field.label}</label>
+          <input 
+            className="register-form-input" 
+            type={field.type} 
+            name={field.name} 
+            value={formData[field.name]} 
+            onChange={handleInputChange} 
+            placeholder={field.placeholder} 
+            required 
+          />
+        </div>
+      ))}
 
-      <div className="register-form-input-container">
-        <label className="register-form-label">Correo</label>
-        <input
-          className="register-form-input"
-          type="email"
-          name="correo"
-          value={formData.correo}
-          onChange={handleChange}
-          placeholder="ejemplo@ejemplo.com"
-        />
-      </div>
-
-      <div className="register-form-input-container">
-        <label className="register-form-label">Teléfono</label>
-        <input
-          className="register-form-input"
-          type="text"
-          name="telefono"
-          value={formData.telefono}
-          onChange={handleChange}
-          placeholder="Número de 10 dígitos"
-        />
-      </div>
-
-      <div className="register-form-input-container">
+      {/* Selects de ubicación */}
+      <div className="register-form-select-container">
         <label className="register-form-label">Departamento</label>
-        <select
-          className="register-form-select"
-          name="departamento"
-          value={selectedDepartment}
+        <Select
+          className="register-form-react-select"
+          options={departmentOptions}
+          value={selectedDeptValue}
           onChange={handleDepartmentChange}
-        >
-          <option value="" disabled hidden>
-            Departamento de ubicación
-          </option>
-          {departments.map((dep) => (
-            <option key={dep.id_departamento} value={dep.id_departamento}>
-              {dep.departamento}
-            </option>
-          ))}
-        </select>
+          placeholder="Departamento de ubicación"
+          isClearable
+          styles={customSelectStyles}
+        />
       </div>
 
-      <div className="register-form-input-container">
+      <div className="register-form-select-container">
         <label className="register-form-label">Ciudad</label>
-        <select
-          className="register-form-select"
-          name="idCiudad"
-          value={formData.idCiudad}
-          onChange={handleChange}
-          disabled={!selectedDepartment}
-        >
-          <option value="" disabled hidden>
-            {selectedDepartment
-              ? "Ciudad de ubicación"
-              : "Seleccione un departamento"}
-          </option>
-          {cities.map((city) => (
-            <option key={city.id_ciudad} value={city.id_ciudad}>
-              {city.ciudad}
-            </option>
-          ))}
-        </select>
+        <Select
+          className="register-form-react-select"
+          options={cityOptions}
+          value={selectedCityValue}
+          onChange={handleCityChange}
+          placeholder={selectedDepartment ? "Ciudad de ubicación" : "Seleccione un departamento"}
+          isDisabled={!selectedDepartment}
+          isClearable
+          styles={customSelectStyles}
+        />
       </div>
 
+      {/* Campos restantes */}
       <div className="register-form-text-area-container">
         <label className="register-form-label">Fecha de nacimiento</label>
-        <input
-          className="register-form-input"
-          type="date"
-          name="fechaNacimiento"
-          value={formData.fechaNacimiento}
-          onChange={handleChange}
+        <input 
+          className="register-form-input" 
+          type="date" 
+          name="fechaNacimiento" 
+          value={formData.fechaNacimiento} 
+          onChange={handleInputChange} 
+          required 
         />
       </div>
 
       <div className="register-form-input-container">
         <label className="register-form-label">Contraseña</label>
-        <input
-          className="register-form-input"
-          type="password"
-          name="contrasena"
-          value={formData.contrasena}
-          onChange={handleChange}
-          placeholder="Contraseña"
+        <input 
+          className="register-form-input" 
+          type="password" 
+          name="contrasena" 
+          value={formData.contrasena} 
+          onChange={handleInputChange} 
+          placeholder="Contraseña" 
+          required 
         />
       </div>
 
       <div className="register-form-input-container">
         <label className="register-form-label">Confirmar Contraseña</label>
-        <input
-          className="register-form-input"
-          type="password"
-          name="confirmarContrasena"
-          value={formData.confirmarContrasena}
-          onChange={handleChange}
-          placeholder="Contraseña"
+        <input 
+          className="register-form-input" 
+          type="password" 
+          name="confirmarContrasena" 
+          value={formData.confirmarContrasena} 
+          onChange={handleInputChange} 
+          placeholder="Contraseña" 
+          required 
         />
       </div>
 

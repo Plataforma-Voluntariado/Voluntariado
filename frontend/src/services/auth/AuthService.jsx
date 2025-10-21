@@ -5,60 +5,58 @@ export const isAuthenticated = async () => {
         const response = await api.get("/auth/perfil");
         return response.status === 200;
     } catch (error) {
-        if(error.response?.status === 401) await logout();
-        console.error("Error comprobando autenticación: ",error);
+        if (error.response?.status === 401) {
+            console.log("Sesión expirada o no autenticado");
+        }
+        console.error("Error comprobando autenticación: ", error);
         return false;
     }
 };
 
 export const getUserData = async () => {
-    try{
+    try {
         const response = await api.get("/auth/perfil");
         return response.data;
-    }catch(error){
-        if(error.response?.status === 401) await logout();
+    } catch (error) {
+        if (error.response?.status === 401) {
+            console.log("No autenticado - cookie probablemente expirada");
+            window.location.href = "/login";
+        }
         console.error("Error obteniendo datos del usuario: ", error);
         return null;
     }
 }
 
-export const register = async(data) => {
-    try{
+//Servicio de Registro de usuarios
+export const register = async (data) => {
+    try {
         const response = await api.post("/usuarios/registro", data);
         return response.data;
-    } catch( error ){
-        throw error;
+    } catch (error) {
+        throw error.response.data.message;
     }
 }
 
+//Servicio de Logout Usuario
 export const logout = async () => {
-  try {
-    const response = await api.post("/auth/logout");
-    console.log(response)
-    return response.status === 200;
-  } catch (error) {
-    console.error("Error cerrando sesión:", error);
-    return false;
-  }
+    try {
+        const response = await api.post("/auth/logout");
+        return response.status === 200;
+    } catch (error) {
+        console.error("Error cerrando sesión:", error);
+        return false;
+    }
 };
 
+//Servicio de Login
 export const login = async (correo, contrasena) => {
     try {
-        const response = await api.post("/auth/login",{
+        const response = await api.post("/auth/login", {
             correo, contrasena,
         });
-        return response.data;
+        return response;
     } catch (error) {
-        return error;
+        throw error.response.data.message;
     }
 }
 
-// ✅ Inicio de sesión con Google
-export const loginWithGoogle = async (credential) => {
-  try {
-    const response = await api.post("/auth/google-login", { credential });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};

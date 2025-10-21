@@ -1,40 +1,25 @@
-import React, { useEffect, useState } from "react";
 import "./NavigationBar.css";
 import VoluntariadoLogo from "../../assets/photos/logo.png";
-import { getUserData } from "../../services/auth/AuthService";
 import { useNavigate } from "react-router";
+import { useAuth } from "../../context/AuthContext";
 import VolunteerCase from "./NavigationBarCases/VolunteerCase";
 import AdministratorCase from "./NavigationBarCases/AdministratorCase";
 import CreatorCase from "./NavigationBarCases/CreatorCase";
 
 function NavigationBar() {
   const Navigate = useNavigate();
-  const [userRole, setUserRole] = useState("");
-  const [userPhoto, setUserPhoto] = useState("");
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const userData = await getUserData();
-      if (!userData) {
-        return Navigate("/login");
-      }
-      setUserRole(userData.rol);
-      setUserPhoto(userData.url_imagen);
-    };
-    fetchUserData();
-  }, [Navigate]);
+  const { user } = useAuth(); 
 
   const renderMenuItems = () => {
-    switch (userRole) {
+    if (!user) return null;
+
+    switch (user.rol) {
       case "CREADOR":
-        return <CreatorCase userPhoto={userPhoto} />;
-
+        return <CreatorCase userPhoto={user.urlImage} />;
       case "VOLUNTARIO":
-        return <VolunteerCase userPhoto={userPhoto} />;
-
+        return <VolunteerCase userPhoto={user.urlImage} />;
       case "ADMIN":
-        return <AdministratorCase userPhoto={userPhoto} />;
-
+        return <AdministratorCase userPhoto={user.urlImage} />;
       default:
         return null;
     }

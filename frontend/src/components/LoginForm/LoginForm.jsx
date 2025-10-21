@@ -3,23 +3,27 @@ import "./LoginForm.css";
 import VoluntariadoLogo from "../../assets/photos/logo.png";
 import { useNavigate } from "react-router-dom";
 import WrongAlert from "../../components/alerts/WrongAlert";
-import { login } from "../../services/auth/AuthService";
 import RedirectAlert from "../alerts/RedirectAlert";
+import { login } from "../../services/auth/AuthService";
 
 function LoginForm() {
-  const Navigate = useNavigate();
-
-  const [formData, setFormData] = useState({
-    correo: "",
-    contrasena: "",
-  });
-
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ correo: "", contrasena: "" });
+  
+  //obtener datos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+  //Manejo de errores
+  const showError = async (error) => {
+    if (Array.isArray(error)) {
+      await WrongAlert({ title: "Error en inicio de sesión", message: error.join("\n") });
+    } else if (typeof error === "string") {
+      await WrongAlert({ title: "Error en inicio de sesión", message: error });
+    } else {
+      await WrongAlert({ title: "Error inesperado", message: "Ocurrió un problema. Por favor, intenta de nuevo." });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -28,43 +32,23 @@ function LoginForm() {
     try {
       const response = await login(formData.correo, formData.contrasena);
 
-      // Si el backend devuelve un objeto con 'status' o 'message', se valida:
-      if (response?.status === 401 || response?.response?.status === 401) {
-        WrongAlert({
-          title: "Credenciales inválidas",
-          message: "El correo o la contraseña no son correctos.",
+      // Login exitoso
+      if (response?.status === 200) {
+        await RedirectAlert({
+          title: "¡Inicio de sesión exitoso!",
+          message: "Serás redirigido al inicio.",
+          timer: 1500,
+          position: "top-end",
         });
+        navigate("/home");
         return;
       }
 
-      if (response?.status >= 500 || response?.response?.status >= 500) {
-        WrongAlert({
-          title: "Error del servidor",
-          message: "Hubo un problema interno. Intenta más tarde.",
-        });
-        return;
-      }
+      // Si status no es 200, error genérico
+      await showError("Ocurrió un problema al iniciar sesión.");
 
-      if (!response || response?.response) {
-        WrongAlert({
-          title: "Error de conexión",
-          message: "No se pudo conectar con el servidor.",
-        });
-        return;
-      }
-      const confirmed = await RedirectAlert({
-        title: "¡Inicio de sesión exitoso!",
-        message: "Serás redirigido al inicio.",
-      });
-      if (confirmed) {
-        Navigate("/home");
-      }
     } catch (error) {
-      console.error("Error en login:", error);
-      WrongAlert({
-        title: "Error inesperado",
-        message: "Ocurrió un problema. Por favor, intenta de nuevo.",
-      });
+      await showError(error); // muestra error según tipo (array, string, otro)
     }
   };
 
@@ -75,11 +59,12 @@ function LoginForm() {
       <label className="login-form-label">Correo</label>
       <input
         className="login-form-input"
-        type="text"
+        type="email"
         name="correo"
         value={formData.correo}
         onChange={handleChange}
         placeholder="ejemplo@ejemplo.com"
+        required
       />
 
       <label className="login-form-label">Contraseña</label>
@@ -90,11 +75,13 @@ function LoginForm() {
         value={formData.contrasena}
         onChange={handleChange}
         placeholder="Contraseña"
+        required
       />
+
       <div className="login-form-recovery-link">
-        {" "}
         <a href="/recuperar-contrasena">¿Olvidaste tu contraseña?</a>
       </div>
+
       <button className="login-form-button" type="submit">
         Iniciar Sesión
       </button>
@@ -106,11 +93,7 @@ function LoginForm() {
         </a>
       </p>
 
-      <img
-        className="login-form-logo-img"
-        src={VoluntariadoLogo}
-        alt="Voluntariado Logo"
-      />
+      <img className="login-form-logo-img" src={VoluntariadoLogo} alt="Voluntariado Logo" />
     </form>
   );
 }

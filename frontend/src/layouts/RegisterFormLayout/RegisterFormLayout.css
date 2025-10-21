@@ -5,16 +5,19 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 1rem;
-  padding: 2rem 2.5rem;
+  padding: 1rem 3rem;
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: var(--radius-large);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15),
-    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+              0 0 0 1px rgba(255, 255, 255, 0.2) inset;
   transition: all var(--transition);
+  margin-top: 2rem;
+  margin-bottom: 2rem;
 }
+
 
 .register-form-title {
   width: 100%;
