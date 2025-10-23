@@ -5,13 +5,34 @@ import iconoCorreo from "../../assets/photos/icono-correo.jpg";
 import iconoCiudad from "../../assets/photos/icono-ciudad.png";
 import iconoTelefono from "../../assets/photos/icono-telefono2.png";
 import iconoFechaNacimiento from "../../assets/photos/icono-fecha-nacimiento.png";
+import { sendVerificationEmail } from "../../services/auth/authEmailVerificationService";
+import SuccessAlert from "../alerts/SuccessAlert";
+import WrongAlert from "../alerts/WrongAlert";
 
 function ProfileInfo({ user }) {
   const navigate = useNavigate();
 
-  const handleVerificationClick = () => {
-    // Navegar a una página de verificación (vacía por ahora)
-    navigate("/verificar-correo");
+  const handleVerificationClick = async () => {
+    try {
+      // Enviar el correo de verificación pasando el correo del usuario
+      const response = await sendVerificationEmail(user.correo);
+
+      if (response && response.message) {
+        SuccessAlert({
+        title: "¡Éxito!",
+          message: "Se ha enviado un código de verificación a tu correo"
+        });
+        navigate("/verificar-correo");
+      } else {
+        WrongAlert(response.message || "No se pudo enviar el código de verificación");
+      }
+    } catch (error) {
+      console.error("Error al enviar el código:", error);
+      WrongAlert(
+        error.response?.data?.message || 
+        "Error al procesar la solicitud. Por favor, intenta más tarde."
+      );
+    }
   };
 
   return (
@@ -27,6 +48,7 @@ function ProfileInfo({ user }) {
             <button 
               className="verification-badge not-verified" 
               onClick={handleVerificationClick}
+              type="button"
             >
               No verificado
             </button>

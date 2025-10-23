@@ -2,6 +2,7 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import UnverifiedEmailRoute from "./routes/UnverifiedEmailRoute";
 import { AuthProvider } from "./context/AuthContext";
 import NavbarLayout from "./layouts/NavbarLayout/NavbarLayout";
 import HomePage from "./pages/HomePage/HomePage";
@@ -26,8 +27,9 @@ root.render(
         }
       >
         <Route element={<NavbarLayout />}>
-          <Route path="home" element={<HomePage />} />
-          <Route path="profile" element={<ProfilePage />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/verificar-correo" element={<EmailVerificationPage />} />
         </Route>
       </Route>
 
