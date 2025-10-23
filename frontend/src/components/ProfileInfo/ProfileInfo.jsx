@@ -14,26 +14,32 @@ function ProfileInfo({ user }) {
 
   const handleVerificationClick = async () => {
     try {
-      // Enviar el correo de verificación pasando el correo del usuario
       const response = await sendVerificationEmail(user.correo);
 
       if (response && response.message) {
-        SuccessAlert({
-        title: "¡Éxito!",
-          message: "Se ha enviado un código de verificación a tu correo"
+        // Espera a que termine la alerta antes de navegar
+        await SuccessAlert({
+          title: "¡Éxito!",
+          message: "Se ha enviado un código de verificación a tu correo",
         });
+
         navigate("/verificar-correo");
       } else {
-        WrongAlert(response.message || "No se pudo enviar el código de verificación");
+        await WrongAlert({
+          message: response.message
+        });
       }
     } catch (error) {
       console.error("Error al enviar el código:", error);
-      WrongAlert(
-        error.response?.data?.message || 
-        "Error al procesar la solicitud. Por favor, intenta más tarde."
+      await WrongAlert(
+        {
+          message: error.response?.data?.message || "Error al procesar la solicitud. Por favor, intenta más tarde."
+        }
       );
     }
   };
+
+
 
   return (
     <div className="profile-info">
@@ -45,8 +51,8 @@ function ProfileInfo({ user }) {
           {user.correo_verificado === 1 || user.correo_verificado === "1" || user.correo_verificado === true ? (
             <span className="verification-badge verified">Verificado</span>
           ) : (
-            <button 
-              className="verification-badge not-verified" 
+            <button
+              className="verification-badge not-verified"
               onClick={handleVerificationClick}
               type="button"
             >

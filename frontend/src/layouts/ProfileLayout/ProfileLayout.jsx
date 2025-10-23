@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import "./ProfileLayout.css";
 import { useNavigate } from "react-router-dom";
 import { getUserData } from "../../services/auth/AuthService";
 import ProfileHeader from "../../components/ProfileHeader/ProfileHeader";

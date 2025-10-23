@@ -11,11 +11,10 @@ export const sendVerificationEmail = async (correo) => {
   }
 };
 
-export const verifyEmail = async (token, userId) => {
+export const verifyEmail = async (token) => {
   try {
     const response = await axios.post('/usuarios/verificacion-correo', {
-      token,
-      userId,
+      token
     });
     return response.data;
   } catch (error) {

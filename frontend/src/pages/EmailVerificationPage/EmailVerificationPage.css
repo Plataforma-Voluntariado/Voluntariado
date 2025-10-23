@@ -1,42 +1,43 @@
+/* Contenedor principal */
 .email-verification-page {
-  min-height: 100vh; /* ocupa al menos la altura de la ventana */
-  background-color: #f5f5f5;
-  padding: 2rem 0; /* padding vertical para separación del header */
+  min-height: 80vh;
+  background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+  padding: 2rem 1rem;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
+/* Caja principal */
 .email-verification-container {
-  max-width: 500px;
-  width: 90%;
-  background: white;
+  max-width: 450px;
+  width: 100%;
+  background: #ffffff;
   padding: 2.5rem 2rem;
-  border-radius: 15px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
   text-align: center;
   margin: auto;
+  transition: all 0.3s ease;
 }
 
-.email-verification-box {
-  padding: 1rem;
-}
-
+/* Box interior */
 .email-verification-box h2 {
-  color: #2c3e50;
-  margin-bottom: 1.5rem;
-  font-size: 1.8rem;
+  color: #1e3a8a; /* azul más moderno */
+  margin-bottom: 1rem;
+  font-size: 1.75rem;
   font-weight: 600;
 }
 
 .email-verification-box p {
-  color: #606f7b;
+  color: #475569; /* gris oscuro suave */
   font-size: 1rem;
   line-height: 1.6;
   margin-bottom: 2rem;
-  padding: 0 1rem;
+  padding: 0 0.5rem;
 }
 
+/* Formulario */
 .verification-form {
   width: 100%;
   max-width: 360px;
@@ -51,27 +52,28 @@
   width: 100%;
   padding: 0.75rem 1rem;
   font-size: 1rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
+  border: 2px solid #cbd5e1;
+  border-radius: 10px;
   transition: all 0.3s ease;
   text-align: center;
   letter-spacing: 0.25em;
-  background-color: #f8fafc;
+  background-color: #f1f5f9;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
 }
 
+/* Botón */
 .verify-button {
   width: 100%;
   padding: 0.75rem 1.5rem;
-  background-color: #3b82f6;
+  background-color: #2563eb;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
@@ -79,7 +81,7 @@
 }
 
 .verify-button:hover:not(:disabled) {
-  background-color: #2563eb;
+  background-color: #1e40af;
   transform: translateY(-1px);
 }
 
@@ -88,8 +90,9 @@
   cursor: not-allowed;
 }
 
+/* Listas de placeholder (si las usas) */
 .placeholder-card ul {
-  color: #666;
+  color: #475569;
   line-height: 1.8;
   margin: 0;
   padding-left: 1.5rem;
@@ -99,18 +102,40 @@
   margin-bottom: 0.5rem;
 }
 
-/* Responsive design */
+/* Responsive */
 @media (max-width: 768px) {
   .email-verification-page {
     padding: 1rem;
   }
-  
+
   .email-verification-container {
     padding: 2rem 1.5rem;
+    border-radius: 15px;
   }
-  
-  .email-verification-container h1 {
+
+  .email-verification-box h2 {
     font-size: 1.5rem;
+  }
+
+  .form-group input {
+    font-size: 0.95rem;
+  }
+
+  .verify-button {
+    font-size: 0.95rem;
   }
 }
 
+@media (max-width: 480px) {
+  .email-verification-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .email-verification-box h2 {
+    font-size: 1.4rem;
+  }
+
+  .email-verification-box p {
+    font-size: 0.95rem;
+  }
+}
