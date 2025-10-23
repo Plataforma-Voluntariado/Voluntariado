@@ -13,7 +13,8 @@ api.interceptors.response.use(
 
     if (error.response?.status === 401 && reqUrl.includes("/auth/perfil")){
       await logout();
-      window.location.href("/login");
+      // redirigir correctamente al login
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }

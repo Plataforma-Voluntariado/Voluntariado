@@ -39,6 +39,7 @@ function PasswordRecoveryPage() {
           title: "¡Enlace enviado exitosamente!",
           message:
             "Se ha enviado un enlace de recuperación a tu correo electrónico. Revisa tu bandeja de entrada y sigue las instrucciones para restablecer tu contraseña.",
+          timer: 4000,
         }).then(() => {
           console.log("SweetAlert completado, navegando al login");
           navigate("/login");
