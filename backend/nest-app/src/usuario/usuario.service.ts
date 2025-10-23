@@ -191,8 +191,8 @@ export class UsuarioService {
   }
 
   // Validación de código de verificación de correo
-  async validarCodigoVerificacionCorreo(dto: VerificacionCorreoDto) {
-    const { token, userId } = dto;
+  async validarCodigoVerificacionCorreo(dto: VerificacionCorreoDto, userId: number) {
+    const { token } = dto;
 
     // Validar token del tipo CONFIRMAR_CORREO
     const tokenValido = await this.tokenService.validarToken(
@@ -212,4 +212,5 @@ export class UsuarioService {
 
     return { message: 'Correo verificado correctamente.' };
   }
+
 }

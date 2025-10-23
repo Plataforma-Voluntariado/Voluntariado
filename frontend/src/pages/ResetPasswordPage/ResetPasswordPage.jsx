@@ -7,94 +7,71 @@ import SuccessAlert from "../../components/alerts/SuccessAlert";
 import { resetPassword } from "../../services/auth/authResetPasswordService";
 
 function ResetPasswordPage() {
-  const [code, setCode] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [form, setForm] = useState({
+    code: "",
+    password: "",
+    confirmPassword: "",
+  });
   const [loading, setLoading] = useState(false);
-  // Ya no necesitamos estados para los mensajes de error y éxito
-  // porque ahora usamos las funciones de alerta directamente
+  const [token, setToken] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
-  const [token, setToken] = useState("");
 
+  //Extrae el token desde la URL solo una vez
   useEffect(() => {
-    // Extraer el token de la URL
-    const queryParams = new URLSearchParams(location.search);
-    const tokenParam = queryParams.get("token");
+    const tokenParam = new URLSearchParams(location.search).get("token");
     if (tokenParam) {
       setToken(tokenParam);
-      // Ocultar el token de la URL reemplazándolo con una URL limpia
       window.history.replaceState({}, document.title, "/reset-password");
     }
   }, [location]);
 
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    let newValue = value;
+
+    if (id === "code") {
+      newValue = value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
+    }
+
+    setForm((prev) => ({ ...prev, [id]: newValue }));
+  };
+
+  const validateForm = () => {
+    const { code, password, confirmPassword } = form;
+
+    if (!code || code.length !== 6)
+      return "El código debe tener exactamente 6 caracteres alfanuméricos.";
+
+    if (!password || password.length < 8)
+      return "La contraseña debe tener al menos 8 caracteres.";
+
+    if (password !== confirmPassword)
+      return "Las contraseñas no coinciden.";
+
+    return null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validaciones básicas
-    if (!code.trim()) {
-      WrongAlert({
-        title: "Error",
-        message: "Por favor ingresa el código de verificación"
-      });
-      return;
-    }
-    
-    if (!password.trim()) {
-      WrongAlert({
-        title: "Error",
-        message: "Por favor ingresa una nueva contraseña"
-      });
-      return;
-    }
-    
-    if (password !== confirmPassword) {
-      WrongAlert({
-        title: "Error",
-        message: "Las contraseñas no coinciden"
-      });
-      return;
-    }
-    
-    if (password.length < 6) {
-      WrongAlert({
-        title: "Error",
-        message: "La contraseña debe tener al menos 6 caracteres"
-      });
-      return;
-    }
-    
+    const error = validateForm();
+    if (error) return WrongAlert({ title: "Error", message: error });
+
     setLoading(true);
-    
     try {
-      // Usar el servicio de restablecimiento de contraseña
-      const response = await resetPassword(token, code, password);
-      
-      // Mostrar alerta de éxito usando la función directamente
-      SuccessAlert({
+      await resetPassword(token, form.code, form.password);
+      await SuccessAlert({
         title: "¡Éxito!",
-        message: "Contraseña actualizada correctamente"
-      }).then(() => {
-        // Redirigir al login después de que el usu
-        // ario cierre la alerta
-        setToken("")
-        navigate("/login");
+        message: "Contraseña actualizada correctamente.",
       });
-      
+      navigate("/login");
     } catch (err) {
-      let errorMessage = "Error al actualizar la contraseña. Inténtalo de nuevo más tarde.";
-      
-      if (err.response && err.response.status === 404) {
-        errorMessage = "Código de verificación inválido o expirado";
-      } else if (err.response && err.response.data && err.response.data.message) {
-        errorMessage = err.response.data.message;
-      }
-      
-      // Mostrar alerta de error usando la función directamente
-      WrongAlert({
-        title: "Error",
-        message: errorMessage
-      });
+      const message =
+        err.response?.data?.message ||
+        (err.response?.status === 404
+          ? "Código de verificación inválido o expirado."
+          : "Error al actualizar la contraseña. Inténtalo de nuevo más tarde.");
+      WrongAlert({ title: "Error", message });
     } finally {
       setLoading(false);
     }
@@ -105,60 +82,62 @@ function ResetPasswordPage() {
       <div className="reset-password-background">
         <img src={ImgHandsBackground} alt="Manos voluntariado" />
       </div>
+
       <div className="reset-password-container">
         <h2 className="reset-password-title">Restablecer Contraseña</h2>
         <p className="reset-password-description">
-          Ingresa el código de verificación que recibiste por correo electrónico y tu nueva contraseña.
+          Ingresa el código de verificación que recibiste por correo electrónico
+          y tu nueva contraseña.
         </p>
-        
-        {/* Las alertas se mostrarán mediante llamadas a funciones, no como componentes */}
-        
+
         <form onSubmit={handleSubmit} className="reset-password-form">
           <div className="form-group">
             <label htmlFor="code">Código de verificación</label>
             <input
               type="text"
               id="code"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              placeholder="Ingresa el código de 6 dígitos"
+              value={form.code}
+              onChange={handleChange}
+              placeholder="Código de 6 caracteres"
+              maxLength={6}
+              autoComplete="off"
               disabled={loading}
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="password">Nueva contraseña</label>
             <input
               type="password"
               id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={form.password}
+              onChange={handleChange}
               placeholder="Ingresa tu nueva contraseña"
               disabled={loading}
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="confirmPassword">Confirmar contraseña</label>
             <input
               type="password"
               id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              value={form.confirmPassword}
+              onChange={handleChange}
               placeholder="Confirma tu nueva contraseña"
               disabled={loading}
             />
           </div>
-          
-          <button 
-            type="submit" 
+
+          <button
+            type="submit"
             className="reset-password-button"
             disabled={loading}
           >
             {loading ? "Procesando..." : "Cambiar Contraseña"}
           </button>
         </form>
-        
+
         <div className="reset-password-back-link">
           <p>
             <a href="/login">Volver al inicio de sesión</a>

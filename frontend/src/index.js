@@ -29,7 +29,9 @@ root.render(
         <Route element={<NavbarLayout />}>
           <Route path="/home" element={<HomePage />} />
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/verificar-correo" element={<EmailVerificationPage />} />
+          <Route element={<UnverifiedEmailRoute />}>
+            <Route path="/verificar-correo" element={<EmailVerificationPage />} />
+          </Route>
         </Route>
       </Route>
 

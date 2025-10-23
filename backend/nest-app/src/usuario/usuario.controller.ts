@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Req } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { solicitudVerificacionCorreoDto } from './dto/solicitud-verificacion-correo.dto';
@@ -23,13 +23,15 @@ export class UsuarioController {
 
   @Post('solicitud-verificacion-correo')
   @UseGuards(JwtAuthGuard)
-  async solicitarRecuperacion(@Body() solicitudVerificacionCorreoDto:solicitudVerificacionCorreoDto) {
+  async solicitarRecuperacion(@Body() solicitudVerificacionCorreoDto: solicitudVerificacionCorreoDto) {
     return this.usuarioService.solicitarVerificacionCorreo(solicitudVerificacionCorreoDto);
   }
 
   @Post('verificacion-correo')
   @UseGuards(JwtAuthGuard)
-  async verificacionCorreo(@Body() verificacionCorreodto: VerificacionCorreoDto) {
-    return this.usuarioService.validarCodigoVerificacionCorreo(verificacionCorreodto);
+  async verificacionCorreo(@Req() req, @Body() verificacionCorreodto: VerificacionCorreoDto) {
+    const userId = req.user.id; // ← ya viene del token JWT
+    return this.usuarioService.validarCodigoVerificacionCorreo(verificacionCorreodto,userId);
   }
+
 }
