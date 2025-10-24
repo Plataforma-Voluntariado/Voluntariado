@@ -28,7 +28,6 @@ const SuccessAlert = async (props) => {
     },
   });
 
-  // Retorna true al terminar (útil si deseas continuar flujo)
   return true;
 };
 

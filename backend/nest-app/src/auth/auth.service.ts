@@ -44,9 +44,7 @@ export class AuthService {
     }
 
     async login(usuario: Usuario) {
-        // Obtener información adicional según rol
         let roleData: Creador | Voluntario | Administrador | null | undefined = null;
-
 
         switch (usuario.rol) {
             case RolUsuario.CREADOR:
@@ -60,8 +58,7 @@ export class AuthService {
                 break;
         }
 
-
-        // Payload que se mandara en la cookie
+        // Payload base
         const payload: any = {
             id_usuario: usuario.id_usuario,
             correo: usuario.correo,
@@ -75,17 +72,25 @@ export class AuthService {
             roleData,
         };
 
-        // Solo agregar nombre y apellido si el rol NO es CREADOR
-        if (usuario.rol !== RolUsuario.CREADOR) {
+        // 👇 Si el rol es CREADOR, agrega nombre_entidad explícito
+        if (usuario.rol === RolUsuario.CREADOR) {
+            payload.nombre_entidad = usuario.creador?.nombre_entidad || null;
+            payload.nombreCompleto = usuario.creador?.nombre_entidad || "Entidad sin nombre";
+        } else {
+            // Para voluntario y admin, usar nombre y apellido
             payload.nombre = usuario.nombre;
             payload.apellido = usuario.apellido;
+            payload.nombreCompleto = `${usuario.nombre} ${usuario.apellido}`.trim();
         }
 
+        // Retornar token + datos
         return {
             access_token: this.jwtService.sign(payload),
             user: payload,
         };
     }
+
+
 
     // Generar y enviar token de recuperación
     async solicitarRecuperacion(dto: ForgotPasswordDto) {
