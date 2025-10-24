@@ -16,6 +16,7 @@ import { TokenModule } from './token/token.module';
 import { MailModule } from './mail/mail.module';
 import { VerificacionModule } from './verificacion/verificacion.module';
 import { VerificacionArchivoModule } from './verificacion/verificacion_archivo/verificacion_archivo.module';
+import { GatewaysModule } from './gateways/gateways.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { VerificacionArchivoModule } from './verificacion/verificacion_archivo/v
     MailModule,
     VerificacionModule,
     VerificacionArchivoModule,
+    GatewaysModule,
   ],
   controllers: [AppController],
   providers: [AppService], 

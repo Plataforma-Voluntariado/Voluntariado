@@ -12,6 +12,7 @@ import { Token } from 'src/token/entity/token.entity';
 import { TokenModule } from 'src/token/token.module';
 import { MailModule } from 'src/mail/mail.module';
 import { Verificacion } from 'src/verificacion/entity/verificacion.entity';
+import { UsersGateway } from './usuario.gateway';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { Verificacion } from 'src/verificacion/entity/verificacion.entity';
     MailModule
   ],
   controllers: [UsuarioController],
-  providers: [UsuarioService],
+  providers: [UsuarioService,UsersGateway],
   exports: [UsuarioService],
 })
 export class UsuarioModule {}

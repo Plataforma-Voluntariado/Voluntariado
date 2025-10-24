@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "./EmailVerificationPage.css";
-import { useAuth } from "../../context/AuthContext";
 import { verifyEmail } from "../../services/auth/authEmailVerificationService";
 import SuccessAlert from "../../components/alerts/SuccessAlert";
 import WrongAlert from "../../components/alerts/WrongAlert";
@@ -9,8 +7,6 @@ import WrongAlert from "../../components/alerts/WrongAlert";
 function EmailVerificationPage() {
   const [verificationCode, setVerificationCode] = useState("");
   const [loading, setLoading] = useState(false);
-  const { user, setUser } = useAuth();
-  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,8 +17,7 @@ function EmailVerificationPage() {
 
       if (success || message) {
         await SuccessAlert({ message });
-        setUser?.({ ...user, correo_verificado: 1 });
-        return navigate("/profile");
+        return
       }
 
       await WrongAlert({ title: "Error en la verificación", message: message || "Error al verificar el código." });

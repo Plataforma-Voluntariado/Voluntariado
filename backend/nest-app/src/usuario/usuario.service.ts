@@ -14,6 +14,7 @@ import { TipoToken } from 'src/token/entity/token.entity';
 import { MailService } from 'src/mail/mail.service';
 import { VerificacionCorreoDto } from './dto/validar-codigo-verificacion.dto';
 import { solicitudVerificacionCorreoDto } from './dto/solicitud-verificacion-correo.dto';
+import { UsersGateway } from './usuario.gateway';
 
 @Injectable()
 export class UsuarioService {
@@ -30,7 +31,8 @@ export class UsuarioService {
     @InjectRepository(Administrador)
     private adminRepository: Repository<Administrador>,
     private tokenService: TokenService,
-    private mailService: MailService
+    private mailService: MailService,
+    private readonly userGateway: UsersGateway
   ) { }
 
   async create(createUsuarioDto: CreateUsuarioDto): Promise<void> {
@@ -209,6 +211,8 @@ export class UsuarioService {
 
     // Marcar el token como usado
     await this.tokenService.marcarComoUsado(tokenValido);
+    //emito novedad al frontend
+    this.userGateway.userNovedad(usuario)
 
     return { message: 'Correo verificado correctamente.' };
   }

@@ -17,29 +17,25 @@ function ProfileInfo({ user }) {
       const response = await sendVerificationEmail(user.correo);
 
       if (response && response.message) {
-        // Espera a que termine la alerta antes de navegar
         await SuccessAlert({
           title: "¡Éxito!",
           message: "Se ha enviado un código de verificación a tu correo",
         });
-
         navigate("/verificar-correo");
       } else {
         await WrongAlert({
-          message: response.message
+          message: response.message,
         });
       }
     } catch (error) {
       console.error("Error al enviar el código:", error);
-      await WrongAlert(
-        {
-          message: error.response?.data?.message || "Error al procesar la solicitud. Por favor, intenta más tarde."
-        }
-      );
+      await WrongAlert({
+        message:
+          error.response?.data?.message ||
+          "Error al procesar la solicitud. Por favor, intenta más tarde.",
+      });
     }
   };
-
-
 
   return (
     <div className="profile-info">
@@ -48,7 +44,9 @@ function ProfileInfo({ user }) {
         <h4>Correo</h4>
         <div className="email-container">
           <p>{user.correo}</p>
-          {user.correo_verificado === 1 || user.correo_verificado === "1" || user.correo_verificado === true ? (
+          {user.correo_verificado === 1 ||
+            user.correo_verificado === "1" ||
+            user.correo_verificado === true ? (
             <span className="verification-badge verified">Verificado</span>
           ) : (
             <button
@@ -61,11 +59,11 @@ function ProfileInfo({ user }) {
           )}
         </div>
       </div>
-
+      
       <div className="profile-info-item">
         <img src={iconoCiudad} alt="Ciudad" className="profile-info-icon" />
         <h4>Ciudad</h4>
-        <p>{user.ciudad?.ciudad || "No especificada"}</p>
+        <p>{user.ciudad || "No especificada"}</p>
       </div>
 
       <div className="profile-info-item">
@@ -74,15 +72,25 @@ function ProfileInfo({ user }) {
         <p>{user.telefono || "No disponible"}</p>
       </div>
 
-      <div className="profile-info-item profile-info-item-centered">
-        <img src={iconoFechaNacimiento} alt="Fecha de Nacimiento" className="profile-info-icon" />
-        <h4>Fecha de Nacimiento</h4>
-        <p>{user.fecha_nacimiento ? new Date(user.fecha_nacimiento).toLocaleDateString('es-ES', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        }) : "No especificada"}</p>
-      </div>
+      {user.rol !== "CREADOR" && (
+        <div className="profile-info-item profile-info-item-centered">
+          <img
+            src={iconoFechaNacimiento}
+            alt="Fecha de Nacimiento"
+            className="profile-info-icon"
+          />
+          <h4>Fecha de Nacimiento</h4>
+          <p>
+            {user.fecha_nacimiento
+              ? new Date(user.fecha_nacimiento).toLocaleDateString("es-ES", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })
+              : "No especificada"}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
