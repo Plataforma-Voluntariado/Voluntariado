@@ -14,7 +14,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 2rem 1rem;
+  padding: 1rem;
   box-sizing: border-box; /* Incluir padding en el ancho */
   overflow-x: hidden; /* Eliminar scroll horizontal */
 }
@@ -43,9 +43,10 @@
 /* ProfileHeader.css */
 .profile-header {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   align-items: center;
   text-align: center;
+  justify-content: center;
   padding-bottom: 2rem;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   margin-bottom: 2rem;
@@ -77,6 +78,7 @@
 .profile-name {
   font-size: 1.75rem;
   font-weight: 600;
+  width: 100%;
   color: #1a1a1a;
   margin: 0 0 0.5rem 0;
   letter-spacing: -0.02em;
@@ -90,7 +92,6 @@
   font-size: 1rem;
   color: #007AFF;
   font-weight: 500;
-  margin: 0 0 0.75rem 0;
   padding: 0.4rem 1rem;
   background: rgba(0, 122, 255, 0.1);
   border-radius: 12px;
@@ -102,11 +103,13 @@
 }
 
 .profile-status {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 500;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 1rem;
   border-radius: 12px;
+  display: inline-block;
   margin: 0;
+  margin-left: 0.4rem;
 }
 
 .profile-status.verified {

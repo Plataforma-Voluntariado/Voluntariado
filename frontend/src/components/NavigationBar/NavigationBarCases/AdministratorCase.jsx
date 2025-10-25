@@ -7,15 +7,15 @@ function AdministratorCase({ userPhoto }) {
     <>
       <li
         className="navigation-bar-list-item"
-        onClick={() => Navigate("/review-users")}
+        onClick={() => Navigate("/user-management/VOLUNTARIO")}
       >
-        REVISAR USUARIOS
+        GESTIONAR USUARIOS
       </li>
       <li
         className="navigation-bar-list-item"
-        onClick={() => Navigate("/review-creators")}
+        onClick={() => Navigate("/user-management/CREADOR")}
       >
-        REVISAR CREADORES
+        GESTIONAR CREADORES
       </li>
       <li>
         <MdNotifications className="navigation-bar-list-item navigation-bar-notifications-button" />

@@ -113,6 +113,7 @@ export class VerificacionService {
                     nombre:
                         creador?.nombre_entidad ??
                         `${v.usuario?.nombre ?? 'Sin nombre'} ${v.usuario?.apellido ?? ''}`.trim(),
+                    rol: creador ? 'CREADOR' : 'VOLUNTARIO',
                 };
             }),
         );

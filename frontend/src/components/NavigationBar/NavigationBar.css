@@ -8,7 +8,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 2rem;
-  border-bottom: 2px solid var(--color-primary);
+  border-bottom: 2px solid #007bff71;
   background-color: white;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   z-index: 1000;
