@@ -1,10 +1,10 @@
 import React from "react";
 import "./ProfileLogout.css";
 import { TbLogout2 } from "react-icons/tb";
-import { logout } from "../../services/auth/AuthService";
-import WrongAlert from "../alerts/WrongAlert";
-import RedirectAlert from "../alerts/RedirectAlert";
-import ConfirmAlert from "../alerts/ConfirmAlert";
+import { logout } from "../../../services/auth/AuthService";
+import WrongAlert from "../../alerts/WrongAlert";
+import RedirectAlert from "../../alerts/RedirectAlert";
+import ConfirmAlert from "../../alerts/ConfirmAlert";
 import { useNavigate } from "react-router-dom";
 
 function ProfileLogout() {
