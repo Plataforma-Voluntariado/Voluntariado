@@ -1,0 +1,107 @@
+.administrator-panel-item {
+  width: 100%;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.administrator-panel-item:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18);
+}
+
+.administrator-panel-item:active {
+  transform: translateY(-4px);
+}
+
+[data-theme="dark"] .administrator-panel-item {
+  background: rgba(26, 26, 26, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .administrator-panel-item:hover {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
+}
+
+.administrator-panel-item-image {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.administrator-panel-item:hover .administrator-panel-item-image {
+  transform: scale(1.05);
+}
+
+.administrator-panel-item-title-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 0;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+[data-theme="dark"] .administrator-panel-item-title-container {
+  background: rgba(42, 42, 42, 0.5);
+}
+
+.administrator-panel-item-title {
+  font-size: 1.25rem;
+  width: 100%;
+  text-align: center;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="dark"] .administrator-panel-item-title {
+  color: #fafafa;
+}
+
+@media (max-width: 768px) {
+  .administrator-panel-item {
+    max-width: 100%;
+    border-radius: 20px;
+  }
+
+  .administrator-panel-item-image {
+    height: 250px;
+  }
+
+  .administrator-panel-item-title {
+    font-size: 1.125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .administrator-panel-item {
+    border-radius: 16px;
+  }
+
+  .administrator-panel-item-image {
+    height: 200px;
+  }
+
+  .administrator-panel-item-title-container {
+    padding: 1.25rem;
+  }
+
+  .administrator-panel-item-title {
+    font-size: 1rem;
+  }
+}

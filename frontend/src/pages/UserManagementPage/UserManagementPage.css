@@ -1,0 +1,46 @@
+.user-management-page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+}
+
+.user-management-page-title {
+  width: 100%;
+  max-width: 900px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 2rem 0;
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+
+[data-theme="dark"] .user-management-page-title {
+  color: #fafafa;
+}
+
+@media (max-width: 768px) {
+  .user-management-page {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .user-management-page-title {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-management-page {
+    padding: 1rem 0.5rem;
+  }
+
+  .user-management-page-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+}
