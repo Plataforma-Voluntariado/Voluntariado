@@ -49,8 +49,6 @@ export async function validarSubidaArchivo(archivoRepo: Repository<VerificacionA
 
     const texto = mensajesPorTipo[tipoDocumento] ?? 'del documento';
 
-    console.log("esto es la respuesta", existente)
-
     if (existente) {
         if (existente.estado === EstadoArchivo.APROBADO) {
             throw new BadRequestException(`Ya tienes el documento ${texto} aprobado.`);

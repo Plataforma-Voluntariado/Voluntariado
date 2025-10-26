@@ -17,7 +17,7 @@ export class VerificacionService {
         @InjectRepository(Usuario)
         private readonly usuarioRepository: Repository<Usuario>,
         @InjectRepository(Creador)
-        private readonly creadorRepo: Repository<Creador>, // 👈 Nuevo repositorio
+        private readonly creadorRepo: Repository<Creador>,
     ) { }
 
     async validarVerificacionCompleta(usuario: Usuario, admin: Administrador): Promise<Verificacion> {
@@ -81,7 +81,7 @@ export class VerificacionService {
                 return [];
         }
     }
-    // 🟢 1️⃣ Obtener lista de verificaciones pendientes
+    // Obtener lista de verificaciones pendientes
     async obtenerVerificacionesPendientes() {
         const verificaciones = await this.verificacionRepo.find({
             where: { estado: EstadoVerificacion.PENDIENTE },
@@ -100,7 +100,7 @@ export class VerificacionService {
             throw new NotFoundException('No hay verificaciones pendientes.');
         }
 
-        // 🔄 Mapeo con verificación de si es creador
+        // Mapeo con verificación de si es creador
         const resultados = await Promise.all(
             verificaciones.map(async (v) => {
                 const creador = await this.creadorRepo.findOne({
@@ -123,7 +123,7 @@ export class VerificacionService {
             ;
     }
 
-    // 🟢 2️⃣ Obtener el último archivo por tipo de documento dentro de una verificación
+    // Obtener el último archivo por tipo de documento dentro de una verificación
     async obtenerArchivosPendientesPorVerificacion(idVerificacion: number) {
         // Traemos todos los archivos de esa verificación
         const archivos = await this.archivoRepo.find({
@@ -137,7 +137,7 @@ export class VerificacionService {
                 'rutaArchivo',
             ],
             order: {
-                idVerificacionArchivo: 'DESC', // 🔹 Ordenamos de más reciente a más antiguo
+                idVerificacionArchivo: 'DESC',
             },
         });
 
@@ -157,5 +157,29 @@ export class VerificacionService {
         // 🔹 Devolvemos solo los más recientes por tipo
         return Array.from(ultimosPorTipo.values());
     }
+
+    async obtenerUltimosArchivosPorUsuario(id_usuario: number) {
+        // Traemos todos los archivos del usuario ordenados por fecha (más reciente primero)
+        const archivos = await this.archivoRepo
+            .createQueryBuilder('archivo')
+            .innerJoin('archivo.verificacion', 'verificacion')
+            .innerJoin('verificacion.usuario', 'usuario')
+            .where('usuario.id_usuario = :id_usuario', { id_usuario })
+            .orderBy('archivo.idVerificacionArchivo', 'DESC') // más recientes primero
+            .getMany();
+
+        // Usamos un Map para quedarnos solo con el último archivo de cada tipo
+        const ultimosPorTipo = new Map<TipoDocumento, VerificacionArchivo>();
+
+        for (const archivo of archivos) {
+            if (!ultimosPorTipo.has(archivo.tipoDocumento)) {
+                ultimosPorTipo.set(archivo.tipoDocumento, archivo);
+            }
+        }
+
+        // Devolvemos solo los que existen (puede faltar CEDULA o RUT si no se subió)
+        return Array.from(ultimosPorTipo.values());
+    }
+
 
 }

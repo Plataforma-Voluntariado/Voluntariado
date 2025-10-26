@@ -63,7 +63,6 @@ export class VerificacionArchivoService {
     const resultadoFast = await this.enviarAFastAPI(archivo);
     const tipoDetectado = resultadoFast?.resultado_final?.tipo_documento;
 
-    console.log(tipoDetectado,tipoDocumentoEsperado)
 
     if (tipoDetectado?.toLowerCase() !== tipoDocumentoEsperado.toLowerCase()) {
       throw new BadRequestException(
