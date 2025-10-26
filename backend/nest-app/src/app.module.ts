@@ -55,7 +55,8 @@ import { CategoriaModule } from './categoria/categoria.module';
     VerificacionModule,
     VerificacionArchivoModule,
     GatewaysModule,
-    CategoriaModule
+    CategoriaModule,
+    VoluntarioModule
   ],
   controllers: [AppController],
   providers: [AppService], 
