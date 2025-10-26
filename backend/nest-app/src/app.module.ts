@@ -17,6 +17,7 @@ import { MailModule } from './mail/mail.module';
 import { VerificacionModule } from './verificacion/verificacion.module';
 import { VerificacionArchivoModule } from './verificacion/verificacion_archivo/verificacion_archivo.module';
 import { GatewaysModule } from './gateways/gateways.module';
+import { CategoriaModule } from './categoria/categoria.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { GatewaysModule } from './gateways/gateways.module';
     VerificacionModule,
     VerificacionArchivoModule,
     GatewaysModule,
+    CategoriaModule
   ],
   controllers: [AppController],
   providers: [AppService], 
