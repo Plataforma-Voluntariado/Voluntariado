@@ -9,5 +9,7 @@ export class Categoria {
   @Column({ type: 'varchar', length: 255, nullable: false })
   nombre: string;
 
-
+  // Relación con Voluntariado 
+  @OneToMany(() => Voluntariado, (voluntariado) => voluntariado.categoria)
+  voluntariados: Voluntariado[];
 }

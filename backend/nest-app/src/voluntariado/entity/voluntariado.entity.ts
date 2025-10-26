@@ -1,5 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Categoria } from '../../categoria/entity/categoria.entity';
+import { Usuario } from '../../usuario/entity/usuario.entity';
 
 export enum EstadoVoluntariado {
   PENDIENTE = 'PENDIENTE',
@@ -32,5 +39,13 @@ export class Voluntariado {
   })
   estado: EstadoVoluntariado;
 
+  // FK → usuario (creador)
+  @ManyToOne(() => Usuario, { nullable: false })
+  @JoinColumn({ name: 'creador_id' })
+  creador: Usuario;
 
+  // FK → categoria
+  @ManyToOne(() => Categoria, (categoria) => categoria.voluntariados, { nullable: false })
+  @JoinColumn({ name: 'categoria_id' })
+  categoria: Categoria;
 }
