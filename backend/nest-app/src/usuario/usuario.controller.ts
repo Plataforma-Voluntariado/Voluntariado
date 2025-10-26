@@ -30,7 +30,7 @@ export class UsuarioController {
   @Post('verificacion-correo')
   @UseGuards(JwtAuthGuard)
   async verificacionCorreo(@Req() req, @Body() verificacionCorreodto: VerificacionCorreoDto) {
-    const userId = req.user.id; // ← ya viene del token JWT
+    const userId = req.user.id_usuario; // ← ya viene del token JWT
     return this.usuarioService.validarCodigoVerificacionCorreo(verificacionCorreodto,userId);
   }
 
