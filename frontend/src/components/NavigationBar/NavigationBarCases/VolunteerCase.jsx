@@ -7,12 +7,6 @@ function VolunteerCase({ userPhoto }) {
 
   return (
     <>
-      <li
-        className="navigation-bar-list-item"
-        onClick={() => navigate("/about-us")}
-      >
-        ACERCA DE NOSOTROS
-      </li>
       <li>
         <MdNotifications className="navigation-bar-list-item navigation-bar-notifications-button" />
       </li>

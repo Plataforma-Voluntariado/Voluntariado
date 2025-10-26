@@ -1,0 +1,196 @@
+.footer {
+  background: var(--color-surface);
+  backdrop-filter: blur(10px);
+  padding: 4rem 0 1rem 0;
+  margin-top: 2rem;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  border-top: 1px solid var(--color-border);
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 4rem;
+  padding: 0 2rem;
+  align-items: start;
+}
+
+.footer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.footer-logo {
+  width: 200px;
+  height: auto;
+  cursor: pointer;
+  transition: transform var(--transition);
+  margin-bottom: 1rem;
+}
+
+.footer-logo:hover {
+  transform: scale(1.05);
+}
+
+.footer-section h3 {
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.footer-section h3::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 50px;
+  background: var(--color-primary);
+}
+
+.footer-section p {
+  color: var(--color-text);
+  line-height: 1.6;
+  opacity: 0.9;
+  font-size: 0.95rem;
+  max-width: 400px;
+}
+
+.social-icons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.social-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 122, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  font-size: 1.2rem;
+  transition: all var(--transition);
+  text-decoration: none;
+}
+
+.social-icon:hover {
+  transform: translateY(-5px);
+  background: var(--color-primary);
+  color: white;
+  box-shadow: 0 5px 15px rgba(0, 122, 255, 0.3);
+}
+
+.footer-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.footer-section ul li {
+  color: var(--color-text);
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  margin-bottom: 0.8rem;
+}
+
+/* Estilos para la lista de contacto */
+.contact-list .contact-item {
+  gap: 12px;
+}
+
+.contact-icon {
+  font-size: 1.2rem;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+/* Estilos específicos para la sección de Enlaces Rápidos */
+.footer-section:nth-child(2) ul li {
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.footer-section:nth-child(2) ul li:hover {
+  color: var(--color-primary);
+  transform: translateX(5px);
+}
+
+.footer-section:nth-child(2) ul li::before {
+  content: '→';
+  margin-right: 8px;
+  color: var(--color-primary);
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: all var(--transition);
+}
+
+.footer-section:nth-child(2) ul li:hover::before {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.footer-bottom {
+  text-align: center;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.footer-bottom p {
+  color: var(--color-text);
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    text-align: center;
+    padding: 0 1rem;
+  }
+
+  .footer-section {
+    align-items: center;
+  }
+
+  .social-icons {
+    justify-content: center;
+  }
+
+  .footer-section h3::after {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+  }
+
+  .footer-section ul {
+    align-items: center;
+  }
+
+  .footer-section ul li::before {
+    display: none;
+  }
+
+  .footer-section ul li:hover {
+    transform: none;
+  }
+
+  .footer p {
+    margin: 0 auto;
+  }
+}

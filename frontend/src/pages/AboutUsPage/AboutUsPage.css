@@ -1,0 +1,261 @@
+.about-us-page {
+  min-height: 100vh;
+  padding-bottom: 2rem;
+}
+
+.about-us-hero {
+  height: 60vh;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("../../assets/photos/manos-voluntariado-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  margin-bottom: 2rem;
+}
+
+.about-us-hero-content {
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-large);
+  max-width: 800px;
+  margin: 0 1rem;
+}
+
+.about-us-hero-content h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.about-us-hero-content p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.about-us-sections {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: grid;
+  gap: 2rem;
+}
+
+.glass-effect {
+  background: var(--color-surface);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-medium);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition);
+}
+
+.glass-effect:hover {
+  transform: translateY(-5px);
+}
+
+.about-us-section {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.section-content {
+  flex: 2; /* Aumentamos la proporción del contenido */
+  padding-right: 2rem;
+}
+
+.section-content h2 {
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.section-content p {
+  color: var(--color-text);
+  line-height: 1.5;
+  text-align: justify;
+  letter-spacing: -0.2px;
+  word-spacing: -0.1px;
+  hyphens: auto;
+}
+
+.section-image {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 30%; /* Reducido al 30% del espacio disponible */
+}
+
+.section-image img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-medium);
+  box-shadow: var(--shadow-sm);
+  max-height: 300px; /* Altura máxima para mantener proporción */
+  object-fit: contain; /* Mantiene la proporción de la imagen */
+}
+
+/* Sección específica de misión y visión */
+.mission-section {
+  flex-direction: row;
+}
+
+.vision-section {
+  flex-direction: row;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .about-us-section {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .vision-section, .mission-section, .values-section {
+    flex-direction: column;
+  }
+
+  .section-image {
+    order: 1;
+    max-width: 50%;
+    margin: 1rem auto;
+  }
+
+  .section-content {
+    order: 2;
+    padding-right: 0;
+  }
+
+  .values-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .values-content {
+    margin-bottom: 1rem;
+  }
+
+  .values-image {
+    margin-left: 0;
+  }
+}
+
+.values-section {
+  flex-direction: row;
+}
+
+.values-content {
+  flex: 2;
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.value-item {
+  text-align: center;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-small);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.value-item:hover {
+  transform: translateY(-5px);
+}
+
+.value-item h3 {
+  color: var(--color-primary);
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.3px;
+  font-size: 1.25rem;
+}
+
+.value-item p {
+  letter-spacing: -0.3px;
+  word-spacing: -0.5px;
+  line-height: 1.4;
+  max-width: 250px;
+  margin: 0 auto;
+  white-space: normal;
+  hyphens: none;
+  text-align: center;
+}
+
+.values-image {
+  align-self: center;
+  margin-left: 2rem;
+}
+
+.impact-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.stat-item h3 {
+  color: var(--color-primary);
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.about-us-join {
+  text-align: center;
+}
+
+.about-us-join h2 {
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+}
+
+.primary-button {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: var(--radius-small);
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin-top: 1.5rem;
+  transition: background-color var(--transition);
+}
+
+.primary-button:hover {
+  background-color: #0056b3;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .about-us-hero-content h1 {
+    font-size: 2rem;
+  }
+
+  .about-us-hero-content p {
+    font-size: 1rem;
+  }
+
+  .about-us-sections {
+    gap: 1.5rem;
+  }
+
+  .values-grid,
+  .impact-stats {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}

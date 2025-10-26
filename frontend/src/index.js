@@ -15,6 +15,7 @@ import EmailVerificationPage from "./pages/EmailVerificationPage/EmailVerificati
 import AdministratorRoute from "./routes/AdministratorRoute";
 import UserManagementPage from "./pages/UserManagementPage/UserManagementPage";
 import UserVerificationPage from "./pages/UserVerificationPage/UserVerificationPage";
+import AboutUsPage from "./pages/AboutUsPage/AboutUsPage";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -32,6 +33,7 @@ root.render(
         <Route element={<NavbarLayout />}>
           <Route path="/home" element={<HomePage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/about-us" element={<AboutUsPage />} />
           <Route element={<UnverifiedEmailRoute />}>
             <Route
               path="/verificar-correo"

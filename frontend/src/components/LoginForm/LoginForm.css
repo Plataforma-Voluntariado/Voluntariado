@@ -17,6 +17,12 @@
   transition: all var(--transition);
   margin: 1rem auto;
   box-sizing: border-box;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.login-form::-webkit-scrollbar {
+  display: none;
 }
 
 .login-form-title {
