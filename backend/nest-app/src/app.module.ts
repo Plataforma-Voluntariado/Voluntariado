@@ -37,7 +37,7 @@ import { GatewaysModule } from './gateways/gateways.module';
         synchronize: false,
         logging: false,
         migrations: [__dirname + '/database/migrations/*{.ts,.js}'],
-        migrationsRun: true, 
+        migrationsRun: false, 
       }),
       inject: [ConfigService],
     }),
