@@ -47,8 +47,8 @@ function ProfileInfo({ user }) {
         <div className="email-container">
           <p>{user.correo}</p>
           {user.correo_verificado === 1 ||
-          user.correo_verificado === "1" ||
-          user.correo_verificado === true ? (
+            user.correo_verificado === "1" ||
+            user.correo_verificado === true ? (
             <span className="verification-badge verified">Verificado</span>
           ) : (
             <button
@@ -65,25 +65,27 @@ function ProfileInfo({ user }) {
       <div className="profile-info-item">
         <img src={iconoCiudad} alt="Ciudad" className="profile-info-icon" />
         <h4>Ciudad</h4>
-        <p>{user.ciudad?.ciudad || "No especificada"}</p>
+        <p>{user.ciudad || "No especificada"}</p>
       </div>
-      <div className="profile-info-item profile-info-item-centered">
-        <img
-          src={iconoFechaNacimiento}
-          alt="Fecha de Nacimiento"
-          className="profile-info-icon"
-        />
-        <h4>Fecha de Nacimiento</h4>
-        <p>
-          {user.fecha_nacimiento
-            ? new Date(user.fecha_nacimiento).toLocaleDateString("es-ES", {
+      {(user.rol === "ADMIN" || user.rol === "VOLUNTARIO") && (
+        <div className="profile-info-item profile-info-item-centered">
+          <img
+            src={iconoFechaNacimiento}
+            alt="Fecha de Nacimiento"
+            className="profile-info-icon"
+          />
+          <h4>Fecha de Nacimiento</h4>
+          <p>
+            {user.fecha_nacimiento
+              ? new Date(user.fecha_nacimiento).toLocaleDateString("es-ES", {
                 year: "numeric",
                 month: "long",
                 day: "numeric",
               })
-            : "No especificada"}
-        </p>
-      </div>
+              : "No especificada"}
+          </p>
+        </div>
+      )}
       <div className="profile-info-item">
         <img src={iconoTelefono} alt="Teléfono" className="profile-info-icon" />
         <h4>Teléfono</h4>

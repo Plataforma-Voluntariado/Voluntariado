@@ -13,4 +13,6 @@ export class UsersGateway extends BaseGateway {
     this.emit('novedad-perfil', user);
   }
 
+  
+
 }
