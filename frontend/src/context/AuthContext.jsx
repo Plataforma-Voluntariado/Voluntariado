@@ -31,6 +31,7 @@ export const AuthProvider = ({ children }) => {
       correo_verificado: userData.correo_verificado ?? prevUser.correo_verificado,
       verificado: userData.verificado ?? prevUser.verificado,
       nombre_entidad: userData.nombre_entidad || prevUser.nombre_entidad,
+      urlImage: userData.url_imagen  || prevUser.urlImage,
     }));
   }, []);
 

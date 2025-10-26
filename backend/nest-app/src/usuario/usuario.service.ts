@@ -15,6 +15,7 @@ import { MailService } from 'src/mail/mail.service';
 import { VerificacionCorreoDto } from './dto/validar-codigo-verificacion.dto';
 import { solicitudVerificacionCorreoDto } from './dto/solicitud-verificacion-correo.dto';
 import { UsersGateway } from './usuario.gateway';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class UsuarioService {
@@ -32,14 +33,15 @@ export class UsuarioService {
     private adminRepository: Repository<Administrador>,
     private tokenService: TokenService,
     private mailService: MailService,
-    private readonly userGateway: UsersGateway
+    private readonly userGateway: UsersGateway,
+    private readonly cloudinaryService: CloudinaryService
   ) { }
 
   async create(createUsuarioDto: CreateUsuarioDto): Promise<void> {
     let avatarUrl: string | undefined = undefined;
     const { correo, contrasena, rol, tipo_entidad, nombre_entidad, ...rest } = createUsuarioDto;
 
-    // 🔹 Verificar que el dominio del correo tenga registros MX válidos
+    // Verificar que el dominio del correo tenga registros MX válidos
     const dominioValido = await verificarDominioCorreo(createUsuarioDto.correo);
     if (!dominioValido) {
       throw new BadRequestException('El dominio del correo no es válido o no puede recibir correos.');
@@ -66,7 +68,7 @@ export class UsuarioService {
     // Hashear la contraseña
     const hashedPassword = await this.hashedPassword(contrasena);
 
-    // Generar avatar automático y subir a Cloudinary
+    // Generar avatar automático
     let nameForAvatar = rol === RolUsuario.CREADOR ? nombre_entidad : `${createUsuarioDto.nombre} ${createUsuarioDto.apellido}`;
 
 
@@ -216,5 +218,114 @@ export class UsuarioService {
 
     return { message: 'Correo verificado correctamente.' };
   }
+
+  private extractPublicIdFromUrl(url: string): string | null {
+    try {
+      const parts = url.split('/');
+      const uploadIndex = parts.findIndex(p => p === 'upload');
+      if (uploadIndex === -1) return null;
+
+      const publicPathParts = parts.slice(uploadIndex + 1);
+
+      if (/^v\d+$/.test(publicPathParts[0])) {
+        publicPathParts.shift();
+      }
+
+
+      const publicIdPath = publicPathParts.join('/').replace(/\.[^/.]+$/, '');
+
+      return publicIdPath || null;
+    } catch {
+      return null;
+    }
+  }
+
+
+  async actualizarImagenPerfil(userId: number, file: Express.Multer.File) {
+    const usuario = await this.usuarioRepository.findOne({ where: { id_usuario: userId } });
+    if (!usuario) throw new NotFoundException('Usuario no encontrado.');
+
+    if (!file) {
+      throw new BadRequestException('Debe proporcionar una imagen válida.');
+    }
+
+    // Si ya tenía una imagen personalizada y pertenece a Cloudinary, eliminarla
+    if (usuario.url_imagen && usuario.url_imagen.includes('res.cloudinary.com')) {
+      const publicId = this.extractPublicIdFromUrl(usuario.url_imagen);
+      if (publicId) {
+        await this.cloudinaryService.deleteImage(publicId).catch(() => { });
+      }
+    }
+
+    // Subir nueva imagen
+    const uploadResult = await this.cloudinaryService.uploadImage(file, 'fotos-perfil');
+
+    usuario.url_imagen = uploadResult.secure_url;
+    await this.usuarioRepository.save(usuario);
+
+    // Emitir novedad en tiempo real
+
+    this.userGateway.userNovedad(usuario);
+
+    return {
+      message: 'Imagen de perfil actualizada correctamente.',
+      url: uploadResult.secure_url,
+    };
+  }
+
+  async eliminarImagenPerfil(userId: number) {
+    const usuario = await this.usuarioRepository.findOne({
+      where: { id_usuario: userId },
+      relations: ['creador'],
+    });
+
+    if (!usuario) {
+      throw new NotFoundException('Usuario no encontrado.');
+    }
+
+    if (!usuario.url_imagen) {
+      throw new BadRequestException('El usuario no tiene una imagen para eliminar.');
+    }
+
+    // Si la imagen actual está en Cloudinary, eliminarla
+    if (usuario.url_imagen.includes('res.cloudinary.com')) {
+      const publicId = this.extractPublicIdFromUrl(usuario.url_imagen);
+      if (publicId) {
+        try {
+          await this.cloudinaryService.deleteImage(publicId);
+        } catch (error) {
+          console.error('Error al eliminar la imagen de Cloudinary:', error.message);
+          throw new BadRequestException('No se pudo eliminar la imagen de Cloudinary.');
+        }
+      }
+    }
+
+    // Generar avatar automático igual que al crear usuario
+    let nameForAvatar = usuario.rol === RolUsuario.CREADOR? usuario.creador?.nombre_entidad: `${usuario.nombre} ${usuario.apellido}`;
+    let avatarUrl: string | undefined = undefined;
+
+    if (nameForAvatar) {
+      try {
+        avatarUrl = await this.generateAvatar(nameForAvatar);
+      } catch (error) {
+        console.error('Error generando avatar:', error);
+        throw new BadRequestException('No se pudo generar el avatar automático.');
+      }
+    }
+
+    // Actualizar imagen de perfil
+    usuario.url_imagen = avatarUrl;
+    await this.usuarioRepository.save(usuario);
+
+    // Emitir novedad a los clientes conectados
+    this.userGateway.userNovedad(usuario);
+
+    return {
+      message: 'Imagen de perfil eliminada correctamente.',
+      nuevaImagen: avatarUrl,
+    };
+  }
+
+
 
 }

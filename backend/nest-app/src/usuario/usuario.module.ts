@@ -19,7 +19,8 @@ import { UsersGateway } from './usuario.gateway';
     TypeOrmModule.forFeature([Ciudad,Voluntario,Administrador,Creador,Usuario,Token,Verificacion]) ,
     CloudinaryModule,
     TokenModule,
-    MailModule
+    MailModule,
+    CloudinaryModule
   ],
   controllers: [UsuarioController],
   providers: [UsuarioService,UsersGateway],

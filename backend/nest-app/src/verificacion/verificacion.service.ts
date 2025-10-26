@@ -154,7 +154,7 @@ export class VerificacionService {
             }
         }
 
-        // 🔹 Devolvemos solo los más recientes por tipo
+        // Devolvemos solo los más recientes por tipo
         return Array.from(ultimosPorTipo.values());
     }
 
