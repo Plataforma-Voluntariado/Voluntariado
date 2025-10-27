@@ -2,6 +2,7 @@ import React from "react";
 import "./HomePage.css";
 import { useAuth } from "../../context/AuthContext";
 import AdministratorPanelLayout from "../../layouts/AdministratorPanelLayout/AdministratorPanelLayout";
+import Footer from "../../components/Footer/Footer";
 function HomePage(){
     const { user } = useAuth();
     const renderLayout = () => {
@@ -18,10 +19,13 @@ function HomePage(){
         }
     }
     return(
-        <section className="home-page">
-            {renderLayout()}
-        </section>
-
+        <>
+            <section className="home-page">
+                {renderLayout()}
+            </section>
+            <Footer />
+            
+        </>
     )
 }
 
