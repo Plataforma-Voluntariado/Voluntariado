@@ -18,6 +18,7 @@ import { VerificacionModule } from './verificacion/verificacion.module';
 import { VerificacionArchivoModule } from './verificacion/verificacion_archivo/verificacion_archivo.module';
 import { GatewaysModule } from './gateways/gateways.module';
 import { CategoriaModule } from './categoria/categoria.module';
+import { VoluntariadoModule } from './voluntariado/voluntariado.module';
 
 @Module({
   imports: [
@@ -55,7 +56,8 @@ import { CategoriaModule } from './categoria/categoria.module';
     VerificacionModule,
     VerificacionArchivoModule,
     GatewaysModule,
-    CategoriaModule
+    CategoriaModule,
+    VoluntariadoModule
   ],
   controllers: [AppController],
   providers: [AppService], 
