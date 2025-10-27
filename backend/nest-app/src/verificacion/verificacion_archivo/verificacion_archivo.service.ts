@@ -1,12 +1,24 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as FormData from 'form-data';
 import * as fs from 'fs';
 import * as path from 'path';
-import { VerificacionArchivo, EstadoArchivo, TipoDocumento } from './entity/verificacion-archivo.entity';
+import {
+  VerificacionArchivo,
+  EstadoArchivo,
+  TipoDocumento,
+} from './entity/verificacion-archivo.entity';
 import { Usuario, RolUsuario } from 'src/usuario/entity/usuario.entity';
-import { Verificacion, EstadoVerificacion } from 'src/verificacion/entity/verificacion.entity';
+import {
+  Verificacion,
+  EstadoVerificacion,
+} from 'src/verificacion/entity/verificacion.entity';
 import { validarArchivoPDF } from './helpers/validar-archivo.util';
 import { determinarTipoDocumento } from './helpers/determinar-tipo.util';
 import { asegurarCarpetaUsuario } from './helpers/rutas.util';
@@ -21,7 +33,10 @@ import { RechazarArchivoDto } from './dto/rechazar-archivo.dto';
 
 @Injectable()
 export class VerificacionArchivoService {
-  private readonly basePath = path.resolve(process.cwd(), 'uploads/Verificaciones');
+  private readonly basePath = path.resolve(
+    process.cwd(),
+    'uploads/Verificaciones',
+  );
 
   constructor(
     @InjectRepository(VerificacionArchivo)
@@ -30,43 +45,67 @@ export class VerificacionArchivoService {
     private readonly verificacionRepo: Repository<Verificacion>,
     private readonly configService: ConfigService,
     private readonly verificacionService: VerificacionService,
-  ) { }
+  ) {}
 
   //Validación inicial del archivo y tipo esperado
-  async validarArchivoInicial(usuario: Usuario, archivo: Express.Multer.File, tipo_Documento: string): Promise<TipoDocumento> {
+  async validarArchivoInicial(
+    usuario: Usuario,
+    archivo: Express.Multer.File,
+    tipo_Documento: string,
+  ): Promise<TipoDocumento> {
     validarArchivoPDF(archivo);
     return determinarTipoDocumento(usuario.rol, tipo_Documento);
   }
 
   //Subir archivo
-  async subirArchivo(usuario: Usuario, archivo: Express.Multer.File, tipo_Documento: string): Promise<{ archivo: VerificacionArchivo; verificacion: Verificacion }> {
-
-    const tipoDocumentoEsperado = await this.validarArchivoInicial(usuario, archivo, tipo_Documento);
+  async subirArchivo(
+    usuario: Usuario,
+    archivo: Express.Multer.File,
+    tipo_Documento: string,
+  ): Promise<{ archivo: VerificacionArchivo; verificacion: Verificacion }> {
+    const tipoDocumentoEsperado = await this.validarArchivoInicial(
+      usuario,
+      archivo,
+      tipo_Documento,
+    );
 
     //Buscar o crear verificación temporal
+    // Buscar o crear verificación
     let verificacion = await this.verificacionRepo.findOne({
       where: { usuario: { id_usuario: usuario.id_usuario } },
       relations: ['archivos'],
     });
+
     if (!verificacion) {
+      // Si no existe, crearla nueva
       verificacion = this.verificacionRepo.create({
         usuario,
         estado: EstadoVerificacion.PENDIENTE,
         fechaCreacion: new Date(),
       });
+    } else if (verificacion.estado === EstadoVerificacion.RECHAZADO) {
+      // 🔹 Si estaba rechazada, la volvemos a dejar pendiente
+      verificacion.estado = EstadoVerificacion.PENDIENTE;
+      verificacion.fechaRevision = new Date();
+      verificacion.observaciones = "";
+      await this.verificacionRepo.save(verificacion);
     }
 
     //Validar duplicados, límites y permisos antes de llamar FastAPI
-    await validarSubidaArchivo(this.archivoRepo, usuario, verificacion, tipoDocumentoEsperado);
+    await validarSubidaArchivo(
+      this.archivoRepo,
+      usuario,
+      verificacion,
+      tipoDocumentoEsperado,
+    );
 
     //Enviar a FastAPI para detectar tipo de documento
     const resultadoFast = await this.enviarAFastAPI(archivo);
     const tipoDetectado = resultadoFast?.resultado_final?.tipo_documento;
 
-
     if (tipoDetectado?.toLowerCase() !== tipoDocumentoEsperado.toLowerCase()) {
       throw new BadRequestException(
-        `El tipo de documento detectado no coincide con el documento esperado`
+        `El tipo de documento detectado no coincide con el documento esperado`,
       );
     }
 
@@ -76,19 +115,35 @@ export class VerificacionArchivoService {
     }
 
     //Procesar y guardar el archivo
-    const archivoGuardado = await this.procesarArchivo(usuario, verificacion, archivo, tipoDocumentoEsperado);
+    const archivoGuardado = await this.procesarArchivo(
+      usuario,
+      verificacion,
+      archivo,
+      tipoDocumentoEsperado,
+    );
 
     return { archivo: archivoGuardado, verificacion };
   }
 
   //Procesamiento final del archivo (carpeta + encriptado + BD)
-  private async procesarArchivo(usuario: Usuario, verificacion: Verificacion, archivo: Express.Multer.File, tipoDocumento: TipoDocumento): Promise<VerificacionArchivo> {
-    const userFolder = asegurarCarpetaUsuario(this.basePath, usuario.id_usuario);
+  private async procesarArchivo(
+    usuario: Usuario,
+    verificacion: Verificacion,
+    archivo: Express.Multer.File,
+    tipoDocumento: TipoDocumento,
+  ): Promise<VerificacionArchivo> {
+    const userFolder = asegurarCarpetaUsuario(
+      this.basePath,
+      usuario.id_usuario,
+    );
 
     const nombreFinal = `${tipoDocumento}-${Date.now()}.pdf`;
     const rutaFinal = path.join(userFolder, nombreFinal);
 
-    const bufferEncriptado = encriptarArchivo(archivo.buffer, usuario.id_usuario);
+    const bufferEncriptado = encriptarArchivo(
+      archivo.buffer,
+      usuario.id_usuario,
+    );
     fs.writeFileSync(rutaFinal, bufferEncriptado);
 
     const registro = this.archivoRepo.create({
@@ -102,7 +157,10 @@ export class VerificacionArchivoService {
   }
 
   //Obtener archivo encriptado
-  async obtenerArchivo(usuarioActual: Usuario, archivoId: number): Promise<Buffer> {
+  async obtenerArchivo(
+    usuarioActual: Usuario,
+    archivoId: number,
+  ): Promise<Buffer> {
     const archivo = await this.archivoRepo.findOne({
       where: { idVerificacionArchivo: archivoId },
       relations: ['verificacion', 'verificacion.usuario'],
@@ -111,7 +169,10 @@ export class VerificacionArchivoService {
     if (!archivo) throw new NotFoundException('Archivo no encontrado');
 
     const ownerId = archivo.verificacion.usuario.id_usuario;
-    if (usuarioActual.id_usuario !== ownerId && usuarioActual.rol !== RolUsuario.ADMIN) {
+    if (
+      usuarioActual.id_usuario !== ownerId &&
+      usuarioActual.rol !== RolUsuario.ADMIN
+    ) {
       throw new ForbiddenException('No tienes permiso para ver este archivo');
     }
 
@@ -138,12 +199,21 @@ export class VerificacionArchivoService {
 
       return response.data;
     } catch (error) {
-      console.error('Error al comunicar con FastAPI:', error?.response?.data || error);
-      throw new BadRequestException(error?.response?.data?.detail || 'Error al analizar el documento con la IA.');
+      console.error(
+        'Error al comunicar con FastAPI:',
+        error?.response?.data || error,
+      );
+      throw new BadRequestException(
+        error?.response?.data?.detail ||
+          'Error al analizar el documento con la IA.',
+      );
     }
   }
 
-  async aceptarArchivo(idArchivo: number, admin: Administrador,): Promise<VerificacionArchivo> {
+  async aceptarArchivo(
+    idArchivo: number,
+    admin: Administrador,
+  ): Promise<VerificacionArchivo> {
     const archivo = await this.archivoRepo.findOne({
       where: { idVerificacionArchivo: idArchivo },
       relations: ['verificacion', 'verificacion.usuario'],
@@ -158,7 +228,9 @@ export class VerificacionArchivoService {
       case EstadoArchivo.APROBADO:
         throw new BadRequestException('El archivo ya fue aprobado previamente');
       case EstadoArchivo.RECHAZADO:
-        throw new BadRequestException('El archivo fue rechazado y no puede aprobarse');
+        throw new BadRequestException(
+          'El archivo fue rechazado y no puede aprobarse',
+        );
     }
 
     // Actualizar estado y fecha
@@ -175,9 +247,15 @@ export class VerificacionArchivoService {
     return archivoActualizado;
   }
 
-  async rechazarArchivo(idArchivo: number, admin: Administrador, dto: RechazarArchivoDto,): Promise<VerificacionArchivo> {
+  async rechazarArchivo(
+    idArchivo: number,
+    admin: Administrador,
+    dto: RechazarArchivoDto,
+  ): Promise<VerificacionArchivo> {
     if (!dto.observaciones || dto.observaciones.trim() === '') {
-      throw new BadRequestException('Debe ingresar una observación del rechazo.');
+      throw new BadRequestException(
+        'Debe ingresar una observación del rechazo.',
+      );
     }
 
     const archivo = await this.archivoRepo.findOne({
@@ -190,7 +268,9 @@ export class VerificacionArchivoService {
     }
 
     if (archivo.estado === EstadoArchivo.APROBADO) {
-      throw new BadRequestException('No se puede rechazar un archivo que ya fue aprobado.');
+      throw new BadRequestException(
+        'No se puede rechazar un archivo que ya fue aprobado.',
+      );
     }
 
     // Actualizar estado y observaciones
@@ -207,5 +287,4 @@ export class VerificacionArchivoService {
 
     return archivoActualizado;
   }
-
 }

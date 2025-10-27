@@ -1,0 +1,122 @@
+.profile-stats {
+  display: flex;
+  gap: 1.25rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.profile-stat {
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.1) 0%, rgba(0, 122, 255, 0.05) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 1.5rem;
+  width: 50%;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 122, 255, 0.2);
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.profile-stat:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 122, 255, 0.15);
+  border-color: rgba(0, 122, 255, 0.3);
+}
+
+[data-theme="dark"] .profile-stat {
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.15) 0%, rgba(0, 122, 255, 0.08) 100%);
+  border: 1px solid rgba(0, 122, 255, 0.25);
+}
+
+.profile-stat h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #525252;
+  margin: 0 0 0.75rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+[data-theme="dark"] .profile-stat h3 {
+  color: #d4d4d4;
+}
+
+.profile-stat p {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #007AFF;
+  margin: 0;
+  line-height: 1;
+}
+
+[data-theme="dark"] .profile-stat p {
+  color: #60a5fa;
+}
+
+@media (max-width: 768px) {
+  .profile-layout {
+    padding: 1rem 0.75rem;
+  }
+
+  .profile-glass-container {
+    padding: 1.5rem;
+    border-radius: 20px;
+  }
+
+  .profile-avatar {
+    width: 100px;
+    height: 100px;
+  }
+
+  .profile-name {
+    font-size: 1.5rem;
+  }
+
+  .profile-info {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .profile-stats {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .profile-stat p {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-glass-container {
+    padding: 1.25rem;
+    border-radius: 16px;
+  }
+
+  .profile-avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  .profile-name {
+    font-size: 1.25rem;
+  }
+
+  .profile-role {
+    font-size: 0.9rem;
+  }
+
+  .profile-info-item {
+    padding: 1rem;
+  }
+
+  .profile-stat {
+    padding: 1.25rem;
+  }
+
+  .profile-stat p {
+    font-size: 1.75rem;
+  }
+}

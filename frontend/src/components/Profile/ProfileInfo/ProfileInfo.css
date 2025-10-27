@@ -1,9 +1,12 @@
 .profile-info {
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
   margin-bottom: 2rem;
   justify-content: center;
+  padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .profile-info-item {

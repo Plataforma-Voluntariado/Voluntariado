@@ -5,7 +5,7 @@ import ProfileInfo from "../../components/Profile/ProfileInfo/ProfileInfo";
 import ProfileStats from "../../components/Profile/ProfileStats/ProfileStats";
 import ProfileLogout from "../../components/Profile/ProfileLogout/ProfileLogout";
 import ProfileVerificationLayout from "../ProfileVerificationLayout/ProfileVerificationLayout";
-
+import "./ProfileLayout.css";
 function ProfileLayout() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -20,7 +20,7 @@ function ProfileLayout() {
       <div className="profile-glass-container">
         <ProfileHeader user={user} />
         <ProfileInfo user={user} />
-        <ProfileVerificationLayout />
+        <ProfileVerificationLayout user = {user}/>
         <ProfileStats user={user} />
         <ProfileLogout />
       </div>
