@@ -1,7 +1,7 @@
 import React from "react";
 import "./HomePage.css";
 import { useAuth } from "../../context/AuthContext";
-import AdministratorPanelLayout from "../../layouts/AdministratorPanelLayout/AdministratorPanelLayout";
+import AdministratorPanelLayout from "../../layouts/Admin/AdministratorPanelLayout/AdministratorPanelLayout";
 import Footer from "../../components/Footer/Footer";
 function HomePage(){
     const { user } = useAuth();

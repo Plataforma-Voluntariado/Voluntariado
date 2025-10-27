@@ -1,7 +1,7 @@
 import React from "react";
 import "./UserVerificationPage.css";
 import { useParams } from "react-router";
-import UserVerificationLayout from "../../layouts/UserVerificationLayout/UserVerificationLayout";
+import UserVerificationLayout from "../../layouts/Admin/UserVerificationLayout/UserVerificationLayout";
 
 function UserVerificationPage() {
     const params = useParams();

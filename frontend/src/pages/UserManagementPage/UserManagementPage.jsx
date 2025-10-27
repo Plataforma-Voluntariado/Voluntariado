@@ -1,7 +1,7 @@
 import React from "react";
 import "./UserManagementPage.css";
 import { useParams } from "react-router";
-import UserManagementLayout from "../../layouts/UserManagementLayout/UserManagementLayout";
+import UserManagementLayout from "../../layouts/Admin/UserManagementLayout/UserManagementLayout";
 
 function UserManagementPage() {
     let params = useParams();
