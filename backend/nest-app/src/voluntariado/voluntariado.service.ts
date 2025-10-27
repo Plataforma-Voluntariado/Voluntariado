@@ -18,7 +18,7 @@ export class VoluntariadoService {
 
     @InjectRepository(Usuario)
     private readonly usuarioRepository: Repository<Usuario>,
-  ) {}
+  ) { }
 
   async create(dto: CreateVoluntariadoDto, creadorId: number) {
     const categoria = await this.categoriaRepository.findOne({
@@ -50,30 +50,45 @@ export class VoluntariadoService {
     return await this.voluntariadoRepository.save(voluntariado);
   }
 
-  async findAllByCreator(creadorId: number) {
-    return await this.voluntariadoRepository.find({
-      where: { creador: { id_usuario: creadorId } },
-      relations: ['categoria', 'creador'],
-      order: { fechaHora: 'ASC' },
+  findAll() {
+    return this.voluntariadoRepository.find({
+      relations: {
+        creador: {
+          creador: true 
+        }
+      },
+      select: {
+        creador: {
+          id_usuario: true, 
+          creador: {
+            nombre_entidad: true 
+          }
+        }
+      }
     });
   }
 
-  async findAll() {
-    return await this.voluntariadoRepository.find({
-      relations: ['categoria', 'creador'],
-      order: { fechaHora: 'ASC' },
+  findAllByCreator(idUsuario: number) {
+    return this.voluntariadoRepository.find({
+      where: { creador: { id_usuario: idUsuario } },
+      relations: {
+        creador: {
+          creador: true 
+        }
+      },
+      select: {
+        creador: {
+          id_usuario: true,
+          creador: {
+            nombre_entidad: true
+          }
+        }
+      }
     });
   }
 
   async findOne(id: number, user: Usuario) {
-    const voluntariado = await this.voluntariadoRepository.findOne({
-      where: { id_voluntariado: id },
-      relations: ['categoria', 'creador'],
-    });
-
-    if (!voluntariado) {
-      throw new NotFoundException('Voluntariado no encontrado.');
-    }
+    const voluntariado = await this.findVoluntariadoById(id);
 
     if (user.rol === RolUsuario.CREADOR && voluntariado.creador.id_usuario !== user.id_usuario) {
       throw new ForbiddenException('No tiene permiso para ver este voluntariado.');
@@ -82,8 +97,9 @@ export class VoluntariadoService {
     return voluntariado;
   }
 
+
   async update(id: number, dto: UpdateVoluntariadoDto, user: Usuario) {
-    const voluntariado = await this.findOne(id, user);
+    const voluntariado = await this.findVoluntariadoById(id);
 
     if (user.rol === RolUsuario.CREADOR && voluntariado.creador.id_usuario !== user.id_usuario) {
       throw new ForbiddenException('No tiene permiso para actualizar este voluntariado.');
@@ -107,10 +123,22 @@ export class VoluntariadoService {
     }
 
     Object.assign(voluntariado, dto);
-
     return await this.voluntariadoRepository.save(voluntariado);
   }
 
+  private async findVoluntariadoById(id: number) {
+    const voluntariado = await this.voluntariadoRepository.findOne({
+      where: { id_voluntariado: id },
+      relations: ['categoria', 'creador'],
+    });
+
+    if (!voluntariado) {
+      throw new NotFoundException('Voluntariado no encontrado.');
+    }
+
+    return voluntariado;
+  }
+  
   async remove(id: number, user: Usuario) {
     const voluntariado = await this.findOne(id, user);
 

@@ -4,10 +4,10 @@ import {
   Post,
   Body,
   Param,
-  Patch,
   Delete,
   Req,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 import { VoluntariadoService } from './voluntariado.service';
 import { CreateVoluntariadoDto } from './dto/create-voluntariado.dto';
@@ -28,14 +28,17 @@ export class VoluntariadoController {
     return this.voluntariadoService.create(dto, req.user.id_usuario);
   }
 
-  @Roles(RolUsuario.CREADOR, RolUsuario.ADMIN)
   @Get()
-  findAll(@Req() req: any) {
-    if (req.user.rol === RolUsuario.CREADOR) {
-      return this.voluntariadoService.findAllByCreator(req.user.id_usuario);
-    }
+  findAll() {
     return this.voluntariadoService.findAll();
   }
+
+  @Roles(RolUsuario.CREADOR)
+  @Get('owns')
+  findMine(@Req() req: any) {
+    return this.voluntariadoService.findAllByCreator(req.user.id_usuario);
+  }
+
 
   @Roles(RolUsuario.CREADOR, RolUsuario.ADMIN)
   @Get(':id')
@@ -44,10 +47,11 @@ export class VoluntariadoController {
   }
 
   @Roles(RolUsuario.CREADOR)
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() dto: UpdateVoluntariadoDto, @Req() req: any) {
     return this.voluntariadoService.update(+id, dto, req.user);
   }
+
 
   @Roles(RolUsuario.CREADOR, RolUsuario.ADMIN)
   @Delete(':id')
