@@ -1,36 +1,57 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Delete,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { VoluntariadoService } from './voluntariado.service';
 import { CreateVoluntariadoDto } from './dto/create-voluntariado.dto';
 import { UpdateVoluntariadoDto } from './dto/update-voluntariado.dto';
-
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { RolUsuario } from 'src/usuario/entity/usuario.entity';
 
 @Controller('voluntariados')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class VoluntariadoController {
-  constructor(private readonly voluntariadoService: VoluntariadoService) {}
+  constructor(private readonly voluntariadoService: VoluntariadoService) { }
 
+  @Roles(RolUsuario.CREADOR)
   @Post()
   create(@Body() dto: CreateVoluntariadoDto, @Req() req: any) {
-    const usuarioId = req.user?.id_usuario ?? 1;
-    return this.voluntariadoService.create(dto, usuarioId);
+    return this.voluntariadoService.create(dto, req.user.id_usuario);
   }
 
+  @Roles(RolUsuario.CREADOR, RolUsuario.ADMIN)
   @Get()
-  findAll() {
+  findAll(@Req() req: any) {
+    if (req.user.rol === RolUsuario.CREADOR) {
+      return this.voluntariadoService.findAllByCreator(req.user.id_usuario);
+    }
     return this.voluntariadoService.findAll();
   }
 
+  @Roles(RolUsuario.CREADOR, RolUsuario.ADMIN)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.voluntariadoService.findOne(+id);
+  findOne(@Param('id') id: string, @Req() req: any) {
+    return this.voluntariadoService.findOne(+id, req.user);
   }
 
+  @Roles(RolUsuario.CREADOR)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateVoluntariadoDto) {
-    return this.voluntariadoService.update(+id, dto);
+  update(@Param('id') id: string, @Body() dto: UpdateVoluntariadoDto, @Req() req: any) {
+    return this.voluntariadoService.update(+id, dto, req.user);
   }
 
+  @Roles(RolUsuario.CREADOR, RolUsuario.ADMIN)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.voluntariadoService.remove(+id);
+  remove(@Param('id') id: string, @Req() req: any) {
+    return this.voluntariadoService.remove(+id, req.user);
   }
 }

@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Voluntariado } from './entity/voluntariado.entity';
 import { Categoria } from '../categoria/entity/categoria.entity';
-import { Usuario } from '../usuario/entity/usuario.entity';
+import { Usuario, RolUsuario } from '../usuario/entity/usuario.entity';
 import { CreateVoluntariadoDto } from './dto/create-voluntariado.dto';
 import { UpdateVoluntariadoDto } from './dto/update-voluntariado.dto';
 
@@ -42,12 +42,20 @@ export class VoluntariadoService {
       descripcion: dto.descripcion,
       fechaHora: dto.fechaHora,
       horas: dto.horas,
-      estado: dto.estado ?? undefined, // opcional
+      estado: dto.estado ?? undefined,
       categoria,
       creador,
     });
 
     return await this.voluntariadoRepository.save(voluntariado);
+  }
+
+  async findAllByCreator(creadorId: number) {
+    return await this.voluntariadoRepository.find({
+      where: { creador: { id_usuario: creadorId } },
+      relations: ['categoria', 'creador'],
+      order: { fechaHora: 'ASC' },
+    });
   }
 
   async findAll() {
@@ -57,7 +65,7 @@ export class VoluntariadoService {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, user: Usuario) {
     const voluntariado = await this.voluntariadoRepository.findOne({
       where: { id_voluntariado: id },
       relations: ['categoria', 'creador'],
@@ -67,13 +75,20 @@ export class VoluntariadoService {
       throw new NotFoundException('Voluntariado no encontrado.');
     }
 
+    if (user.rol === RolUsuario.CREADOR && voluntariado.creador.id_usuario !== user.id_usuario) {
+      throw new ForbiddenException('No tiene permiso para ver este voluntariado.');
+    }
+
     return voluntariado;
   }
 
-  async update(id: number, dto: UpdateVoluntariadoDto) {
-    const voluntariado = await this.findOne(id);
+  async update(id: number, dto: UpdateVoluntariadoDto, user: Usuario) {
+    const voluntariado = await this.findOne(id, user);
 
-    // Si desea actualizar categoría
+    if (user.rol === RolUsuario.CREADOR && voluntariado.creador.id_usuario !== user.id_usuario) {
+      throw new ForbiddenException('No tiene permiso para actualizar este voluntariado.');
+    }
+
     if (dto.categoria_id) {
       const categoria = await this.categoriaRepository.findOne({
         where: { id_categoria: dto.categoria_id },
@@ -87,7 +102,6 @@ export class VoluntariadoService {
       delete dto.categoria_id;
     }
 
-    // Asegurar que no se pueda cambiar el creador
     if ('creador' in dto) {
       throw new BadRequestException('No está permitido modificar el creador del voluntariado.');
     }
@@ -97,8 +111,17 @@ export class VoluntariadoService {
     return await this.voluntariadoRepository.save(voluntariado);
   }
 
-  async remove(id: number) {
-    const voluntariado = await this.findOne(id);
-    return await this.voluntariadoRepository.remove(voluntariado);
+  async remove(id: number, user: Usuario) {
+    const voluntariado = await this.findOne(id, user);
+
+    if (user.rol === RolUsuario.CREADOR && voluntariado.creador.id_usuario !== user.id_usuario) {
+      throw new ForbiddenException('No tiene permiso para eliminar este voluntariado.');
+    }
+
+    await this.voluntariadoRepository.remove(voluntariado);
+
+    return {
+      message: `El voluntariado "${voluntariado.titulo}" ha sido eliminado exitosamente.`,
+    };
   }
 }
