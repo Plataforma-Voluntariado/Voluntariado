@@ -1,9 +1,9 @@
 import { Module, Global } from '@nestjs/common';
 import { BaseGateway } from './base.gateway';
 
-@Global() // <- hace que no tengas que importarlo en cada módulo
+@Global() 
 @Module({
-  providers: [BaseGateway],
-  exports: [BaseGateway],
+  providers: [],
+  exports: [],
 })
 export class GatewaysModule {}

@@ -1,0 +1,27 @@
+.navigation-bar-notifications-wrapper {
+  position: relative;
+  cursor: pointer;
+}
+
+.navigation-bar-notifications-button {
+  font-size: 1.5rem;
+  color: var(--color-primary, #007bff);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background-color: red;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 2px rgba(0,0,0,0.5);
+  z-index: 10;
+}

@@ -46,9 +46,8 @@ function ProfileVerificationItem({ data }) {
   return (
     <>
       <div
-        className={`profile-verification-card ${
-          !isFileUploaded ? "profile-verification-card-empty" : ""
-        }`}
+        className={`profile-verification-card ${!isFileUploaded ? "profile-verification-card-empty" : ""
+          }`}
       >
         <div className="profile-verification-header">
           <h4 className="profile-verification-title">{tipoDocumento}</h4>
@@ -116,6 +115,7 @@ function ProfileVerificationItem({ data }) {
               >
                 Ver archivo
               </button>
+              {estado === "rechazado" ? <button className="profile-verification-button upload" onClick={handleUploadClick}>Subir nuevo</button> : null}
             </div>
           </>
         )}
