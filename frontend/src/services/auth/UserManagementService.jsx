@@ -45,7 +45,6 @@ export const RejectUserFile = async (idVerificacionArchivo, observacion) => {
         observaciones: observacion,
       }
     );
-    console.log(response);
     return response;
   } catch (error) {
     console.error("Error rechazando el archivo del usuario.", error);
@@ -58,7 +57,6 @@ export const AcceptUserFile = async (idVerificacionArchivo) => {
     const response = await api.post(
       "verificacion-archivo/aceptar/" + idVerificacionArchivo
     );
-    console.log("verificacion-archivo/aceptar/" + idVerificacionArchivo);
     return response;
   } catch (error) {
     console.error("Error aceptando el archivo del usuario.", error);
@@ -113,7 +111,7 @@ export const UploadProfilePhoto = async (photoFile) => {
 };
 
 export const DeleteProfilePhoto = async () => {
-  try{
+  try {
     const response = await api.delete("/usuarios/imagen-perfil");
     return response;
   } catch (error) {

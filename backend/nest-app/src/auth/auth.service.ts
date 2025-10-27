@@ -29,6 +29,14 @@ export class AuthService {
         private readonly configService: ConfigService
     ) { }
 
+    async getUserById(userId: number) {
+        return this.usuarioRepository.findOne({
+            where: { id_usuario: userId },
+            relations: ['ciudad', 'creador', 'voluntario', 'admin', 'ciudad.departamento'],
+        });
+    }
+
+
     async validateUser(InicioSesionDto: InicioSesionDto): Promise<any> {
         const { correo, contrasena } = InicioSesionDto
 
