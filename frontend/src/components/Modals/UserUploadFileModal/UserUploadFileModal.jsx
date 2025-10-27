@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./UserUploadFileModal.css";
-import { UploadUserFile } from "../../services/auth/UserManagementService";
-import SuccessAlert from "../alerts/SuccessAlert";
-import WrongAlert from "../alerts/WrongAlert";
+import { UploadUserFile } from "../../../services/auth/UserManagementService";
+import SuccessAlert from "../../alerts/SuccessAlert";
+import WrongAlert from "../../alerts/WrongAlert";
 
 function UserUploadFileModal({ tipoDocumento, onClose }) {
   const [selectedFile, setSelectedFile] = useState(null);

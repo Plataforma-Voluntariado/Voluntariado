@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./ProfileVerificationItem.css";
-import UserUploadFileModal from "../../UserUploadFileModal/UserUploadFileModal";
+import UserUploadFileModal from "../../Modals/UserUploadFileModal/UserUploadFileModal";
 
 const baseURL = process.env.REACT_APP_URL_SERVER_VOLUNTARIADO;
 
