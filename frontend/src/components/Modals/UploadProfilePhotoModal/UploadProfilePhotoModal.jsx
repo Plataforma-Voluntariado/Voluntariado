@@ -9,99 +9,79 @@ function UploadProfilePhotoModal({ currentPhotoUrl, onClose }) {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Stop propagation helper
+  const stopPropagation = (e) => e.stopPropagation();
+
+  // Manejo de selección de archivo
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (!file.type.startsWith("image/")) {
-        WrongAlert({
-          title: "Error",
-          message: "Por favor selecciona un archivo de imagen válido.",
-        });
-        return;
-      }
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result);
-      };
-      reader.readAsDataURL(file);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      return WrongAlert({
+        title: "Error",
+        message: "Por favor selecciona un archivo de imagen válido.",
+      });
     }
+
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file)); // Previsualización rápida
   };
 
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      WrongAlert({
-        title: "Error",
-        message: "Por favor selecciona una imagen antes de subir.",
-      });
-      return;
-    }
-
+  // Función helper para manejo de acciones async con alerts
+  const handleAsyncAction = async (action, successMsg) => {
     try {
       setLoading(true);
-      const response = await UploadProfilePhoto(selectedFile);
-
+      const response = await action();
       if (response && !response.error) {
-        await SuccessAlert({
-          title: "Foto actualizada",
-          message: "Tu foto de perfil se ha actualizado correctamente.",
-        });
+        await SuccessAlert(successMsg);
         onClose();
-        window.location.reload();
-      } else {
-        throw new Error(response.error || "Error al subir la foto");
-      }
+      } else throw new Error(response.error || "Ocurrió un error");
     } catch (error) {
-      console.error("Error subiendo foto:", error);
+      console.error(error);
       WrongAlert({
         title: "Error",
-        message: error.message || "Ocurrió un error al subir la foto. Intenta nuevamente.",
+        message: error.message || "Ocurrió un error. Intenta nuevamente.",
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async () => {
-    try {
-      setLoading(true);
-      const response = await DeleteProfilePhoto();
-
-      if (response && !response.error) {
-        await SuccessAlert({
-          title: "Foto eliminada",
-          message: "Tu foto de perfil se ha eliminado correctamente.",
-        });
-        onClose();
-        window.location.reload();
-      } else {
-        throw new Error(response.error || "Error al eliminar la foto");
+  // Subir nueva foto
+  const handleUpload = () =>
+    handleAsyncAction(
+      () => UploadProfilePhoto(selectedFile),
+      {
+        title: "Foto actualizada",
+        message: "Tu foto de perfil se ha actualizado correctamente.",
       }
-    } catch (error) {
-      console.error("Error eliminando foto:", error);
-      WrongAlert({
-        title: "Error",
-        message: error.message || "Ocurrió un error al eliminar la foto. Intenta nuevamente.",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    );
+
+  // Eliminar foto actual
+  const handleDelete = () =>
+    handleAsyncAction(
+      DeleteProfilePhoto,
+      {
+        title: "Foto eliminada",
+        message: "Tu foto de perfil se ha eliminado correctamente.",
+      }
+    );
 
   return (
     <div className="upload-photo-modal-overlay" onClick={onClose}>
-      <div className="upload-photo-modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="upload-photo-modal-content" onClick={stopPropagation}>
+        {/* Header */}
         <div className="upload-photo-modal-header">
           <h3>Foto de perfil</h3>
-          <button className="upload-photo-modal-close" onClick={onClose}>
-            ×
-          </button>
+          <button className="upload-photo-modal-close" onClick={onClose}>×</button>
         </div>
 
+        {/* Body */}
         <div className="upload-photo-modal-body">
           <div className="upload-photo-preview">
             <img
-              src={previewUrl || currentPhotoUrl}
+              src={previewUrl || currentPhotoUrl || "/placeholder.svg"}
               alt="Vista previa"
               className="upload-photo-preview-image"
             />
@@ -128,6 +108,7 @@ function UploadProfilePhotoModal({ currentPhotoUrl, onClose }) {
           )}
         </div>
 
+        {/* Actions */}
         <div className="upload-photo-modal-actions">
           <button
             className="upload-photo-modal-button delete"
@@ -136,6 +117,7 @@ function UploadProfilePhotoModal({ currentPhotoUrl, onClose }) {
           >
             {loading ? "Eliminando..." : "Eliminar foto"}
           </button>
+
           <button
             className="upload-photo-modal-button upload"
             onClick={handleUpload}

@@ -9,7 +9,6 @@ function ProfileInfo({ user }) {
 
   useEffect(() => {
     if (user?.fecha_nacimiento) {
-      
       const fechaNacimiento = new Date(user.fecha_nacimiento);
       if (!isNaN(fechaNacimiento)) {
         const fechaFormateada = fechaNacimiento.toLocaleDateString("es-ES", {
@@ -34,15 +33,17 @@ function ProfileInfo({ user }) {
         <p>{user?.ciudad || "No especificada"}</p>
       </div>
 
-      <div className="profile-info-item profile-info-item-centered">
-        <img
-          src={iconoFechaNacimiento}
-          alt="Fecha de Nacimiento"
-          className="profile-info-icon"
-        />
-        <h4>Fecha de Nacimiento</h4>
-        <p>{fecha}</p>
-      </div>
+      {user?.rol !== "CREADOR" && (
+        <div className="profile-info-item profile-info-item-centered">
+          <img
+            src={iconoFechaNacimiento}
+            alt="Fecha de Nacimiento"
+            className="profile-info-icon"
+          />
+          <h4>Fecha de Nacimiento</h4>
+          <p>{fecha}</p>
+        </div>
+      )}
 
       <div className="profile-info-item">
         <img src={iconoTelefono} alt="Teléfono" className="profile-info-icon" />

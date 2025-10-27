@@ -15,9 +15,11 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  console.log(user)
+
   //Maneja actualizaciones en tiempo real por WebSocket
   const handleUserUpdate = useCallback((userData) => {
-    
+
     setUser((prevUser) => ({
       ...prevUser,
       ...userData,
@@ -25,20 +27,20 @@ export const AuthProvider = ({ children }) => {
         userData.rol === "CREADOR"
           ? userData.nombre_entidad || prevUser.nombre_entidad || "Entidad sin nombre"
           : userData.nombre && userData.apellido
-          ? `${userData.nombre} ${userData.apellido}`
-          : prevUser.nombreCompleto,
+            ? `${userData.nombre} ${userData.apellido}`
+            : prevUser.nombreCompleto,
       email: userData.correo || prevUser.email,
       correo: userData.correo || prevUser.correo,
       correo_verificado: userData.correo_verificado ?? prevUser.correo_verificado,
       verificado: userData.verificado ?? prevUser.verificado,
       nombre_entidad: userData.nombre_entidad || prevUser.nombre_entidad,
-      urlImage: userData.url_imagen  || prevUser.urlImage,
+      urlImage: userData.url_imagen || prevUser.urlImage,
     }));
   }, []);
 
   //Inicializa conexión de socket (si aplica)
   useUserSocket(user?.userId, handleUserUpdate);
-  
+
   //Carga el perfil del usuario al iniciar
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -53,16 +55,14 @@ export const AuthProvider = ({ children }) => {
             rol: profile.rol,
             verificado: profile.verificado,
             correo_verificado: profile.correo_verificado,
-            urlImage: profile.url_imagen,
+            urlImage: profile.url_imagen ? `${profile.url_imagen}?t=${Date.now()}` : null,
             ciudad: profile.ciudad?.ciudad,
             departamento: profile.ciudad?.departamento?.departamento,
             telefono: profile.telefono,
             fecha_nacimiento: profile.fecha_nacimiento,
-            nombre_entidad: profile.nombre_entidad || null,
-            nombreCompleto:
-              profile.rol === "CREADOR"
-                ? profile.nombre_entidad || "Entidad sin nombre"
-                : `${profile.nombre || ""} ${profile.apellido || ""}`.trim(),
+            nombre_entidad: profile.creador?.nombre_entidad || null,
+            nombreCompleto: profile.nombre || profile.apellido ? `${profile.nombre || ""} ${profile.apellido || ""}`.trim() : null,
+
           });
         } else {
           setUser(null);
