@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { getUserData } from "../services/auth/AuthService";
 import { useUserSocket } from "../hooks/useUserSocket";
 
+
 const AuthContext = createContext(null);
 
 export const useAuth = () => {
@@ -37,7 +38,7 @@ export const AuthProvider = ({ children }) => {
 
   //Inicializa conexión de socket (si aplica)
   useUserSocket(user?.userId, handleUserUpdate);
-
+  
   //Carga el perfil del usuario al iniciar
   useEffect(() => {
     const fetchUserProfile = async () => {

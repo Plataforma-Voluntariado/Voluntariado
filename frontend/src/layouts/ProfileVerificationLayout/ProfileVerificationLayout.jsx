@@ -13,7 +13,6 @@ function ProfileVerificationLayout({ user }) {
       try {
         const response = await GetUserFilesArray();
         if (response) {
-          console.log(response);
           setFiles(response);
         }
       } catch (error) {
@@ -35,7 +34,6 @@ function ProfileVerificationLayout({ user }) {
   };
 
   const getAllDocuments = () => {
-    console.log(files);
     const requiredDocs = getRequiredDocuments();
 
     return requiredDocs.map((docType) => {

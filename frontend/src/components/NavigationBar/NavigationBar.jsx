@@ -1,3 +1,4 @@
+// NavigationBar.jsx
 import "./NavigationBar.css";
 import VoluntariadoLogo from "../../assets/photos/logo.png";
 import { useNavigate } from "react-router";
@@ -5,21 +6,23 @@ import { useAuth } from "../../context/AuthContext";
 import VolunteerCase from "./NavigationBarCases/VolunteerCase";
 import AdministratorCase from "./NavigationBarCases/AdministratorCase";
 import CreatorCase from "./NavigationBarCases/CreatorCase";
+import { MdNotifications } from "react-icons/md";
+import NotificationButton from "../NotificacionButton/NotificationButton";
 
 function NavigationBar() {
   const Navigate = useNavigate();
-  const { user } = useAuth(); 
+  const { user } = useAuth();
 
-  const renderMenuItems = () => {
+  const renderRoleSpecificItems = () => {
     if (!user) return null;
 
     switch (user.rol) {
       case "CREADOR":
-        return <CreatorCase userPhoto={user.urlImage} />;
+        return <CreatorCase />;
       case "VOLUNTARIO":
-        return <VolunteerCase userPhoto={user.urlImage} />;
+        return <VolunteerCase />;
       case "ADMIN":
-        return <AdministratorCase userPhoto={user.urlImage} />;
+        return <AdministratorCase />;
       default:
         return null;
     }
@@ -37,7 +40,22 @@ function NavigationBar() {
       </div>
 
       <div className="navigation-bar-right">
-        <ul className="navigation-bar-list">{renderMenuItems()}</ul>
+        <ul className="navigation-bar-list">
+          {renderRoleSpecificItems()}
+          <li>
+            <NotificationButton />
+          </li>
+          {user && (
+            <li className="navigation-bar-list-item">
+              <img
+                className="navigation-bar-user-photo"
+                src={user.urlImage}
+                alt="Foto de perfil"
+                onClick={() => Navigate("/profile")}
+              />
+            </li>
+          )}
+        </ul>
       </div>
     </nav>
   );

@@ -16,6 +16,8 @@ import { VerificacionCorreoDto } from './dto/validar-codigo-verificacion.dto';
 import { solicitudVerificacionCorreoDto } from './dto/solicitud-verificacion-correo.dto';
 import { UsersGateway } from './usuario.gateway';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { NotificacionesService } from 'src/notificaciones/notificaciones.service';
+import { TipoNotificacion } from 'src/notificaciones/entity/notificacion.entity';
 
 @Injectable()
 export class UsuarioService {
@@ -34,7 +36,8 @@ export class UsuarioService {
     private tokenService: TokenService,
     private mailService: MailService,
     private readonly userGateway: UsersGateway,
-    private readonly cloudinaryService: CloudinaryService
+    private readonly cloudinaryService: CloudinaryService,
+    private readonly notificacionesService: NotificacionesService
   ) { }
 
   async create(createUsuarioDto: CreateUsuarioDto): Promise<void> {
@@ -264,8 +267,15 @@ export class UsuarioService {
     await this.usuarioRepository.save(usuario);
 
     // Emitir novedad en tiempo real
-
     this.userGateway.userNovedad(usuario);
+    
+    //emitir notificacion
+    await this.notificacionesService.crearYEnviarNotificacion([usuario.id_usuario], {
+      tipo: TipoNotificacion.INFO,
+      titulo: 'Imagen de perfil actualizada',
+      mensaje: 'Tu imagen de perfil ha sido actualizada correctamente.',
+    });
+
 
     return {
       message: 'Imagen de perfil actualizada correctamente.',
@@ -301,7 +311,7 @@ export class UsuarioService {
     }
 
     // Generar avatar automático igual que al crear usuario
-    let nameForAvatar = usuario.rol === RolUsuario.CREADOR? usuario.creador?.nombre_entidad: `${usuario.nombre} ${usuario.apellido}`;
+    let nameForAvatar = usuario.rol === RolUsuario.CREADOR ? usuario.creador?.nombre_entidad : `${usuario.nombre} ${usuario.apellido}`;
     let avatarUrl: string | undefined = undefined;
 
     if (nameForAvatar) {
@@ -320,12 +330,16 @@ export class UsuarioService {
     // Emitir novedad a los clientes conectados
     this.userGateway.userNovedad(usuario);
 
+    await this.notificacionesService.crearYEnviarNotificacion([usuario.id_usuario], {
+      tipo: TipoNotificacion.INFO,
+      titulo: 'Imagen de perfil eliminada',
+      mensaje: 'Tu imagen de perfil ha sido eliminada correctamente y se generó un avatar automático.',
+    });
+
     return {
       message: 'Imagen de perfil eliminada correctamente.',
       nuevaImagen: avatarUrl,
     };
   }
-
-
 
 }

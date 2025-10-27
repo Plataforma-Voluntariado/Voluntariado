@@ -1,11 +1,8 @@
-import {WebSocketGateway,WebSocketServer,OnGatewayConnection,OnGatewayDisconnect,OnGatewayInit,} from '@nestjs/websockets';
+import { WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { websocketCorsConfig } from 'src/common/websocket.config';
 
-@WebSocketGateway(websocketCorsConfig)
-export class BaseGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+export abstract class BaseGateway
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
   afterInit() {
@@ -13,14 +10,21 @@ export class BaseGateway
   }
 
   handleConnection(client: Socket) {
-    console.log(`[Gateway] Cliente conectado: ${client.id}`);
+    if (client.nsp.name !== this.getNamespace()) return;
+
+    this.onClientConnected(client);
   }
 
   handleDisconnect(client: Socket) {
+    if (client.nsp.name !== this.getNamespace()) return;
+
     console.log(`[Gateway] Cliente desconectado: ${client.id}`);
+    this.onClientDisconnected(client);
   }
 
-  emit(event: string, payload?: any) {
-    this.server.emit(event, payload);
-  }
+  protected onClientConnected(client: Socket): void { }
+  protected onClientDisconnected(client: Socket): void { }
+
+ 
+  protected abstract getNamespace(): string;
 }

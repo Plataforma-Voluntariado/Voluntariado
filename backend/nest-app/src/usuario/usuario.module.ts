@@ -13,6 +13,7 @@ import { TokenModule } from 'src/token/token.module';
 import { MailModule } from 'src/mail/mail.module';
 import { Verificacion } from 'src/verificacion/entity/verificacion.entity';
 import { UsersGateway } from './usuario.gateway';
+import { NotificacionesModule } from 'src/notificaciones/notificaciones.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { UsersGateway } from './usuario.gateway';
     CloudinaryModule,
     TokenModule,
     MailModule,
-    CloudinaryModule
+    CloudinaryModule,
+    NotificacionesModule
   ],
   controllers: [UsuarioController],
   providers: [UsuarioService,UsersGateway],
