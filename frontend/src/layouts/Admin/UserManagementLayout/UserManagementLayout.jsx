@@ -1,17 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import "./UserManagementLayout.css";
 import { GetUsersByRole } from "../../../services/auth/UserManagementService";
 import UserManagementItem from "../../../components/Admin/UserManagementItem/UserManagementItem";
+import { useVerificacionArchivoAdminSocket } from "../../../hooks/useVerificacionArchivoSocketAdmin";
 
-function UserManagementLayout({ rol }) {
+function UserManagementLayout({ rol, admin }) {
   const [users, setUsers] = useState([]);
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const filteredUsers = await GetUsersByRole(rol);
-      setUsers(filteredUsers);
-    };
-    fetchUsers();
+
+  const fetchUsers = useCallback(async () => {
+    const filteredUsers = await GetUsersByRole(rol);
+    setUsers(filteredUsers);
   }, [rol]);
+
+  //Cargar usuarios al montar o cambiar rol
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  useVerificacionArchivoAdminSocket(admin?.userId, (evento) => {
+    const { tipo } = evento;
+    if (["subido", "aprobado", "rechazado"].includes(tipo)) {
+      fetchUsers();
+    }
+  });
+
+
   if (!users.length) {
     return (
       <p className="user-management-empty">
@@ -19,6 +32,7 @@ function UserManagementLayout({ rol }) {
       </p>
     );
   }
+
   return (
     <div className="user-management-layout">
       {users.map((user) => (

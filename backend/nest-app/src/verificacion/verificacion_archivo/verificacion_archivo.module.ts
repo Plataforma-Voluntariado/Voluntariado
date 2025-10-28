@@ -7,6 +7,8 @@ import { VerificacionArchivoController } from './verificacion_archivo.controller
 import { ConfigModule } from '@nestjs/config';
 import { VerificacionModule } from '../verificacion.module';
 import { Usuario } from 'src/usuario/entity/usuario.entity';
+import { VerificacionArchivoGateway } from './verificacion-archivo.gateway';
+import { VerificacionArchivoAdminGateway } from './verificacion-archivo-admin.gateway';
 
 @Module({
   imports: [
@@ -15,7 +17,7 @@ import { Usuario } from 'src/usuario/entity/usuario.entity';
     VerificacionModule
   ],
   controllers:[VerificacionArchivoController],
-  providers: [VerificacionArchivoService],
+  providers: [VerificacionArchivoService,VerificacionArchivoGateway,VerificacionArchivoAdminGateway],
   exports: [VerificacionArchivoService]
 })
 export class VerificacionArchivoModule { }

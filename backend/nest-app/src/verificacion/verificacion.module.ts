@@ -6,18 +6,19 @@ import { VerificacionArchivo } from './verificacion_archivo/entity/verificacion-
 import { VerificacionService } from './verificacion.service';
 import { VerificacionController } from './verificacion.controller';
 import { Creador } from '../creador/entity/creador.entity'; // 👈 Importación añadida
+import { UsersGateway } from 'src/usuario/usuario.gateway';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       Usuario,
       Verificacion,
-      VerificacionArchivo, // 👈 Agregado
-      Creador, // 👈 Agregado
+      VerificacionArchivo, 
+      Creador, 
     ]),
   ],
   controllers: [VerificacionController],
-  providers: [VerificacionService],
+  providers: [VerificacionService, UsersGateway],
   exports:[VerificacionService]
 })
 export class VerificacionModule {}

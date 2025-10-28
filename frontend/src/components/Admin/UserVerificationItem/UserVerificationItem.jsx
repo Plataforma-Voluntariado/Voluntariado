@@ -9,81 +9,54 @@ import { AcceptUserFile, RejectUserFile } from "../../../services/auth/UserManag
 const baseURL = process.env.REACT_APP_URL_SERVER_VOLUNTARIADO;
 
 function UserVerificationItem({ data }) {
-  const { idVerificacionArchivo, tipoDocumento, rutaArchivo } = data;
+  const { idVerificacionArchivo, tipoDocumento, rutaArchivo, estado } = data;
 
-  const [fileStatus, setFileStatus] = useState(data.estado);
+  const [fileStatus, setFileStatus] = useState(estado);
   const [loading, setLoading] = useState(false);
 
+  const isFinalizado = ["aprobado", "rechazado"].includes(fileStatus);
+  const displayStatus = fileStatus.charAt(0).toUpperCase() + fileStatus.slice(1);
+
   const getFileName = (path) => path.split("\\").pop();
+  const handleOpenFile = () => window.open(`${baseURL}/verificacion-archivo/ver/${idVerificacionArchivo}`, "_blank");
 
-  const handleOpenFile = () => {
-    const fileUrl = `${baseURL}/verificacion-archivo/ver/${idVerificacionArchivo}`;
-    window.open(fileUrl, "_blank");
-  };
-
-  const handleAccept = async () => {
-    const confirmResult = await ConfirmAlert({
-      title: "Aceptar archivo",
-      message: "¿Estás seguro de aceptar este archivo?",
-      confirmText: "Sí, aceptar",
-      cancelText: "Cancelar",
-    });
-
-    if (!confirmResult) return;
-
-    try {
-      setLoading(true);
-      const response = await AcceptUserFile(idVerificacionArchivo);
-
-      if (response?.statusText==="Created" || response?.status === 201) {
-        setFileStatus("aprovado");
-        SuccessAlert({
-          title: "Archivo aceptado",
-          message: "El archivo ha sido aceptado correctamente.",
-        });
-      } else {
-        throw new Error(response.response.data.message);
-      }
-    } catch (error) {
-      console.error("Error aceptando el archivo:", error);
-      WrongAlert({
-        title: "Error",
-        message: error,
+  const handleAction = async (tipo) => {
+    if (tipo === "aceptar") {
+      const confirmResult = await ConfirmAlert({
+        title: "Aceptar archivo",
+        message: "¿Estás seguro de aceptar este archivo?",
+        confirmText: "Sí, aceptar",
+        cancelText: "Cancelar",
       });
-    } finally {
-      setLoading(false);
+      if (!confirmResult) return;
+    } else {
+      const { confirmed, text } = await TextAreaAlert({
+        title: "Rechazar archivo",
+        message: "Por favor, escribe una observación para el usuario.",
+        confirmText: "Rechazar archivo",
+        cancelText: "Cancelar",
+      });
+      if (!confirmed) return;
+      data.observacion = text; // guardar texto de rechazo
     }
-  };
-
-  const handleReject = async () => {
-    const { confirmed, text } = await TextAreaAlert({
-      title: "Rechazar archivo",
-      message: "Por favor, escribe una observación para el usuario.",
-      confirmText: "Rechazar archivo",
-      cancelText: "Cancelar",
-    });
-
-    if (!confirmed) return;
 
     try {
       setLoading(true);
-      const response = await RejectUserFile(idVerificacionArchivo, text);
+      const response =
+        tipo === "aceptar"
+          ? await AcceptUserFile(idVerificacionArchivo)
+          : await RejectUserFile(idVerificacionArchivo, data.observacion);
 
-        if (response?.statusText==="Created" || response?.status === 201) {
-        setFileStatus("rechazado");
+      if (response?.statusText === "Created" || response?.status === 201) {
+        setFileStatus(tipo === "aceptar" ? "aprobado" : "rechazado");
         SuccessAlert({
-          title: "Archivo rechazado",
-          message: "El archivo ha sido rechazado correctamente.",
+          title: `Archivo ${tipo === "aceptar" ? "aceptado" : "rechazado"}`,
+          message: `El archivo ha sido ${tipo === "aceptar" ? "aceptado" : "rechazado"} correctamente.`,
         });
-      } else {
-        throw new Error("El servidor no devolvió una respuesta válida.");
-      }
+      } else throw new Error(response?.response?.data?.message || "Error desconocido");
     } catch (error) {
-      console.error("Error rechazando el archivo:", error);
-      WrongAlert({
-        title: "Error",
-        message: error,
-      });
+      console.error(`Error ${tipo}ndo el archivo:`, error);
+      WrongAlert({ title: "Error", message: error.message || error });
     } finally {
       setLoading(false);
     }
@@ -93,11 +66,9 @@ function UserVerificationItem({ data }) {
     <div className={`user-verification-item ${loading ? "loading" : ""}`}>
       <div className="user-verification-item-info">
         <h3>{tipoDocumento}</h3>
-
         <p className={`user-verification-status user-verification-status-${fileStatus}`}>
-          {fileStatus.charAt(0).toUpperCase() + fileStatus.slice(1)}
+          {displayStatus}
         </p>
-
         <p
           className="user-verification-filename"
           onClick={handleOpenFile}
@@ -107,22 +78,16 @@ function UserVerificationItem({ data }) {
         </p>
       </div>
 
-      <div className="user-verification-actions">
-        <button
-          className="user-verification-button accept"
-          onClick={handleAccept}
-          disabled={loading || fileStatus === "aceptado"}
-        >
-          Aceptar
-        </button>
-        <button
-          className="user-verification-button reject"
-          onClick={handleReject}
-          disabled={loading || fileStatus === "rechazado"}
-        >
-          Rechazar
-        </button>
-      </div>
+      {!isFinalizado && (
+        <div className="user-verification-actions">
+          <button className="user-verification-button accept" onClick={() => handleAction("aceptar")} disabled={loading}>
+            Aceptar
+          </button>
+          <button className="user-verification-button reject" onClick={() => handleAction("rechazar")} disabled={loading}>
+            Rechazar
+          </button>
+        </div>
+      )}
     </div>
   );
 }

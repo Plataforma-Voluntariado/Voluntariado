@@ -1,17 +1,31 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import "./UserVerificationLayout.css";
 import { GetUserByVerificationId } from "../../../services/auth/UserManagementService";
 import UserVerificationItem from "../../../components/Admin/UserVerificationItem/UserVerificationItem";
+import { useVerificacionArchivoAdminSocket } from "../../../hooks/useVerificacionArchivoSocketAdmin";
 
-function UserVerificationLayout({ verificationId }) {
+function UserVerificationLayout({ verificationId, admin }) {
   const [files, setFiles] = useState([]);
-  useEffect(() => {
-    const fetchFiles = async () => {
-      const filesData = await GetUserByVerificationId(verificationId);
-      setFiles(filesData);
-    };
-    fetchFiles();
+  const fetchFilesRef = useRef(null); 
+
+  const fetchFiles = useCallback(async () => {
+    const filesData = await GetUserByVerificationId(verificationId);
+    setFiles(filesData);
   }, [verificationId]);
+
+  fetchFilesRef.current = fetchFiles;
+
+  useEffect(() => {
+    fetchFiles();
+  }, [fetchFiles]);
+
+  useVerificacionArchivoAdminSocket(admin?.userId, (evento) => {
+    const { tipo } = evento;
+    if (["subido", "aprobado", "rechazado"].includes(tipo)) {
+      fetchFilesRef.current?.(); 
+    }
+  });
+
   if (!files.length) {
     return (
       <p className="user-verification-empty">
@@ -19,10 +33,11 @@ function UserVerificationLayout({ verificationId }) {
       </p>
     );
   }
+
   return (
     <div className="user-verification-layout">
       {files.map((file) => (
-        <UserVerificationItem key={file.idVerificacion} data={file} />
+        <UserVerificationItem key={file.idVerificacionArchivo} data={file} />
       ))}
     </div>
   );
