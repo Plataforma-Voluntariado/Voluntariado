@@ -20,6 +20,7 @@ import { GatewaysModule } from './gateways/gateways.module';
 import { CategoriaModule } from './categoria/categoria.module';
 import { VoluntariadoModule } from './voluntariado/voluntariado.module';
 import { NotificacionesModule } from './notificaciones/notificaciones.module';
+import { FotosVoluntariadoModule } from './fotos_voluntariado/fotos_voluntariado.module';
 
 
 @Module({
@@ -60,7 +61,8 @@ import { NotificacionesModule } from './notificaciones/notificaciones.module';
     GatewaysModule,
     CategoriaModule,
     VoluntariadoModule,
-    NotificacionesModule
+    NotificacionesModule,
+    FotosVoluntariadoModule
   ],
   controllers: [AppController],
   providers: [AppService], 
