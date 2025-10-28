@@ -4,9 +4,11 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Categoria } from '../../categoria/entity/categoria.entity';
 import { Usuario } from '../../usuario/entity/usuario.entity';
+import { FotosVoluntariado } from 'src/fotos_voluntariado/entity/fotos_voluntariado.entity';
 
 export enum EstadoVoluntariado {
   PENDIENTE = 'PENDIENTE',
@@ -48,4 +50,7 @@ export class Voluntariado {
   @ManyToOne(() => Categoria, (categoria) => categoria.voluntariados, { nullable: false })
   @JoinColumn({ name: 'categoria_id' })
   categoria: Categoria;
+
+  @OneToMany(() => FotosVoluntariado, (foto) => foto.voluntariado)
+  fotos: FotosVoluntariado[];
 }
