@@ -28,11 +28,11 @@ function PasswordRecoveryPage() {
     try {
       // Usar el servicio de recuperación de contraseña
       const response = await requestPasswordRecovery(email);
-      console.log("Respuesta del servidor:", response);
+      
 
       // Mostrar alerta de éxito si la petición fue exitosa (cualquier status 2xx)
       if (response.status >= 200 && response.status < 300) {
-        console.log("Mostrando alerta de éxito");
+        
         
         // Solo usar SweetAlert2
         SuccessAlert({
@@ -41,11 +41,9 @@ function PasswordRecoveryPage() {
             "Se ha enviado un enlace de recuperación a tu correo electrónico. Revisa tu bandeja de entrada y sigue las instrucciones para restablecer tu contraseña.",
           timer: 4000,
         }).then(() => {
-          console.log("SweetAlert completado, navegando al login");
           navigate("/login");
         });
       } else {
-        console.log("Status no exitoso:", response.status);
         WrongAlert({
           title: "Error",
           message: "No se pudo enviar el correo. Intenta nuevamente más tarde.",

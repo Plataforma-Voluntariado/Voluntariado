@@ -6,7 +6,6 @@ export const isAuthenticated = async () => {
         return response.status === 200;
     } catch (error) {
         if (error.response?.status === 401) {
-            console.log("Sesión expirada o no autenticado");
         }
         console.error("Error comprobando autenticación: ", error);
         return false;
@@ -19,7 +18,6 @@ export const getUserData = async () => {
         return response.data;
     } catch (error) {
         if (error.response?.status === 401) {
-            console.log("No autenticado - cookie probablemente expirada");
             window.location.href = "/login";
         }
         console.error("Error obteniendo datos del usuario: ", error);

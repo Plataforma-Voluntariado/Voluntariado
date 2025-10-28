@@ -1,24 +1,12 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as FormData from 'form-data';
 import * as fs from 'fs';
 import * as path from 'path';
-import {
-  VerificacionArchivo,
-  EstadoArchivo,
-  TipoDocumento,
-} from './entity/verificacion-archivo.entity';
+import { VerificacionArchivo, EstadoArchivo, TipoDocumento, } from './entity/verificacion-archivo.entity';
 import { Usuario, RolUsuario } from 'src/usuario/entity/usuario.entity';
-import {
-  Verificacion,
-  EstadoVerificacion,
-} from 'src/verificacion/entity/verificacion.entity';
+import { Verificacion, EstadoVerificacion, } from 'src/verificacion/entity/verificacion.entity';
 import { validarArchivoPDF } from './helpers/validar-archivo.util';
 import { determinarTipoDocumento } from './helpers/determinar-tipo.util';
 import { asegurarCarpetaUsuario } from './helpers/rutas.util';
@@ -30,6 +18,8 @@ import { FASTAPI_URL } from 'src/config/constants';
 import { VerificacionService } from '../verificacion.service';
 import { Administrador } from 'src/administrador/entity/administrador.entity';
 import { RechazarArchivoDto } from './dto/rechazar-archivo.dto';
+import { VerificacionArchivoGateway } from './verificacion-archivo.gateway';
+import { VerificacionArchivoAdminGateway } from './verificacion-archivo-admin.gateway';
 
 @Injectable()
 export class VerificacionArchivoService {
@@ -45,24 +35,35 @@ export class VerificacionArchivoService {
     private readonly verificacionRepo: Repository<Verificacion>,
     private readonly configService: ConfigService,
     private readonly verificacionService: VerificacionService,
-  ) {}
+    private readonly gateway: VerificacionArchivoGateway,
+    private readonly gatewayadmin: VerificacionArchivoAdminGateway,
+  ) { }
+
+  private notificarCambioArchivo(
+    userId: number,
+    tipo: 'subido' | 'aprobado' | 'rechazado',
+    archivo: VerificacionArchivo,
+  ) {
+    this.gateway.notificarUsuario(userId, tipo, archivo,);
+    this.gatewayadmin.notificarAdmins(tipo, {
+      userId,
+      archivo: {
+        idArchivo: archivo.idVerificacionArchivo,
+        tipoDocumento: archivo.tipoDocumento,
+        estado: archivo.estado,
+        fechaRevision: archivo.fechaRevision,
+      },
+    });
+  }
 
   //Validación inicial del archivo y tipo esperado
-  async validarArchivoInicial(
-    usuario: Usuario,
-    archivo: Express.Multer.File,
-    tipo_Documento: string,
-  ): Promise<TipoDocumento> {
+  async validarArchivoInicial(usuario: Usuario, archivo: Express.Multer.File, tipo_Documento: string,): Promise<TipoDocumento> {
     validarArchivoPDF(archivo);
     return determinarTipoDocumento(usuario.rol, tipo_Documento);
   }
 
   //Subir archivo
-  async subirArchivo(
-    usuario: Usuario,
-    archivo: Express.Multer.File,
-    tipo_Documento: string,
-  ): Promise<{ archivo: VerificacionArchivo; verificacion: Verificacion }> {
+  async subirArchivo(usuario: Usuario, archivo: Express.Multer.File, tipo_Documento: string,): Promise<{ archivo: VerificacionArchivo; verificacion: Verificacion }> {
     const tipoDocumentoEsperado = await this.validarArchivoInicial(
       usuario,
       archivo,
@@ -121,6 +122,9 @@ export class VerificacionArchivoService {
       archivo,
       tipoDocumentoEsperado,
     );
+
+    // Notificar al usuario (archivo subido)
+    this.notificarCambioArchivo(usuario.id_usuario, 'subido', archivoGuardado);
 
     return { archivo: archivoGuardado, verificacion };
   }
@@ -205,7 +209,7 @@ export class VerificacionArchivoService {
       );
       throw new BadRequestException(
         error?.response?.data?.detail ||
-          'Error al analizar el documento con la IA.',
+        'Error al analizar el documento con la IA.',
       );
     }
   }
@@ -237,6 +241,10 @@ export class VerificacionArchivoService {
     archivo.estado = EstadoArchivo.APROBADO;
     archivo.fechaRevision = new Date();
     const archivoActualizado = await this.archivoRepo.save(archivo);
+
+    // 🔔 Notificar al usuario (archivo aprobado)
+    this.notificarCambioArchivo(archivo.verificacion.usuario.id_usuario, 'aprobado', archivoActualizado);
+
 
     // Recalcular el estado general de la verificación
     await this.verificacionService.validarVerificacionCompleta(
@@ -278,6 +286,10 @@ export class VerificacionArchivoService {
     archivo.comentarioAdmin = dto.observaciones;
     archivo.fechaRevision = new Date();
     const archivoActualizado = await this.archivoRepo.save(archivo);
+
+    // 🔔 Notificar al usuario (archivo rechazado)
+    this.notificarCambioArchivo(archivo.verificacion.usuario.id_usuario, 'rechazado', archivoActualizado);
+
 
     // Recalcular el estado general de la verificación
     await this.verificacionService.validarVerificacionCompleta(

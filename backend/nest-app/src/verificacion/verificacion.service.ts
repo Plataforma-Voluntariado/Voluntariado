@@ -6,6 +6,7 @@ import { VerificacionArchivo, EstadoArchivo, TipoDocumento } from './verificacio
 import { Usuario, RolUsuario } from 'src/usuario/entity/usuario.entity';
 import { Administrador } from 'src/administrador/entity/administrador.entity';
 import { Creador } from '../creador/entity/creador.entity'; // 👈 Importación añadida
+import { UsersGateway } from 'src/usuario/usuario.gateway';
 
 @Injectable()
 export class VerificacionService {
@@ -18,6 +19,7 @@ export class VerificacionService {
         private readonly usuarioRepository: Repository<Usuario>,
         @InjectRepository(Creador)
         private readonly creadorRepo: Repository<Creador>,
+        private readonly userGateway: UsersGateway,
     ) { }
 
     async validarVerificacionCompleta(usuario: Usuario, admin: Administrador): Promise<Verificacion> {
@@ -68,6 +70,8 @@ export class VerificacionService {
 
         //Guardar cambios
         await this.usuarioRepository.save(usuario);
+        //generamos evento 
+        this.userGateway.userNovedad(usuario)
         return await this.verificacionRepo.save(verificacion);
     }
 
