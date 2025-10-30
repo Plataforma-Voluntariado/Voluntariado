@@ -5,10 +5,12 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
 import { Categoria } from '../../categoria/entity/categoria.entity';
 import { Usuario } from '../../usuario/entity/usuario.entity';
 import { FotosVoluntariado } from 'src/fotos_voluntariado/entity/fotos_voluntariado.entity';
+import { Ubicacion } from 'src/ubicacion/entity/ubicacion.entity';
 
 export enum EstadoVoluntariado {
   PENDIENTE = 'PENDIENTE',
@@ -41,16 +43,26 @@ export class Voluntariado {
   })
   estado: EstadoVoluntariado;
 
-  // FK → usuario (creador)
+  // 🔹 Relación con el usuario creador
   @ManyToOne(() => Usuario, { nullable: false })
   @JoinColumn({ name: 'creador_id' })
   creador: Usuario;
 
-  // FK → categoria
+  // 🔹 Relación con la categoría
   @ManyToOne(() => Categoria, (categoria) => categoria.voluntariados, { nullable: false })
   @JoinColumn({ name: 'categoria_id' })
   categoria: Categoria;
 
-  @OneToMany(() => FotosVoluntariado, (foto) => foto.voluntariado)
+  // 🔹 Relación con las fotos del voluntariado
+  @OneToMany(() => FotosVoluntariado, (foto) => foto.voluntariado, {
+    cascade: true,
+  })
   fotos: FotosVoluntariado[];
+
+  // 🔹 Relación uno a uno con la ubicación
+  @OneToOne(() => Ubicacion, (ubicacion) => ubicacion.voluntariado, {
+    cascade: true, // importante para guardar automáticamente la ubicación
+  })
+  @JoinColumn({ name: 'id_ubicacion' }) // crea la FK en voluntariado
+  ubicacion: Ubicacion;
 }

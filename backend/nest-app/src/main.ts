@@ -12,7 +12,7 @@ async function bootstrap() {
   // Configuracion de cors
   app.enableCors({
     origin: ['http://localhost:3000'],
-    credentials: true, 
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   });
 
@@ -36,6 +36,15 @@ async function bootstrap() {
 
   await app.listen(port);
   console.log("Servidor corriendo en http://localhost:" + port);
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true, // ← convierte automáticamente los tipos
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
+
 }
 
 bootstrap();
