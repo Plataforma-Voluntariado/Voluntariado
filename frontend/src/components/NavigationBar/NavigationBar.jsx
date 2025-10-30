@@ -6,7 +6,6 @@ import { useAuth } from "../../context/AuthContext";
 import VolunteerCase from "./NavigationBarCases/VolunteerCase";
 import AdministratorCase from "./NavigationBarCases/AdministratorCase";
 import CreatorCase from "./NavigationBarCases/CreatorCase";
-import { MdNotifications } from "react-icons/md";
 import NotificationButton from "../NotificacionButton/NotificationButton";
 
 function NavigationBar() {

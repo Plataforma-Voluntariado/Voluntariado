@@ -14,89 +14,128 @@ export const useAuth = () => {
 };
 
 // Hook personalizado para manejar sockets de usuario y notificaciones
-const useAuthSockets = (userId, handleUserUpdate, handleNotifications) => {
+const useAuthSockets = (userId,handleUserUpdate,handleNotifications,handleNotificationVista,handleNotificationEliminada) => {
   useUserSocket(userId, handleUserUpdate);
-  useNotificacionesSocket(userId, handleNotifications);
+
+  const memoizedEventHandler = useCallback(
+    (event) => {
+      if (!event) return;
+      switch (event.tipo) {
+        case "VISTA":
+          handleNotificationVista(event.id_notificacion);
+          break;
+        case "ELIMINADA":
+          handleNotificationEliminada(event.id_notificacion);
+          break;
+        default:
+          handleNotifications();
+      }
+    },
+    [handleNotificationVista, handleNotificationEliminada, handleNotifications]
+  );
+
+  useNotificacionesSocket(userId, memoizedEventHandler);
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, _setUser] = useState(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [notifications, setNotifications] = useState({ vistas: [], noVistas: [] });
 
-  // Wrapper de setUser
-  const setUser = (newUser) => _setUser(newUser);
+  // Contador de no vistas siempre derivado del estado
+  const unreadCount = notifications.noVistas.length;
 
   // Actualiza datos del usuario desde socket
   const handleUserUpdate = useCallback((userData) => {
-    setUser((prevUser) => {
-      if (!prevUser) return prevUser;
+    setUser((prev) => {
+      if (!prev) return prev;
 
-      const rolPrevio = prevUser.rol;
+      const nombreCompleto =
+        userData.rol === "CREADOR"
+          ? userData.nombre_entidad || prev.nombre_entidad || "Entidad sin nombre"
+          : userData.nombre && userData.apellido
+          ? `${userData.nombre} ${userData.apellido}`
+          : prev.nombreCompleto;
 
       return {
-        ...prevUser,
+        ...prev,
         ...userData,
-        rol: rolPrevio,
-        nombreCompleto:
-          userData.rol === "CREADOR"
-            ? userData.nombre_entidad || prevUser.nombre_entidad || "Entidad sin nombre"
-            : userData.nombre && userData.apellido
-            ? `${userData.nombre} ${userData.apellido}`
-            : prevUser.nombreCompleto,
-        email: userData.correo || prevUser.email,
-        correo: userData.correo || prevUser.correo,
-        correo_verificado: userData.correo_verificado ?? prevUser.correo_verificado,
-        verificado: userData.verificado ?? prevUser.verificado,
-        nombre_entidad: userData.nombre_entidad || prevUser.nombre_entidad,
-        urlImage: userData.url_imagen || prevUser.urlImage,
+        rol: prev.rol,
+        nombreCompleto,
+        email: userData.correo || prev.email,
+        correo: userData.correo || prev.correo,
+        correo_verificado: userData.correo_verificado ?? prev.correo_verificado,
+        verificado: userData.verificado ?? prev.verificado,
+        nombre_entidad: userData.nombre_entidad || prev.nombre_entidad,
+        urlImage: userData.url_imagen || prev.urlImage,
       };
     });
   }, []);
 
-  // Función para cargar notificaciones sin leer
-  const fetchUnreadNotifications = useCallback(async () => {
+  // Fetch de notificaciones
+  const fetchNotifications = useCallback(async () => {
     try {
-      const response = await GetNotifications();
-      if (response && Array.isArray(response)) {
-        const sinLeer = response.filter((n) => n.visto === false).length;
-        setUnreadCount(sinLeer);
-      }
+      const data = await GetNotifications();
+      setNotifications({
+        vistas: data.vistas || [],
+        noVistas: data.noVistas || [],
+      });
     } catch (err) {
       console.error("Error al obtener notificaciones:", err);
+      setNotifications({ vistas: [], noVistas: [] });
     }
   }, []);
 
-  useAuthSockets(user?.userId, handleUserUpdate, fetchUnreadNotifications);
+  // Marcar notificación como vista en estado local
+  const handleNotificationVista = useCallback((id_notificacion) => {
+    setNotifications((prev) => {
+      const noti = prev.noVistas.find((n) => n.id_notificacion === id_notificacion);
+      if (!noti) return prev;
+      return {
+        vistas: [noti, ...prev.vistas],
+        noVistas: prev.noVistas.filter((n) => n.id_notificacion !== id_notificacion),
+      };
+    });
+  }, []);
 
+  // Eliminar notificación (vistas o no vistas)
+  const handleNotificationEliminada = useCallback((id_notificacion) => {
+    setNotifications((prev) => ({
+      vistas: prev.vistas.filter((n) => n.id_notificacion !== id_notificacion),
+      noVistas: prev.noVistas.filter((n) => n.id_notificacion !== id_notificacion),
+    }));
+  }, []);
+
+  // Inicializa sockets
+  useAuthSockets(user?.userId, handleUserUpdate, fetchNotifications, handleNotificationVista, handleNotificationEliminada);
+
+  // Cargar usuario y notificaciones al iniciar
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         const profile = await getUserData();
-        if (profile) {
-          setUser({
-            userId: profile.id_usuario,
-            email: profile.correo,
-            correo: profile.correo,
-            rol: profile.rol,
-            verificado: profile.verificado,
-            correo_verificado: profile.correo_verificado,
-            urlImage: profile.url_imagen ? `${profile.url_imagen}?t=${Date.now()}` : null,
-            ciudad: profile.ciudad?.ciudad,
-            departamento: profile.ciudad?.departamento?.departamento,
-            telefono: profile.telefono,
-            fecha_nacimiento: profile.fecha_nacimiento,
-            nombre_entidad: profile.creador?.nombre_entidad || null,
-            nombreCompleto:
-              profile.nombre || profile.apellido
-                ? `${profile.nombre || ""} ${profile.apellido || ""}`.trim()
-                : null,
-          });
+        if (!profile) return setUser(null);
 
-          await fetchUnreadNotifications();
-        } else {
-          setUser(null);
-        }
+        setUser({
+          userId: profile.id_usuario,
+          email: profile.correo,
+          correo: profile.correo,
+          rol: profile.rol,
+          verificado: profile.verificado,
+          correo_verificado: profile.correo_verificado,
+          urlImage: profile.url_imagen ? `${profile.url_imagen}?t=${Date.now()}` : null,
+          ciudad: profile.ciudad?.ciudad,
+          departamento: profile.ciudad?.departamento?.departamento,
+          telefono: profile.telefono,
+          fecha_nacimiento: profile.fecha_nacimiento,
+          nombre_entidad: profile.creador?.nombre_entidad || null,
+          nombreCompleto:
+            profile.nombre || profile.apellido
+              ? `${profile.nombre || ""} ${profile.apellido || ""}`.trim()
+              : null,
+        });
+
+        await fetchNotifications();
       } catch (err) {
         setUser(null);
       }
@@ -104,7 +143,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     fetchUserProfile();
-  }, [fetchUnreadNotifications]);
+  }, [fetchNotifications]);
 
   return (
     <AuthContext.Provider
@@ -114,7 +153,8 @@ export const AuthProvider = ({ children }) => {
         loading,
         isAuthenticated: !!user,
         unreadCount,
-        refreshNotifications: fetchUnreadNotifications,
+        notifications,
+        refreshNotifications: fetchNotifications,
       }}
     >
       {children}

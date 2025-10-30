@@ -29,6 +29,21 @@ export class NotificacionesGateway extends BaseGateway {
     });
   }
 
+  async notificacionVista(usuarioIds: number[], notificacionId: number) {
+    usuarioIds.forEach((id) => {
+      this.server.to(`user_${id}`).emit('notificacionVista', { id_notificacion: notificacionId });
+    });
+  }
+
+  async notificacionEliminada(usuarioIds: number[], notificacionId: number) {
+    usuarioIds.forEach((id) => {
+      this.server
+        .to(`user_${id}`)
+        .emit('notificacionEliminada', { id_notificacion: notificacionId });
+    });
+  }
+
+
   protected getNamespace(): string {
     return '/notificaciones';
   }

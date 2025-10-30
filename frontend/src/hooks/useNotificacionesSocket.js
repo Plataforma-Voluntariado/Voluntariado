@@ -3,15 +3,15 @@ import { useEffect, useRef } from "react";
 import { createSocketConnection } from "../services/socket";
 
 // 🚨 Ahora acepta un callback para notificar al componente.
-export const useNotificacionesSocket = (userId, onNotificationEvent) => { 
+export const useNotificacionesSocket = (userId, onNotificationEvent) => {
   const socketRef = useRef(null);
 
   useEffect(() => {
     if (!userId) return;
-    
+
     if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
+      socketRef.current.disconnect();
+      socketRef.current = null;
     }
 
     const socket = createSocketConnection("/notificaciones", {
@@ -26,13 +26,22 @@ export const useNotificacionesSocket = (userId, onNotificationEvent) => {
     });
 
     socket.on("notificacion", (data) => {
-      
+
       if (onNotificationEvent) {
-          onNotificationEvent(data); 
+        onNotificationEvent(data);
       }
     });
-    
-    
+
+    socket.on("notificacionVista", ({ id_notificacion }) => {
+      if (onNotificationEvent) {
+        onNotificationEvent({ tipo: "VISTA", id_notificacion });
+      }
+    });
+
+    socket.on("notificacionEliminada", ({ id_notificacion }) => {
+      if (onNotificationEvent) onNotificationEvent({ tipo: "ELIMINADA", id_notificacion });
+    });
+
     socket.on("disconnect", (reason) => {
       console.log("❌ WebSocket /notificaciones desconectado:", reason);
     });
@@ -45,6 +54,6 @@ export const useNotificacionesSocket = (userId, onNotificationEvent) => {
       socket.disconnect();
       socketRef.current = null;
     };
-  // 🚨 Agregar onNotificationEvent a las dependencias, envuélvelo en useCallback si lo pasas desde otro hook.
-  }, [userId, onNotificationEvent]); 
+    // 🚨 Agregar onNotificationEvent a las dependencias, envuélvelo en useCallback si lo pasas desde otro hook.
+  }, [userId, onNotificationEvent]);
 };

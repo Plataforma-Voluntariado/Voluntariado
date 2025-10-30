@@ -9,15 +9,27 @@ export class NotificacionesController {
   @UseGuards(JwtAuthGuard)
   @Get()
   async obtenerPorUsuario(@Req() req) {
-    const userId = req.user.id_usuario;
-    return this.notificacionesService.obtenerPorUsuario(userId);
+    const todas = await this.notificacionesService.obtenerPorUsuario(req.user.id_usuario);
+
+    return {
+      vistas: todas.filter(n => n.visto),
+      noVistas: todas.filter(n => !n.visto),
+    };
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('marcar-vista/:notificacionId')
-  async marcarComoVista(@Req() req,@Param('notificacionId', ParseIntPipe) notificacionId: number,) {
+  async marcarComoVista(@Req() req, @Param('notificacionId', ParseIntPipe) notificacionId: number,) {
     const userId = req.user.id_usuario;
     return this.notificacionesService.marcarComoVista(userId, notificacionId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post('eliminar/:notificacionId')
+  async eliminarNotificacion(@Req() req,@Param('notificacionId', ParseIntPipe) notificacionId: number,) {
+    const userId = req.user.id_usuario;
+    return this.notificacionesService.eliminarNotificacion(userId, notificacionId);
+  }
 }
+
+
