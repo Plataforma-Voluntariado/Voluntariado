@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Notificacion } from './entity/notificacion.entity';
+import { EstadoNotificacion, Notificacion } from './entity/notificacion.entity';
 import { Usuario } from 'src/usuario/entity/usuario.entity';
 import { NotificacionesGateway } from './notificaciones.gateway';
 
@@ -18,7 +18,6 @@ export class NotificacionesService {
 
 
     async crearYEnviarNotificacion(usuarioIds: number[], datos: Partial<Notificacion>,) {
-        //Obtener los usuarios destino
         const usuarios = await this.usuarioRepo.findByIds(usuarioIds);
 
         if (!usuarios.length) {
@@ -60,6 +59,33 @@ export class NotificacionesService {
         }
 
         notificacion.visto = true;
-        return this.notificacionRepo.save(notificacion);
+        const guardada = await this.notificacionRepo.save(notificacion);
+
+        this.notificacionesGateway.notificacionVista([usuarioId], notificacionId);
+
+        return guardada;
     }
+
+    async eliminarNotificacion(usuarioId: number, notificacionId: number) {
+        const notificacion = await this.notificacionRepo
+            .createQueryBuilder("notificacion")
+            .leftJoin("notificacion.usuarios", "usuario")
+            .where("usuario.id_usuario = :usuarioId", { usuarioId })
+            .andWhere("notificacion.id_notificacion = :notificacionId", { notificacionId })
+            .getOne();
+
+        if (!notificacion) {
+            throw new NotFoundException('Notificación no encontrada o no pertenece al usuario.');
+        }
+
+        notificacion.estado = EstadoNotificacion.ELIMINADO;
+        const guardada = await this.notificacionRepo.save(notificacion);
+
+        // Emitir un evento para que el front la elimine en caliente
+        this.notificacionesGateway.notificacionEliminada([usuarioId], notificacionId);
+
+        return guardada;
+    }
+
+
 }

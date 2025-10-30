@@ -274,6 +274,7 @@ export class UsuarioService {
       tipo: TipoNotificacion.INFO,
       titulo: 'Imagen de perfil actualizada',
       mensaje: 'Tu imagen de perfil ha sido actualizada correctamente.',
+      url_redireccion: '/profile',
     });
 
 
@@ -334,6 +335,7 @@ export class UsuarioService {
       tipo: TipoNotificacion.INFO,
       titulo: 'Imagen de perfil eliminada',
       mensaje: 'Tu imagen de perfil ha sido eliminada correctamente y se generó un avatar automático.',
+      url_redireccion: '/profile'
     });
 
     return {
