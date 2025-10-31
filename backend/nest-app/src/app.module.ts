@@ -22,6 +22,7 @@ import { VoluntariadoModule } from './voluntariado/voluntariado.module';
 import { NotificacionesModule } from './notificaciones/notificaciones.module';
 import { FotosVoluntariadoModule } from './fotos_voluntariado/fotos_voluntariado.module';
 import { UbicacionModule } from './ubicacion/ubicacion.module';
+import { InscripcionModule } from './inscripcion/inscripcion.module';
 
 
 @Module({
@@ -43,7 +44,7 @@ import { UbicacionModule } from './ubicacion/ubicacion.module';
         synchronize: false,
         logging: false,
         migrations: [__dirname + '/database/migrations/*{.ts,.js}'],
-        migrationsRun: false,
+        migrationsRun:false,
       }),
       inject: [ConfigService],
     }),
@@ -64,7 +65,8 @@ import { UbicacionModule } from './ubicacion/ubicacion.module';
     VoluntariadoModule,
     NotificacionesModule,
     FotosVoluntariadoModule,
-    UbicacionModule
+    UbicacionModule,
+    InscripcionModule
   ],
   controllers: [AppController],
   providers: [AppService],

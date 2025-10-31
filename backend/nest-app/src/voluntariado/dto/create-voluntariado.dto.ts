@@ -1,16 +1,4 @@
-import {
-  IsEnum,
-  IsInt,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MaxLength,
-  Min,
-  ValidateNested,
-  IsDecimal,
-  Max,
-  IsNumber,
-} from 'class-validator';
+import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength, Min, ValidateNested, Max, IsNumber, } from 'class-validator';
 import { Type } from 'class-transformer';
 import { EstadoVoluntariado } from '../entity/voluntariado.entity';
 
@@ -74,6 +62,13 @@ export class CreateVoluntariadoDto {
   @IsInt({ message: 'Las horas deben ser un número entero.' })
   @Min(1, { message: 'Las horas deben ser como mínimo 1.' })
   horas: number;
+
+  @IsNotEmpty({ message: 'El número máximo de participantes es obligatorio.' })
+  @Type(() => Number)
+  @IsInt({ message: 'El número máximo de participantes debe ser un número entero.' })
+  @Min(1, { message: 'El número máximo de participantes debe ser como mínimo 1.' })
+  @Max(100, { message: 'El número máximo de participantes no puede superar 100.' })
+  maxParticipantes: number;
 
   @IsOptional()
   @IsEnum(EstadoVoluntariado, {

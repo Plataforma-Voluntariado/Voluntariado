@@ -1,302 +1,223 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, In } from 'typeorm';
 import { Voluntariado } from './entity/voluntariado.entity';
 import { Categoria } from '../categoria/entity/categoria.entity';
 import { Usuario, RolUsuario } from '../usuario/entity/usuario.entity';
 import { CreateVoluntariadoDto } from './dto/create-voluntariado.dto';
 import { UpdateVoluntariadoDto } from './dto/update-voluntariado.dto';
-import { Ubicacion } from '../ubicacion/entity/ubicacion.entity';
-import { Ciudad } from '../ciudad/entity/ciudad.entity';
-import { CloudinaryService } from '../cloudinary/cloudinary.service';
-import { FotosVoluntariado } from '../fotos_voluntariado/entity/fotos_voluntariado.entity';
+import { FotosVoluntariadoService } from '../fotos_voluntariado/fotos_voluntariado.service';
+import { UbicacionService } from 'src/ubicacion/ubicacion.service';
+import { Ubicacion } from 'src/ubicacion/entity/ubicacion.entity';
+import { FotosVoluntariado } from 'src/fotos_voluntariado/entity/fotos_voluntariado.entity';
+import { Ciudad } from 'src/ciudad/entity/ciudad.entity';
 
 @Injectable()
 export class VoluntariadoService {
+  private readonly logger = new Logger(VoluntariadoService.name);
+  private readonly commonRelations = ['categoria', 'creador', 'fotos', 'ubicacion', 'ubicacion.ciudad'] as const;
+
   constructor(
-    @InjectRepository(Voluntariado)
-    private readonly voluntariadoRepository: Repository<Voluntariado>,
-
-    @InjectRepository(Categoria)
-    private readonly categoriaRepository: Repository<Categoria>,
-
-    @InjectRepository(Usuario)
-    private readonly usuarioRepository: Repository<Usuario>,
-
-    @InjectRepository(Ubicacion)
-    private readonly ubicacionRepository: Repository<Ubicacion>,
-
-    @InjectRepository(Ciudad)
-    private readonly ciudadRepository: Repository<Ciudad>,
-
-    @InjectRepository(FotosVoluntariado)
-    private readonly fotosRepository: Repository<FotosVoluntariado>,
-
-    private readonly cloudinaryService: CloudinaryService,
-
+    @InjectRepository(Voluntariado) private readonly voluntariadoRepo: Repository<Voluntariado>,
+    @InjectRepository(Categoria) private readonly categoriaRepo: Repository<Categoria>,
+    private readonly fotosVoluntariadoService: FotosVoluntariadoService,
+    private readonly ubicacionService: UbicacionService,
     private readonly dataSource: DataSource,
   ) { }
 
-  /**
-   * Crear voluntariado con ubicación y fotos (todo en una transacción)
-   */
-  async create(
-    dto: CreateVoluntariadoDto,
-    creadorId: number,
-    files?: Express.Multer.File[],
-  ) {
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+  // ====================== CREATE ======================
+  async create(dto: CreateVoluntariadoDto, creadorId: number, files?: Express.Multer.File[]) {
+    return this.executeTransaction(async (qr) => {
+      const [categoria, creador] = await Promise.all([
+        this.findCategoria(dto.categoria_id, qr),
+        this.findUsuario(creadorId, qr),
+      ]);
 
-    try {
-      // 1️ Validar categoría
-      const categoria = await queryRunner.manager.findOne(Categoria, {
-        where: { id_categoria: dto.categoria_id },
-      });
-      if (!categoria)
-        throw new NotFoundException('La categoría especificada no existe.');
+      if (!creador.verificado)
+        throw new BadRequestException('Tu cuenta debe estar verificada para crear voluntariados.');
 
-      // 2️ Validar creador
-      const creador = await queryRunner.manager.findOne(Usuario, {
-        where: { id_usuario: creadorId },
-      });
-      if (!creador)
-        throw new NotFoundException('El usuario creador no existe.');
-
-      // 3️ Crear voluntariado base
-      const voluntariado = queryRunner.manager.create(Voluntariado, {
+      const voluntariado = await qr.manager.save(Voluntariado, {
         titulo: dto.titulo.trim(),
         descripcion: dto.descripcion.trim(),
         fechaHora: dto.fechaHora,
         horas: dto.horas,
-        estado: dto.estado ?? undefined,
+        maxParticipantes: dto.maxParticipantes,
+        estado: dto.estado,
         categoria,
         creador,
       });
-      await queryRunner.manager.save(voluntariado);
 
-      // 4️ Crear ubicación (si viene en el DTO)
-      if (dto.ubicacion) {
-        const { ciudad_id, latitud, longitud, direccion, nombre_sector } =
-          dto.ubicacion;
-
-        const ciudad = await queryRunner.manager.findOne(Ciudad, {
-          where: { id_ciudad: ciudad_id },
-        });
-        if (!ciudad)
-          throw new NotFoundException('La ciudad indicada no existe.');
-
-        const ubicacion = queryRunner.manager.create(Ubicacion, {
-          ciudad,
-          latitud,
-          longitud,
-          direccion: direccion?.trim(),
-          nombre_sector: nombre_sector?.trim(),
-          voluntariado,
-        });
-
-        await queryRunner.manager.save(Ubicacion, ubicacion);
-        voluntariado.ubicacion = ubicacion;
-      }
-
-      // 5️ Subir fotos (si hay archivos)
-      if (files && files.length > 0) {
-        const fotosGuardadas: FotosVoluntariado[] = [];
-
-        for (const file of files) {
-          try {
-            const uploadResult = await this.cloudinaryService.uploadImage(
-              file,
-              'fotos-voluntariado',
-            );
-
-            const nuevaFoto = queryRunner.manager.create(FotosVoluntariado, {
-              url: uploadResult.secure_url,
-              voluntariado,
-            });
-
-            await queryRunner.manager.save(FotosVoluntariado, nuevaFoto);
-            fotosGuardadas.push(nuevaFoto);
-          } catch (uploadError) {
-            console.error('Error subiendo imagen a Cloudinary:', uploadError);
-            throw new BadRequestException(
-              'Error al subir una de las imágenes. Verifique el formato.',
-            );
-          }
-        }
-
-        voluntariado.fotos = fotosGuardadas;
-      }
-
-      await queryRunner.commitTransaction();
-
-      // 6️ Retornar voluntariado con todas sus relaciones
-      const voluntariadoCompleto = await this.voluntariadoRepository.findOne({
+      const voluntariadoDb = await qr.manager.findOne(Voluntariado, {
         where: { id_voluntariado: voluntariado.id_voluntariado },
-        relations: ['categoria', 'creador', 'ubicacion', 'fotos'],
+        relations: ['ubicacion'],
       });
+
+      if (!voluntariadoDb) throw new BadRequestException('Error al cargar voluntariado en la transacción');
+
+      if (dto.ubicacion) await this.ubicacionService.create(dto.ubicacion, voluntariadoDb, qr);
+      if (files?.length) await this.fotosVoluntariadoService.uploadFotos(files, voluntariadoDb, qr);
+
+      const completo = await this.findVoluntariadoById(voluntariado.id_voluntariado, qr);
 
       return {
-        message: ' Voluntariado creado exitosamente con ubicación y fotos.',
-        voluntariado: voluntariadoCompleto,
+        message: 'Voluntariado creado exitosamente.',
+        voluntariado: completo,
       };
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      console.error(' Error creando voluntariado:', error);
-      throw new BadRequestException(
-        error.message || 'Error al crear el voluntariado.',
-      );
-    } finally {
-      await queryRunner.release();
-    }
+    });
   }
 
-  /**
-   * Obtener todos los voluntariados
-   */
-  findAll() {
-    return this.voluntariadoRepository.find({
-      relations: ['creador', 'categoria', 'fotos', 'ubicacion'],
+  // ====================== LIST ======================
+  async findAll() {
+    return this.voluntariadoRepo.find({
+      relations: this.commonRelations as any,
       order: { id_voluntariado: 'DESC' },
     });
   }
 
-  /**
-   * Obtener los voluntariados creados por un usuario específico
-   */
-  findAllByCreator(idUsuario: number) {
-    return this.voluntariadoRepository.find({
+  async findAllByCreator(idUsuario: number) {
+    return this.voluntariadoRepo.find({
       where: { creador: { id_usuario: idUsuario } },
-      relations: ['creador', 'categoria', 'fotos', 'ubicacion'],
+      relations: this.commonRelations as any,
       order: { id_voluntariado: 'DESC' },
     });
   }
 
-  /**
-   * Obtener un voluntariado por ID
-   */
   async findOne(id: number, user: Usuario) {
     const voluntariado = await this.findVoluntariadoById(id);
-
-    if (
-      user.rol === RolUsuario.CREADOR &&
-      voluntariado.creador.id_usuario !== user.id_usuario
-    ) {
-      throw new ForbiddenException(
-        'No tiene permiso para ver este voluntariado.',
-      );
-    }
-
+    this.validarPermiso(voluntariado, user, 'ver');
     return voluntariado;
   }
 
-  /**
-   * Actualizar voluntariado
-   */
-  async update(id: number, dto: UpdateVoluntariadoDto, user: Usuario) {
-    const voluntariado = await this.findVoluntariadoById(id);
+  // ====================== UPDATE ======================
+  async update(id: number, dto: UpdateVoluntariadoDto, user: Usuario, nuevasFotos?: Express.Multer.File[],) {
+    return this.executeTransaction(async (qr) => {
+      if (!user.verificado)
+        throw new BadRequestException('Tu cuenta debe estar verificada para editar voluntariados.');
 
-    if (
-      user.rol === RolUsuario.CREADOR &&
-      voluntariado.creador.id_usuario !== user.id_usuario
-    ) {
-      throw new ForbiddenException(
-        'No tiene permiso para actualizar este voluntariado.',
-      );
-    }
+      const voluntariado = await this.findVoluntariadoById(id, qr);
+      this.validarPermiso(voluntariado, user, 'actualizar');
 
-    if (dto.categoria_id) {
-      const categoria = await this.categoriaRepository.findOne({
-        where: { id_categoria: dto.categoria_id },
-      });
-      if (!categoria)
-        throw new NotFoundException('La categoría indicada no existe.');
-      voluntariado.categoria = categoria;
-      delete dto.categoria_id;
-    }
+      // Categoria
+      if (dto.categoria_id) {
+        voluntariado.categoria = await this.findCategoria(dto.categoria_id, qr);
+      }
 
-    Object.assign(voluntariado, dto);
-    return await this.voluntariadoRepository.save(voluntariado);
-  }
+      // Ubicación
+      if (dto.ubicacion) {
+        if (voluntariado.ubicacion) {
+          voluntariado.ubicacion.latitud = dto.ubicacion.latitud ?? voluntariado.ubicacion.latitud;
+          voluntariado.ubicacion.longitud = dto.ubicacion.longitud ?? voluntariado.ubicacion.longitud;
+          voluntariado.ubicacion.direccion = dto.ubicacion.direccion?.trim() ?? voluntariado.ubicacion.direccion;
+          voluntariado.ubicacion.nombre_sector = dto.ubicacion.nombre_sector?.trim() ?? voluntariado.ubicacion.nombre_sector;
 
-  /**
-   * Buscar voluntariado (uso interno)
-   */
-  private async findVoluntariadoById(id: number) {
-    const voluntariado = await this.voluntariadoRepository.findOne({
-      where: { id_voluntariado: id },
-      relations: ['categoria', 'creador', 'fotos', 'ubicacion', 'ubicacion.ciudad'],
-    });
-
-    if (!voluntariado)
-      throw new NotFoundException('Voluntariado no encontrado.');
-
-    return voluntariado;
-  }
-
-  /**
- * Eliminar voluntariado (borra fotos en Cloudinary también)
- */
-  async remove(id: number, user: Usuario) {
-    const voluntariado = await this.findOne(id, user);
-
-    if (
-      user.rol === RolUsuario.CREADOR &&
-      voluntariado.creador.id_usuario !== user.id_usuario
-    ) {
-      throw new ForbiddenException(
-        'No tiene permiso para eliminar este voluntariado.',
-      );
-    }
-
-    // 🔹 Eliminar fotos de Cloudinary antes de borrar el voluntariado
-    if (voluntariado.fotos && voluntariado.fotos.length > 0) {
-      for (const foto of voluntariado.fotos) {
-        if (foto.url.includes('res.cloudinary.com')) {
-          const publicId = this.extractPublicIdFromUrl(foto.url);
-          if (publicId) {
-            try {
-              await this.cloudinaryService.deleteImage(publicId);
-            } catch (err) {
-              console.warn(
-                `⚠️ No se pudo eliminar la imagen ${publicId} de Cloudinary.`,
-              );
-            }
+          if (dto.ubicacion.ciudad_id) {
+            voluntariado.ubicacion.ciudad = { id_ciudad: Number(dto.ubicacion.ciudad_id) } as Ciudad;
           }
+
+          await qr.manager.save(Ubicacion, voluntariado.ubicacion);
+        } else {
+          await this.ubicacionService.create(dto.ubicacion, voluntariado, qr);
         }
       }
-    }
 
-    // 🔹 Eliminar voluntariado (borra fotos y ubicación en BD)
-    await this.voluntariadoRepository.remove(voluntariado);
+      // Fotos
+      const fotosActuales = voluntariado.fotos ?? [];
+      const idsMantener = (dto.fotosMantener ?? []).map(Number).filter(v => !isNaN(v));
+      const fotosAEliminar = fotosActuales.filter(f => !idsMantener.includes(Number(f.id_foto)));
 
-    return {
-      message: `El voluntariado "${voluntariado.titulo}" ha sido eliminado exitosamente.`,
-    };
+      if (fotosAEliminar.length > 0) {
+        await this.fotosVoluntariadoService.deleteFotosCloudinary(fotosAEliminar);
+        await qr.manager.delete(FotosVoluntariado, {
+          id_foto: In(fotosAEliminar.map(f => Number(f.id_foto))),
+        });
+      }
+
+      if (nuevasFotos?.length) {
+        await this.fotosVoluntariadoService.uploadFotos(
+          nuevasFotos,
+          { id_voluntariado: voluntariado.id_voluntariado } as Voluntariado,
+          qr
+        );
+      }
+
+      // Campos
+      Object.assign(voluntariado, {
+        titulo: dto.titulo?.trim() ?? voluntariado.titulo,
+        descripcion: dto.descripcion?.trim() ?? voluntariado.descripcion,
+        fechaHora: dto.fechaHora ?? voluntariado.fechaHora,
+        horas: dto.horas ?? voluntariado.horas,
+        maxParticipantes: dto.maxParticipantes ?? voluntariado.maxParticipantes,
+        estado: dto.estado ?? voluntariado.estado,
+      });
+
+      // Reload fotos real desde DB
+      voluntariado.fotos = await qr.manager.find(FotosVoluntariado, {
+        where: { voluntariado: { id_voluntariado: voluntariado.id_voluntariado } },
+      });
+
+      const actualizado = await qr.manager.save(Voluntariado, voluntariado);
+
+      return {
+        message: 'Voluntariado actualizado correctamente.',
+        voluntariado: actualizado,
+      };
+    });
   }
 
-  /**
-   * Extraer el public_id de una URL de Cloudinary
-   */
-  private extractPublicIdFromUrl(url: string): string | null {
+  // ====================== DELETE ======================
+  async remove(id: number, user: Usuario) {
+    const voluntariado = await this.findVoluntariadoById(id);
+
+    if (user.rol === RolUsuario.CREADOR && voluntariado.creador.id_usuario !== user.id_usuario)
+      throw new ForbiddenException('No tiene permiso para eliminar este voluntariado.');
+
+    await this.fotosVoluntariadoService.deleteFotosCloudinary(voluntariado.fotos);
+    await this.voluntariadoRepo.remove(voluntariado);
+
+    return { message: `Voluntariado "${voluntariado.titulo}" eliminado.` };
+  }
+
+  // ====================== HELPERS ======================
+  private async executeTransaction<T>(operation: (qr: any) => Promise<T>): Promise<T> {
+    const qr = this.dataSource.createQueryRunner();
+    await qr.connect();
+    await qr.startTransaction();
     try {
-      const parts = url.split('/');
-      const uploadIndex = parts.findIndex((p) => p === 'upload');
-      if (uploadIndex === -1) return null;
-
-      const publicPathParts = parts.slice(uploadIndex + 1);
-      if (/^v\d+$/.test(publicPathParts[0])) publicPathParts.shift();
-
-      const publicIdPath = publicPathParts.join('/').replace(/\.[^/.]+$/, '');
-      return publicIdPath || null;
-    } catch {
-      return null;
+      const result = await operation(qr);
+      await qr.commitTransaction();
+      return result;
+    } catch (error) {
+      await qr.rollbackTransaction();
+      this.logger.error(error.message);
+      throw new BadRequestException(error.message);
+    } finally {
+      await qr.release();
     }
+  }
+
+  private async findCategoria(id: number, qr?: any) {
+    const repo = qr ? qr.manager.getRepository(Categoria) : this.categoriaRepo;
+    const categoria = await repo.findOne({ where: { id_categoria: id } });
+    if (!categoria) throw new NotFoundException('La categoría no existe.');
+    return categoria;
+  }
+
+  private async findUsuario(id: number, qr?: any) {
+    const repo = qr ? qr.manager.getRepository(Usuario) : this.voluntariadoRepo.manager.getRepository(Usuario);
+    const usuario = await repo.findOne({ where: { id_usuario: id } });
+    if (!usuario) throw new NotFoundException('El usuario no existe.');
+    return usuario;
+  }
+
+  private validarPermiso(v: Voluntariado, user: Usuario, accion: string) {
+    if (user.rol === RolUsuario.CREADOR && v.creador.id_usuario !== user.id_usuario)
+      throw new ForbiddenException(`No tiene permiso para ${accion} este voluntariado.`);
+  }
+
+  private async findVoluntariadoById(id: number, qr?: any) {
+    const repo = qr ? qr.manager.getRepository(Voluntariado) : this.voluntariadoRepo;
+    const v = await repo.findOne({ where: { id_voluntariado: id }, relations: this.commonRelations as any });
+    if (!v) throw new NotFoundException('Voluntariado no encontrado.');
+    return v;
   }
 }

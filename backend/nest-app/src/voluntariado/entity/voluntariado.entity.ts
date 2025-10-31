@@ -1,16 +1,9 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-  OneToMany,
-  OneToOne,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, OneToOne, } from 'typeorm';
 import { Categoria } from '../../categoria/entity/categoria.entity';
 import { Usuario } from '../../usuario/entity/usuario.entity';
 import { FotosVoluntariado } from 'src/fotos_voluntariado/entity/fotos_voluntariado.entity';
 import { Ubicacion } from 'src/ubicacion/entity/ubicacion.entity';
+import { Inscripcion } from 'src/inscripcion/entity/inscripcion.entity';
 
 export enum EstadoVoluntariado {
   PENDIENTE = 'PENDIENTE',
@@ -36,6 +29,10 @@ export class Voluntariado {
   @Column({ type: 'int', unsigned: true, nullable: false })
   horas: number;
 
+  @Column({ type: 'int', unsigned: true, nullable: false, default: 10 })
+  maxParticipantes: number;
+
+
   @Column({
     type: 'enum',
     enum: EstadoVoluntariado,
@@ -43,26 +40,31 @@ export class Voluntariado {
   })
   estado: EstadoVoluntariado;
 
-  // 🔹 Relación con el usuario creador
+  // Relación con el usuario creador
   @ManyToOne(() => Usuario, { nullable: false })
   @JoinColumn({ name: 'creador_id' })
   creador: Usuario;
 
-  // 🔹 Relación con la categoría
+  // Relación con la categoría
   @ManyToOne(() => Categoria, (categoria) => categoria.voluntariados, { nullable: false })
   @JoinColumn({ name: 'categoria_id' })
   categoria: Categoria;
 
-  // 🔹 Relación con las fotos del voluntariado
+  // Relación con las fotos del voluntariado
   @OneToMany(() => FotosVoluntariado, (foto) => foto.voluntariado, {
     cascade: true,
   })
   fotos: FotosVoluntariado[];
 
-  // 🔹 Relación uno a uno con la ubicación
+  // Relación uno a uno con la ubicación
   @OneToOne(() => Ubicacion, (ubicacion) => ubicacion.voluntariado, {
-    cascade: true, // importante para guardar automáticamente la ubicación
+    cascade: true,
   })
-  @JoinColumn({ name: 'id_ubicacion' }) // crea la FK en voluntariado
   ubicacion: Ubicacion;
+
+  //relacion uno a muchos con inscripcion 
+  @OneToMany(() => Inscripcion, (inscripcion) => inscripcion.voluntariado, {
+    cascade: true,
+  })
+  inscripciones: Inscripcion[];
 }

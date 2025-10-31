@@ -1,10 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
 import { Voluntariado } from '../../voluntariado/entity/voluntariado.entity';
 import { Ciudad } from '../../ciudad/entity/ciudad.entity';
 
@@ -12,19 +6,6 @@ import { Ciudad } from '../../ciudad/entity/ciudad.entity';
 export class Ubicacion {
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
   id_ubicacion: number;
-
-  @ManyToOne(() => Voluntariado, (voluntariado) => voluntariado.id_voluntariado, {
-    nullable: false,
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'voluntariado_id' })
-  voluntariado: Voluntariado;
-
-  @ManyToOne(() => Ciudad, (ciudad) => ciudad.id_ciudad, {
-    nullable: false,
-  })
-  @JoinColumn({ name: 'ciudad_id' })
-  ciudad: Ciudad;
 
   @Column({ type: 'decimal', precision: 10, scale: 8, nullable: false })
   latitud: number;
@@ -37,4 +18,16 @@ export class Ubicacion {
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   nombre_sector: string;
+
+  @OneToOne(() => Voluntariado, (voluntariado) => voluntariado.ubicacion, {
+    onDelete: 'CASCADE', 
+  })
+  @JoinColumn({ name: 'voluntariado_id' }) 
+  voluntariado: Voluntariado;
+
+  @ManyToOne(() => Ciudad, (ciudad) => ciudad.id_ciudad, {
+    nullable: false,
+  })
+  @JoinColumn({ name: 'ciudad_id' })
+  ciudad: Ciudad;
 }

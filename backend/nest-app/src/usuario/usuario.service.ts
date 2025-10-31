@@ -222,28 +222,6 @@ export class UsuarioService {
     return { message: 'Correo verificado correctamente.' };
   }
 
-  private extractPublicIdFromUrl(url: string): string | null {
-    try {
-      const parts = url.split('/');
-      const uploadIndex = parts.findIndex(p => p === 'upload');
-      if (uploadIndex === -1) return null;
-
-      const publicPathParts = parts.slice(uploadIndex + 1);
-
-      if (/^v\d+$/.test(publicPathParts[0])) {
-        publicPathParts.shift();
-      }
-
-
-      const publicIdPath = publicPathParts.join('/').replace(/\.[^/.]+$/, '');
-
-      return publicIdPath || null;
-    } catch {
-      return null;
-    }
-  }
-
-
   async actualizarImagenPerfil(userId: number, file: Express.Multer.File) {
     const usuario = await this.usuarioRepository.findOne({ where: { id_usuario: userId } });
     if (!usuario) throw new NotFoundException('Usuario no encontrado.');
@@ -254,7 +232,7 @@ export class UsuarioService {
 
     // Si ya tenía una imagen personalizada y pertenece a Cloudinary, eliminarla
     if (usuario.url_imagen && usuario.url_imagen.includes('res.cloudinary.com')) {
-      const publicId = this.extractPublicIdFromUrl(usuario.url_imagen);
+      const publicId = this.cloudinaryService.extractPublicIdFromUrl(usuario.url_imagen);
       if (publicId) {
         await this.cloudinaryService.deleteImage(publicId).catch(() => { });
       }
@@ -268,7 +246,7 @@ export class UsuarioService {
 
     // Emitir novedad en tiempo real
     this.userGateway.userNovedad(usuario);
-    
+
     //emitir notificacion
     await this.notificacionesService.crearYEnviarNotificacion([usuario.id_usuario], {
       tipo: TipoNotificacion.INFO,
@@ -276,7 +254,6 @@ export class UsuarioService {
       mensaje: 'Tu imagen de perfil ha sido actualizada correctamente.',
       url_redireccion: '/profile',
     });
-
 
     return {
       message: 'Imagen de perfil actualizada correctamente.',
@@ -300,7 +277,7 @@ export class UsuarioService {
 
     // Si la imagen actual está en Cloudinary, eliminarla
     if (usuario.url_imagen.includes('res.cloudinary.com')) {
-      const publicId = this.extractPublicIdFromUrl(usuario.url_imagen);
+      const publicId = this.cloudinaryService.extractPublicIdFromUrl(usuario.url_imagen);
       if (publicId) {
         try {
           await this.cloudinaryService.deleteImage(publicId);
