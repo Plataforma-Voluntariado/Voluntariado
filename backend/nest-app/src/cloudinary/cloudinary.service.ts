@@ -45,4 +45,20 @@ export class CloudinaryService {
       throw new BadRequestException('Error al eliminar la imagen de Cloudinary');
     }
   }
+
+  extractPublicIdFromUrl(url: string): string | null {
+    try {
+      const parts = url.split('/');
+      const uploadIndex = parts.findIndex(p => p === 'upload');
+      if (uploadIndex === -1) return null;
+
+      const publicPathParts = parts.slice(uploadIndex + 1);
+      if (/^v\d+$/.test(publicPathParts[0])) publicPathParts.shift();
+
+      const publicIdPath = publicPathParts.join('/').replace(/\.[^/.]+$/, '');
+      return publicIdPath || null;
+    } catch {
+      return null;
+    }
+  }
 }

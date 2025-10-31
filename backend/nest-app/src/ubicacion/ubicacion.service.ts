@@ -1,77 +1,47 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Ubicacion } from './entity/ubicacion.entity';
-import { CreateUbicacionDto } from './dto/create-ubicacion.dto';
-import { UpdateUbicacionDto } from './dto/update-ubicacion.dto';
-import { Voluntariado } from './../voluntariado/entity/voluntariado.entity';
-import { Ciudad } from './../ciudad/entity/ciudad.entity';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { Ubicacion } from "./entity/ubicacion.entity";
+import { Ciudad } from "src/ciudad/entity/ciudad.entity";
+import { Voluntariado } from "src/voluntariado/entity/voluntariado.entity";
+import { EntityManager } from "typeorm";
+
+interface UbicacionDto {
+  ciudad_id?: number;
+  latitud?: number;
+  longitud?: number;
+  direccion?: string;
+  nombre_sector?: string;
+}
 
 @Injectable()
 export class UbicacionService {
-  constructor(
-    @InjectRepository(Ubicacion)
-    private readonly ubicacionRepository: Repository<Ubicacion>,
-    @InjectRepository(Voluntariado)
-    private readonly voluntariadoRepository: Repository<Voluntariado>,
-    @InjectRepository(Ciudad)
-    private readonly ciudadRepository: Repository<Ciudad>,
-  ) { }
+  constructor() { }
 
-  async create(createUbicacionDto: CreateUbicacionDto) {
-    const { voluntariado_id, ciudad_id, ...rest } = createUbicacionDto;
-
-    const voluntariado = await this.voluntariadoRepository.findOne({
-      where: { id_voluntariado: voluntariado_id },
+  private async getCiudad(id: number, queryRunner: any) {
+    const ciudad = await queryRunner.manager.findOne(Ciudad, {
+      where: { id_ciudad: id },
     });
-    if (!voluntariado)
-      throw new NotFoundException('Voluntariado no encontrado.');
 
-    const ciudad = await this.ciudadRepository.findOne({
-      where: { id_ciudad: ciudad_id },
-    });
-    if (!ciudad) throw new NotFoundException('Ciudad no encontrada.');
+    if (!ciudad) {
+      throw new NotFoundException("La ciudad indicada no existe.");
+    }
 
-    const ubicacion = this.ubicacionRepository.create({
-      ...rest,
-      voluntariado,
+    return ciudad;
+  }
+
+  async create(dto: UbicacionDto, voluntariado: Voluntariado, queryRunner: any) {
+    const ciudad = await this.getCiudad(dto.ciudad_id!, queryRunner);
+
+    const ubicacion = queryRunner.manager.create(Ubicacion, {
       ciudad,
+      latitud: dto.latitud,
+      longitud: dto.longitud,
+      direccion: dto.direccion?.trim(),
+      nombre_sector: dto.nombre_sector?.trim(),
+      voluntariado,
     });
 
-    return this.ubicacionRepository.save(ubicacion);
+    return queryRunner.manager.save(Ubicacion, ubicacion);
   }
 
-  async findAll() {
-    return this.ubicacionRepository.find({
-      relations: ['voluntariado', 'ciudad'],
-    });
-  }
 
-  async findOne(id: number) {
-    const ubicacion = await this.ubicacionRepository.findOne({
-      where: { id_ubicacion: id },
-      relations: ['voluntariado', 'ciudad'],
-    });
-    if (!ubicacion) throw new NotFoundException('Ubicación no encontrada.');
-    return ubicacion;
-  }
-
-  async update(id: number, updateUbicacionDto: UpdateUbicacionDto) {
-    const ubicacion = await this.ubicacionRepository.findOne({
-      where: { id_ubicacion: id },
-    });
-    if (!ubicacion) throw new NotFoundException('Ubicación no encontrada.');
-
-    Object.assign(ubicacion, updateUbicacionDto);
-    return this.ubicacionRepository.save(ubicacion);
-  }
-
-  async remove(id: number) {
-    const ubicacion = await this.ubicacionRepository.findOne({
-      where: { id_ubicacion: id },
-    });
-    if (!ubicacion) throw new NotFoundException('Ubicación no encontrada.');
-
-    return this.ubicacionRepository.remove(ubicacion);
-  }
 }
