@@ -126,3 +126,54 @@
   background: #f5f5f5;
   border-radius: 6px;
 }
+
+/* Responsive: Mobile */
+@media screen and (max-width: 768px) {
+  .notifications-modal {
+    position: fixed;
+    top: 70px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    max-width: none;
+    margin: 0 auto;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .notifications-modal {
+    position: fixed;
+    top: 65px;
+    right: 5px;
+    left: 5px;
+    width: auto;
+    max-width: none;
+    margin: 0;
+  }
+  
+  .notifications-modal-tabs button {
+    padding: 8px;
+    font-size: 14px;
+  }
+  
+  .notification-content h4 {
+    font-size: 14px;
+  }
+  
+  .notification-content p {
+    font-size: 13px;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .notifications-modal {
+    top: 60px;
+    right: 3px;
+    left: 3px;
+  }
+  
+  .notifications-modal-tabs button {
+    padding: 6px;
+    font-size: 13px;
+  }
+}
