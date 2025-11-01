@@ -16,11 +16,23 @@
 }
 
 .content-wrapper {
-  padding-top: 10vh;
+  padding-top: 6vh;
+}
+
+@media screen and (max-width: 768px) {
+  .content-wrapper {
+    padding-top: 5vh;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .content-wrapper {
+    padding-top: 4vh;
+  }
 }
 
 .navigation-bar-left img {
-  height: 3vw;
+  height: clamp(40px, 3vw, 60px);
   width: auto;
   cursor: pointer;
   transition: transform 0.3s ease;
@@ -82,18 +94,61 @@
   color: rgb(215, 215, 215);
 }
 
-/* Responsive: pantallas ≤ 900px */
+/* Responsive: pantallas ≤ 768px */
+@media screen and (max-width: 768px) {
+  .navigation-bar {
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+  }
+
+  .navigation-bar-left img {
+    height: 38px;
+    width: auto;
+  }
+
+  .navigation-bar-list {
+    gap: 1rem;
+  }
+}
+
+/* Responsive: pantallas ≤ 480px */
+@media screen and (max-width: 480px) {
+  .navigation-bar {
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+  }
+
+  .navigation-bar-left img {
+    height: 35px;
+    width: auto;
+  }
+
+  .navigation-bar-list {
+    gap: 0.875rem;
+  }
+
+  .navigation-bar-user-photo {
+    height: 38px;
+    width: 38px;
+  }
+
+  .navigation-bar-notifications-button {
+    font-size: 1.3rem;
+  }
+}
+
+/* Responsive: pantallas ≤ 400px */
 @media screen and (max-width: 400px) {
   .navigation-bar {
     height: auto;
     padding: 1rem;
-    justify-content: flex-end;
-    
+    justify-content: space-between;
   }
 
   .navigation-bar-left img {
-    display: none;
-    /* ❌ ocultamos el logo */
+    display: block;
+    height: 32px;
+    width: auto;
   }
 
   .navigation-bar-list {

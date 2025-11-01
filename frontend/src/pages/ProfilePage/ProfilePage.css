@@ -1,8 +1,23 @@
 .profile-page {
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  overflow-x: hidden; 
+  justify-content: flex-start;
+  overflow-x: hidden;
+  padding-top: 70px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .profile-page {
+    padding-top: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-page {
+    padding-top: 60px;
+    min-height: calc(100vh - 60px);
+  }
 }

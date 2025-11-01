@@ -6,16 +6,23 @@
   margin-bottom: 2rem;
   justify-content: center;
   padding-bottom: 2rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .profile-info-item {
   flex: 1;
+  min-width: 0;
+  max-width: 100%;
   background: white;
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   position: relative;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .profile-info-item h4 {
@@ -106,10 +113,17 @@
   .profile-info {
     flex-direction: column;
     gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    padding-left: 0;
+    padding-right: 0;
   }
   
   .profile-info-item {
-    padding: 1rem;
+    padding: 1.25rem;
+    width: 100%;
+    flex: none;
+    max-width: none;
   }
 
   .profile-info-item-centered {
@@ -121,5 +135,53 @@
     height: 20px;
     top: 0.75rem;
     right: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-info {
+    gap: 0.875rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1.25rem;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  
+  .profile-info-item {
+    padding: 1rem;
+    width: 100%;
+    margin: 0;
+  }
+
+  .profile-info-item h4 {
+    font-size: 0.85rem;
+  }
+
+  .profile-info-item p {
+    font-size: 0.95rem;
+    word-break: break-word;
+  }
+
+  .verification-badge {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .profile-info {
+    gap: 0.75rem;
+  }
+
+  .profile-info-item {
+    padding: 0.875rem;
+  }
+
+  .profile-info-item h4 {
+    font-size: 0.8rem;
+  }
+
+  .profile-info-item p {
+    font-size: 0.9rem;
   }
 }

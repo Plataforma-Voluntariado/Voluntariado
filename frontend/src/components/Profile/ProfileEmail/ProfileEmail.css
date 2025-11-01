@@ -1,15 +1,17 @@
 .profile-email-card {
   position: relative;
   width: 100%;
+  max-width: 100%;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 20px;
   padding: 1.5rem;
-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(0, 0, 0, 0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
+  margin: 0 auto;
 }
 
 .profile-email-card:hover {
@@ -136,6 +138,8 @@ box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 @media (max-width: 768px) {
   .profile-email-card {
     padding: 1.25rem;
+    width: 100%;
+    margin: 0;
   }
 
   .profile-email-content {
@@ -156,6 +160,8 @@ box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   .profile-email-card {
     padding: 1rem;
     border-radius: 16px;
+    width: 100%;
+    margin: 0;
   }
 
   .profile-email-icon {
