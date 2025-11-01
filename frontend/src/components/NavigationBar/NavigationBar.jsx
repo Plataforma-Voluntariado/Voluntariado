@@ -7,10 +7,14 @@ import VolunteerCase from "./NavigationBarCases/VolunteerCase";
 import AdministratorCase from "./NavigationBarCases/AdministratorCase";
 import CreatorCase from "./NavigationBarCases/CreatorCase";
 import NotificationButton from "../NotificacionButton/NotificationButton";
+import Sidebar from "./Sidebar";
+import { useSidebar } from "../../hooks/useSidebar";
+import { FaBars } from "react-icons/fa";
 
 function NavigationBar() {
   const Navigate = useNavigate();
   const { user } = useAuth();
+  const { isSidebarOpen, isMobile, openSidebar, closeSidebar } = useSidebar();
 
   const renderRoleSpecificItems = () => {
     if (!user) return null;
@@ -28,35 +32,54 @@ function NavigationBar() {
   };
 
   return (
-    <nav className="navigation-bar">
-      <div className="navigation-bar-left">
-        <img
-          src={VoluntariadoLogo}
-          alt="Logo-Voluntariado"
-          onClick={() => Navigate("/home")}
-          className="navigation-bar-logo"
-        />
-      </div>
+    <>
+      <nav className="navigation-bar">
+        <div className="navigation-bar-left">
+          <img
+            src={VoluntariadoLogo}
+            alt="Logo-Voluntariado"
+            onClick={() => Navigate("/home")}
+            className="navigation-bar-logo"
+          />
+        </div>
 
-      <div className="navigation-bar-right">
-        <ul className="navigation-bar-list">
-          {renderRoleSpecificItems()}
-          <li>
-            <NotificationButton />
-          </li>
-          {user && (
-            <li className="navigation-bar-list-item">
-              <img
-                className="navigation-bar-user-photo"
-                src={user.urlImage}
-                alt="Foto de perfil"
-                onClick={() => Navigate("/profile")}
-              />
-            </li>
+        <div className="navigation-bar-right">
+          {/* Menú hamburguesa para móviles */}
+          {isMobile && (
+            <button 
+              className="hamburger-button"
+              onClick={openSidebar}
+              aria-label="Abrir menú"
+            >
+              <FaBars />
+            </button>
           )}
-        </ul>
-      </div>
-    </nav>
+
+          {/* Menú normal para pantallas grandes */}
+          {!isMobile && (
+            <ul className="navigation-bar-list">
+              {renderRoleSpecificItems()}
+              <li>
+                <NotificationButton />
+              </li>
+              {user && (
+                <li className="navigation-bar-list-item">
+                  <img
+                    className="navigation-bar-user-photo"
+                    src={user.urlImage}
+                    alt="Foto de perfil"
+                    onClick={() => Navigate("/profile")}
+                  />
+                </li>
+              )}
+            </ul>
+          )}
+        </div>
+      </nav>
+
+      {/* Sidebar para móviles */}
+      <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+    </>
   );
 }
 
