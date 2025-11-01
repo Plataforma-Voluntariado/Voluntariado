@@ -94,11 +94,38 @@
   color: rgb(215, 215, 215);
 }
 
+/* Botón hamburguesa para móviles */
+.hamburger-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--color-primary, #007bff);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hamburger-button:hover {
+  background-color: rgba(0, 123, 255, 0.1);
+  color: var(--color-primary-dark, #0056b3);
+  transform: scale(1.05);
+}
+
+.hamburger-button:active {
+  transform: scale(0.95);
+}
+
 /* Responsive: pantallas ≤ 768px */
 @media screen and (max-width: 768px) {
   .navigation-bar {
     justify-content: space-between;
     padding: 0.75rem 1rem;
+    height: auto;
+    min-height: 60px;
   }
 
   .navigation-bar-left img {
@@ -106,8 +133,14 @@
     width: auto;
   }
 
+  /* Ocultar la lista normal en móviles */
   .navigation-bar-list {
-    gap: 1rem;
+    display: none;
+  }
+
+  /* Mostrar solo el botón hamburguesa */
+  .hamburger-button {
+    display: flex;
   }
 }
 
@@ -116,6 +149,7 @@
   .navigation-bar {
     justify-content: space-between;
     padding: 0.75rem 1rem;
+    min-height: 56px;
   }
 
   .navigation-bar-left img {
@@ -123,44 +157,37 @@
     width: auto;
   }
 
-  .navigation-bar-list {
-    gap: 0.875rem;
-  }
-
-  .navigation-bar-user-photo {
-    height: 38px;
-    width: 38px;
-  }
-
-  .navigation-bar-notifications-button {
-    font-size: 1.3rem;
+  .hamburger-button {
+    font-size: 1.4rem;
+    padding: 0.4rem;
   }
 }
 
 /* Responsive: pantallas ≤ 400px */
 @media screen and (max-width: 400px) {
   .navigation-bar {
-    height: auto;
-    padding: 1rem;
-    justify-content: space-between;
+    padding: 0.75rem 0.875rem;
+    min-height: 52px;
   }
 
   .navigation-bar-left img {
-    display: block;
     height: 32px;
     width: auto;
   }
 
+  .hamburger-button {
+    font-size: 1.3rem;
+    padding: 0.35rem;
+  }
+}
+
+/* Para pantallas grandes, ocultar el botón hamburguesa */
+@media screen and (min-width: 769px) {
+  .hamburger-button {
+    display: none;
+  }
+  
   .navigation-bar-list {
-    gap: 1rem;
-  }
-
-  .navigation-bar-user-photo {
-    height: 40px;
-    width: 40px;
-  }
-
-  .navigation-bar-notifications-button {
-    font-size: 1.2rem;
+    display: flex;
   }
 }

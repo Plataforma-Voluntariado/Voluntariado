@@ -1,0 +1,78 @@
+/* ResponsiveNavigation.css - Variables globales para la navegación responsive */
+
+:root {
+  /* Breakpoints */
+  --mobile-breakpoint: 768px;
+  --small-mobile-breakpoint: 480px;
+  --tiny-mobile-breakpoint: 400px;
+  --mini-mobile-breakpoint: 320px;
+
+  /* Navigation Heights */
+  --navbar-height-desktop: 8vh;
+  --navbar-height-tablet: 60px;
+  --navbar-height-mobile: 56px;
+  --navbar-height-small: 52px;
+
+  /* Sidebar Dimensions */
+  --sidebar-width-desktop: 280px;
+  --sidebar-width-mobile: 260px;
+  --sidebar-width-small: 240px;
+
+  /* Z-index layers */
+  --z-navbar: 1000;
+  --z-sidebar-overlay: 1998;
+  --z-sidebar: 1999;
+
+  /* Colors for navigation */
+  --nav-primary: #007bff;
+  --nav-primary-dark: #0056b3;
+  --nav-primary-light: rgba(0, 123, 255, 0.1);
+  --nav-text-primary: #1a1a1a;
+  --nav-text-secondary: #6c757d;
+  --nav-bg-primary: white;
+  --nav-bg-secondary: #f8f9fa;
+  --nav-border: #e0e0e0;
+  --nav-shadow: rgba(0, 0, 0, 0.05);
+
+  /* Animations */
+  --nav-transition-fast: 0.2s ease;
+  --nav-transition-normal: 0.3s ease;
+  --nav-transition-slow: 0.4s ease;
+
+  /* Spacing */
+  --nav-padding-desktop: 2rem;
+  --nav-padding-tablet: 1rem;
+  --nav-padding-mobile: 0.75rem;
+  --nav-gap-desktop: 1.5rem;
+  --nav-gap-mobile: 1rem;
+}
+
+/* Utility classes for responsive navigation */
+.nav-hide-mobile {
+  display: block;
+}
+
+.nav-show-mobile {
+  display: none;
+}
+
+@media screen and (max-width: 768px) {
+  .nav-hide-mobile {
+    display: none;
+  }
+  
+  .nav-show-mobile {
+    display: block;
+  }
+}
+
+/* Focus management for accessibility */
+.nav-focus-visible:focus-visible {
+  outline: 2px solid var(--nav-primary);
+  outline-offset: 2px;
+}
+
+/* Smooth scrolling when sidebar is open */
+.sidebar-open-body {
+  overflow: hidden;
+}
