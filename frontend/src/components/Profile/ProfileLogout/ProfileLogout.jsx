@@ -33,7 +33,7 @@ function ProfileLogout() {
         timer: 1500,
       });
 
-      navigate("/login");
+      navigate("/");
     } catch (err) {
       console.error("Error en handleLogout:", err);
       await WrongAlert({

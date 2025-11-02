@@ -111,11 +111,13 @@ function PasswordRecoveryPage() {
               <a href="/login">Volver al inicio de sesión</a>
             </p>
           </div>
-          <img
-            className="login-form-logo-img"
-            src={VoluntariadoLogo}
-            alt="Voluntariado Logo"
-          />
+          <div className="login-form-logo-container" onClick={() => navigate("/")}>
+            <img
+              className="login-form-logo-img"
+              src={VoluntariadoLogo}
+              alt="Voluntariado Logo"
+            />
+          </div>
         </form>
       </div>
     </section>

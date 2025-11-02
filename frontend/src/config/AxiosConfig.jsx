@@ -11,10 +11,14 @@ api.interceptors.response.use(
   async error => {
     const reqUrl = error.config?.url;
 
-    if (error.response?.status === 401 && reqUrl.includes("/auth/perfil")){
-      await logout();
-      // redirigir correctamente al login
-      window.location.href = "/login";
+    if (error.response?.status === 401 && reqUrl?.includes("/auth/perfil")){
+      // Solo hacer logout, no redirigir automáticamente para evitar bucles
+      // La redirección se manejará en el contexto/componente
+      try {
+        await logout();
+      } catch (logoutError) {
+        console.error("Error during logout:", logoutError);
+      }
     }
     return Promise.reject(error);
   }

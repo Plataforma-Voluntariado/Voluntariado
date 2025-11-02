@@ -2,6 +2,7 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import PublicRoute from "./routes/PublicRoute";
 import UnverifiedEmailRoute from "./routes/UnverifiedEmailRoute";
 import { AuthProvider } from "./context/AuthContext";
 import NavbarLayout from "./layouts/NavbarLayout/NavbarLayout";
@@ -16,13 +17,31 @@ import AdministratorRoute from "./routes/AdministratorRoute";
 import UserManagementPage from "./pages/UserManagementPage/UserManagementPage";
 import UserVerificationPage from "./pages/UserVerificationPage/UserVerificationPage";
 import AboutUsPage from "./pages/AboutUsPage/AboutUsPage";
+import LandingPage from "./pages/LandingPage/LandingPage";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <BrowserRouter>
     <Routes>
-      {/* Rutas privadas */}
+      {/* Rutas públicas - SIN AuthProvider para evitar verificaciones innecesarias */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/recuperar-contrasena" element={<PasswordRecoveryPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+      {/* Ruta About Us - CON AuthProvider para verificación de usuario */}
+      <Route
+        path="/about-us"
+        element={
+          <AuthProvider>
+            <AboutUsPage />
+          </AuthProvider>
+        }
+      />
+
+      {/* Rutas privadas - CON AuthProvider */}
       <Route
         element={
           <AuthProvider>
@@ -33,17 +52,16 @@ root.render(
         <Route element={<NavbarLayout />}>
           <Route path="/home" element={<HomePage />} />
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/about-us" element={<AboutUsPage />} />
           <Route element={<UnverifiedEmailRoute />}>
             <Route
               path="/verificar-correo"
               element={<EmailVerificationPage />}
             />
           </Route>
-          <Route path="*" element={<HomePage />} />
         </Route>
       </Route>
-      {/* Rutas de administración */}
+
+      {/* Rutas de administración - CON AuthProvider */}
       <Route
         element={
           <AuthProvider>
@@ -63,14 +81,8 @@ root.render(
         </Route>
       </Route>
 
-      {/* Rutas públicas */}
-      <Route path="login" element={<LoginPage />} />
-      <Route path="register" element={<RegisterPage />} />
-      <Route path="recuperar-contrasena" element={<PasswordRecoveryPage />} />
-      <Route path="reset-password" element={<ResetPasswordPage />} />
-
-      {/* Ruta fallback */}
-      <Route path="*" element={<LoginPage />} />
+      {/* Ruta fallback - redirige a landing page */}
+      <Route path="*" element={<LandingPage />} />
     </Routes>
   </BrowserRouter>
 );

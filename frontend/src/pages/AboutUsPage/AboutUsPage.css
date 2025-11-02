@@ -3,6 +3,24 @@
   padding-bottom: 2rem;
 }
 
+/* Ajustes cuando hay NavigationBar para usuarios logueados */
+.about-us-page.with-navbar .about-us-hero {
+  margin-top: 0;
+}
+
+.about-us-page.with-navbar .about-us-sections {
+  margin-top: 2rem;
+}
+
+/* Fallback con :has() selector para navegadores modernos */
+.about-us-page:has(.navigation-bar) .about-us-hero {
+  margin-top: 0;
+}
+
+.about-us-page:has(.navigation-bar) .about-us-sections {
+  margin-top: 2rem;
+}
+
 .about-us-hero {
   height: 60vh;
   background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
@@ -239,6 +257,16 @@
   background-color: #0056b3;
 }
 
+/* Header buttons consistency - Override any conflicting styles */
+.landing-header .nav-buttons .btn {
+  padding: 0.75rem 1.5rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  min-width: 120px !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .about-us-hero-content h1 {
@@ -258,4 +286,23 @@
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
+  
+  .landing-header .nav-buttons .btn {
+    padding: 0.75rem 1.5rem !important;
+    font-size: 0.875rem !important;
+    min-width: 120px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .landing-header .nav-buttons .btn {
+    padding: 0.75rem 1.2rem !important;
+    font-size: 0.8rem !important;
+    min-width: 100px !important;
+  }
+}
+
+/* Logo clickeable específico para AboutUs */
+.logo-clickable {
+  cursor: pointer;
 }

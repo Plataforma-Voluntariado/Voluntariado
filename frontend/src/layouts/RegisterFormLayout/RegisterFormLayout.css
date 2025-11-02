@@ -62,10 +62,20 @@
   background: rgba(0, 122, 255, 0.1);
 }
 
+.register-form-logo-container {
+  display: block;
+  margin: 0 auto 1.5rem auto;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.register-form-logo-container:hover {
+  transform: scale(1.05);
+}
+
 .register-form-logo-img {
   width: 300px;
   height: auto;
-  margin: 0 auto 1.5rem auto;
   display: block;
 }
 

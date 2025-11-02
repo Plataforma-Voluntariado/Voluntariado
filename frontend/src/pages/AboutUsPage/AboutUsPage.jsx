@@ -1,12 +1,87 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "./AboutUsPage.css";
+import "../LandingPage/LandingPage.css"; // Importar estilos del header
+import "../../components/NavigationBar/NavigationBar.css"; // Estilos para NavigationBar
 import misionImage from "../../assets/photos/mision.png";
 import visionImage from "../../assets/photos/vision.png";
 import valoresImage from "../../assets/photos/valores.png";
+import VoluntariadoLogo from "../../assets/photos/logo.png";
+import Footer from "../../components/Footer/Footer";
+import NavigationBar from "../../components/NavigationBar/NavigationBar";
 
 function AboutUsPage() {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+
+  // Verificar si hay un usuario logueado
+  useEffect(() => {
+    // Verificar si hay cookies de autenticación o llamar al endpoint de perfil
+    const checkAuth = async () => {
+      try {
+        // Hacer una llamada simple para verificar si hay sesión activa
+        const response = await fetch(`${process.env.REACT_APP_URL_SERVER_VOLUNTARIADO}/auth/perfil`, {
+          credentials: 'include',
+          method: 'GET'
+        });
+        
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+        }
+      } catch (error) {
+        // Si falla, el usuario no está logueado
+        setUser(null);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  const handleStartHelping = () => {
+    if (!user) {
+      // Si no está logueado, redirigir a registro
+      navigate("/register");
+    }
+    // Si está logueado, no mostrar el botón (se maneja en el render)
+  };
+
+  const handleLogoClick = () => {
+    // Si está logueado, ir a home, sino ir a landing
+    if (user) {
+      navigate("/home");
+    } else {
+      navigate("/");
+    }
+  };
+
   return (
-    <div className="about-us-page">
+    <div className={`about-us-page ${user ? 'with-navbar' : ''}`}>
+      {/* Header - NavigationBar para usuarios logueados, header simple para no logueados */}
+      {user ? (
+        <NavigationBar />
+      ) : (
+        <header className="landing-header">
+          <div className="container">
+            <div className="logo logo-clickable" onClick={handleLogoClick}>
+              <img 
+                src={VoluntariadoLogo} 
+                alt="Logo Voluntariado" 
+                className="header-logo"
+              />
+            </div>
+            <nav className="nav-buttons">
+              <Link to="/login" className="btn btn-outline">
+                Iniciar Sesión
+              </Link>
+              <Link to="/register" className="btn btn-primary">
+                Registrarse
+              </Link>
+            </nav>
+          </div>
+        </header>
+      )}
+
       <div className="about-us-hero">
         <div className="about-us-hero-content">
           <h1>Conectando Corazones Voluntarios</h1>
@@ -92,15 +167,22 @@ function AboutUsPage() {
             </div>
           </section>
 
-          <section className="about-us-join glass-effect">
-            <h2>Únete a Nuestra Comunidad</h2>
-            <p>
-              Sé parte de una red de personas comprometidas con el cambio social.
-              Juntos podemos hacer la diferencia.
-            </p>
-            <button className="primary-button">Comienza a Ayudar</button>
-          </section>
+          {!user && (
+            <section className="about-us-join glass-effect">
+              <h2>Únete a Nuestra Comunidad</h2>
+              <p>
+                Sé parte de una red de personas comprometidas con el cambio social.
+                Juntos podemos hacer la diferencia.
+              </p>
+              <button className="primary-button" onClick={handleStartHelping}>
+                Comienza a Ayudar
+              </button>
+            </section>
+          )}
         </div>
+        
+        {/* Footer */}
+        <Footer showUserLinks={!!user} showAuthLinks={!user} />
     </div>
   );
 }

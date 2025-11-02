@@ -44,7 +44,7 @@ import { InscripcionModule } from './inscripcion/inscripcion.module';
         synchronize: false,
         logging: false,
         migrations: [__dirname + '/database/migrations/*{.ts,.js}'],
-        migrationsRun:false,
+        migrationsRun: false,
       }),
       inject: [ConfigService],
     }),

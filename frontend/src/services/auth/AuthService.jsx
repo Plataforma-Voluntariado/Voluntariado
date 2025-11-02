@@ -17,8 +17,10 @@ export const getUserData = async () => {
         const response = await api.get("/auth/perfil");
         return response.data;
     } catch (error) {
+        // No redirigir automáticamente desde aquí para evitar bucles
+        // La redirección se manejará en el componente que usa este servicio
         if (error.response?.status === 401) {
-            window.location.href = "/login";
+            console.log("Usuario no autenticado");
         }
         console.error("Error obteniendo datos del usuario: ", error);
         return null;
