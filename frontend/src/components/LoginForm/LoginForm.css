@@ -35,11 +35,21 @@
   letter-spacing: -0.02em;
 }
 
-.login-form-logo-img {
-  width: 300px;
-  max-width: 80%;
-  height: auto;
+.login-form-logo-container {
+  display: block;
   margin: 0 auto 1.5rem auto;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.login-form-logo-container:hover {
+  transform: scale(1.05);
+}
+
+.login-form-logo-img {
+  width: 350px;
+  max-width: 90%;
+  height: auto;
   display: block;
 }
 

@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./RegisterFormLayout.css";
 import VoluntariadoLogo from "../../assets/photos/logo.png";
 import RegisterFormVolunteer from "../../components/RegisterFormVolunteer/RegisterFormVolunteer";
 import RegisterFormCreator from "../../components/RegisterFormCreator/RegisterFormCreator";
 function RegisterForm() {
+  const navigate = useNavigate();
   const [userType, setUserType] = useState(true);
   const handleSwitchType = (type) => {
     setUserType(type);
@@ -32,11 +34,13 @@ function RegisterForm() {
           Inicia Sesión
         </a>
       </p>
-      <img
-        className="register-form-logo-img"
-        src={VoluntariadoLogo}
-        alt="Voluntariado Logo"
-      />
+      <div className="register-form-logo-container" onClick={() => navigate("/")}>
+        <img
+          className="register-form-logo-img"
+          src={VoluntariadoLogo}
+          alt="Voluntariado Logo"
+        />
+      </div>
     </section>
   );
 }

@@ -64,6 +64,16 @@
   text-align: center;
 }
 
+/* Header Button Specific Styles - Para garantizar consistencia entre páginas */
+.nav-buttons .btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  min-width: 120px;
+  text-align: center;
+  white-space: nowrap;
+}
+
 .btn-primary {
   background: #2563eb;
   color: white;
@@ -226,8 +236,32 @@
 }
 
 .feature-icon {
-  font-size: 3rem;
   margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(59, 130, 246, 0.05));
+  border-radius: 50%;
+  margin: 0 auto 1.5rem auto;
+  transition: all 0.3s ease;
+}
+
+.feature-icon-svg {
+  font-size: 3.5rem;
+  color: #2563eb;
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(59, 130, 246, 0.1));
+  transform: scale(1.05);
+}
+
+.feature-card:hover .feature-icon-svg {
+  color: #1d4ed8;
+  transform: scale(1.1);
 }
 
 .feature-card h3 {
@@ -323,6 +357,12 @@
     justify-content: center;
   }
   
+  .nav-buttons .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    min-width: 120px;
+  }
+  
   .footer-content {
     grid-template-columns: 1fr;
     text-align: center;
@@ -373,4 +413,15 @@
     width: 100%;
     max-width: 300px;
   }
+  
+  .nav-buttons .btn {
+    padding: 0.75rem 1.2rem;
+    font-size: 0.8rem;
+    min-width: 100px;
+  }
+}
+
+/* Logo clickeable */
+.logo-clickable {
+  cursor: pointer;
 }

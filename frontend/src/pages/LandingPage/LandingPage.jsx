@@ -1,17 +1,24 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./LandingPage.css";
 import Footer from "../../components/Footer/Footer";
-import { MdVolunteerActivism } from "react-icons/md";
+import { MdVolunteerActivism, MdVerifiedUser, MdPublic, MdGroups } from "react-icons/md";
+import { HiDocumentText } from "react-icons/hi2";
 import VoluntariadoLogo from "../../assets/photos/logo.png";
 
 const LandingPage = () => {
+  const navigate = useNavigate();
+  
+  const handleLogoClick = () => {
+    navigate("/");
+  };
+
   return (
     <div className="landing-page">
       {/* Header */}
       <header className="landing-header">
         <div className="container">
-          <div className="logo">
+          <div className="logo logo-clickable" onClick={handleLogoClick}>
             <img 
               src={VoluntariadoLogo} 
               alt="Logo Voluntariado" 
@@ -57,7 +64,9 @@ const LandingPage = () => {
           <h2 className="section-title">¿Por qué elegir nuestra plataforma?</h2>
           <div className="features-grid">
             <div className="feature-card">
-              <div className="feature-icon">📋</div>
+              <div className="feature-icon">
+                <HiDocumentText className="feature-icon-svg" />
+              </div>
               <h3>Fácil inscripción</h3>
               <p>
                 Proceso simple y rápido para registrarte e inscribirte en
@@ -65,7 +74,9 @@ const LandingPage = () => {
               </p>
             </div>
             <div className="feature-card">
-              <div className="feature-icon">🏆</div>
+              <div className="feature-icon">
+                <MdVerifiedUser className="feature-icon-svg" />
+              </div>
               <h3>Certificación</h3>
               <p>
                 Obtén certificados por tu participación y horas de voluntariado
@@ -73,7 +84,9 @@ const LandingPage = () => {
               </p>
             </div>
             <div className="feature-card">
-              <div className="feature-icon">🌍</div>
+              <div className="feature-icon">
+                <MdPublic className="feature-icon-svg" />
+              </div>
               <h3>Impacto social</h3>
               <p>
                 Contribuye al desarrollo de tu comunidad y genera un impacto
@@ -81,7 +94,9 @@ const LandingPage = () => {
               </p>
             </div>
             <div className="feature-card">
-              <div className="feature-icon">👥</div>
+              <div className="feature-icon">
+                <MdGroups className="feature-icon-svg" />
+              </div>
               <h3>Comunidad</h3>
               <p>
                 Conecta con otros voluntarios y organizaciones comprometidas con
@@ -111,7 +126,7 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <Footer />
+      <Footer showAuthLinks={true} />
     </div>
   );
 };

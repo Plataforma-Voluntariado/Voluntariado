@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import WrongAlert from "../../components/alerts/WrongAlert";
 import SuccessAlert from "../../components/alerts/SuccessAlert";
 import { resetPassword } from "../../services/auth/authResetPasswordService";
+import VoluntariadoLogo from "../../assets/photos/logo.png";
 
 function ResetPasswordPage() {
   const [form, setForm] = useState({
@@ -142,6 +143,14 @@ function ResetPasswordPage() {
           <p>
             <a href="/login">Volver al inicio de sesión</a>
           </p>
+        </div>
+
+        <div className="login-form-logo-container" onClick={() => navigate("/")}>
+          <img
+            className="login-form-logo-img"
+            src={VoluntariadoLogo}
+            alt="Voluntariado Logo"
+          />
         </div>
       </div>
     </div>

@@ -26,11 +26,20 @@ root.render(
     <Routes>
       {/* Rutas públicas - SIN AuthProvider para evitar verificaciones innecesarias */}
       <Route path="/" element={<LandingPage />} />
-      <Route path="/about-us" element={<AboutUsPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/recuperar-contrasena" element={<PasswordRecoveryPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+      {/* Ruta About Us - CON AuthProvider para verificación de usuario */}
+      <Route
+        path="/about-us"
+        element={
+          <AuthProvider>
+            <AboutUsPage />
+          </AuthProvider>
+        }
+      />
 
       {/* Rutas privadas - CON AuthProvider */}
       <Route
