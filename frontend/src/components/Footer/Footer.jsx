@@ -5,7 +5,7 @@ import VoluntariadoLogo from "../../assets/photos/logo.png";
 import { MdEmail, MdPhone, MdLocationOn } from "react-icons/md";
 import { FaXTwitter, FaWhatsapp, FaFacebookF, FaInstagram } from "react-icons/fa6";
 
-function Footer() {
+function Footer({ showUserLinks = false }) {
   const navigate = useNavigate();
 
   return (
@@ -39,8 +39,8 @@ function Footer() {
           <h3>Enlaces Rápidos</h3>
           <ul>
             <li onClick={() => navigate("/about-us")}>Acerca de Nosotros</li>
-            <li onClick={() => navigate("/home")}>Inicio</li>
-            <li onClick={() => navigate("/profile")}>Perfil</li>
+            {showUserLinks && <li onClick={() => navigate("/home")}>Inicio</li>}
+            {showUserLinks && <li onClick={() => navigate("/profile")}>Perfil</li>}
           </ul>
         </div>
 

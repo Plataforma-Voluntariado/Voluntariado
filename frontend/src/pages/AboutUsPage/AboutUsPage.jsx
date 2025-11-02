@@ -1,12 +1,39 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import "./AboutUsPage.css";
+import "../LandingPage/LandingPage.css"; // Importar estilos del header
 import misionImage from "../../assets/photos/mision.png";
 import visionImage from "../../assets/photos/vision.png";
 import valoresImage from "../../assets/photos/valores.png";
+import VoluntariadoLogo from "../../assets/photos/logo.png";
+import Footer from "../../components/Footer/Footer";
 
 function AboutUsPage() {
   return (
     <div className="about-us-page">
+      {/* Header */}
+      <header className="landing-header">
+        <div className="container">
+          <div className="logo">
+            <Link to="/">
+              <img 
+                src={VoluntariadoLogo} 
+                alt="Logo Voluntariado" 
+                className="header-logo"
+              />
+            </Link>
+          </div>
+          <nav className="nav-buttons">
+            <Link to="/login" className="btn btn-outline">
+              Iniciar Sesión
+            </Link>
+            <Link to="/register" className="btn btn-primary">
+              Registrarse
+            </Link>
+          </nav>
+        </div>
+      </header>
+
       <div className="about-us-hero">
         <div className="about-us-hero-content">
           <h1>Conectando Corazones Voluntarios</h1>
@@ -101,6 +128,9 @@ function AboutUsPage() {
             <button className="primary-button">Comienza a Ayudar</button>
           </section>
         </div>
+        
+        {/* Footer */}
+        <Footer />
     </div>
   );
 }

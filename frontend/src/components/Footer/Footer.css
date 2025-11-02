@@ -11,8 +11,8 @@
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  gap: 4rem;
+  grid-template-columns: 1.2fr 0.9fr 0.9fr;
+  gap: 2rem;
   padding: 0 2rem;
   align-items: start;
 }
@@ -24,7 +24,7 @@
 }
 
 .footer-logo {
-  width: 200px;
+  width: 150px;
   height: auto;
   cursor: pointer;
   transition: transform var(--transition);
@@ -58,8 +58,8 @@
   color: var(--color-text);
   line-height: 1.6;
   opacity: 0.9;
-  font-size: 0.95rem;
-  max-width: 400px;
+  font-size: 0.9rem;
+  max-width: 250px;
 }
 
 .social-icons {

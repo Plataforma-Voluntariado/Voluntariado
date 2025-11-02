@@ -19,8 +19,12 @@ const AdministratorRoute = () => {
       </div>
     );
   }
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+  
   if (user.rol !== "ADMIN") {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   return <Outlet />;

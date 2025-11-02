@@ -1,7 +1,7 @@
 import { useAuth } from "../context/AuthContext";
 import { Navigate, Outlet } from "react-router-dom";
 
-const ProtectedRoute = () => {
+const PublicRoute = () => {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -11,19 +11,20 @@ const ProtectedRoute = () => {
         justifyContent: "center", 
         alignItems: "center", 
         height: "100vh", 
-        fontSize: "1.5em",
-        color: "#666"
+        fontSize: "1.5em" 
       }}>
         Verificando sesión...
       </div>
     );
   }
 
-  if (!user) {
-    return <Navigate to="/" replace />;
+  // Si hay usuario logueado, redirigir a /home
+  if (user) {
+    return <Navigate to="/home" replace />;
   }
 
+  // Si no hay usuario, permitir acceso a rutas públicas
   return <Outlet />; 
 };
 
-export default ProtectedRoute;
+export default PublicRoute;

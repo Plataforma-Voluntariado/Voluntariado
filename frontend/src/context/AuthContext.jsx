@@ -111,10 +111,19 @@ export const AuthProvider = ({ children }) => {
 
   // Cargar usuario y notificaciones al iniciar
   useEffect(() => {
+    let isMounted = true; // Flag para evitar actualizaciones de estado en componentes desmontados
+    
     const fetchUserProfile = async () => {
       try {
         const profile = await getUserData();
-        if (!profile) return setUser(null);
+        
+        if (!isMounted) return; // No actualizar si el componente se desmontó
+        
+        if (!profile) {
+          setUser(null);
+          setLoading(false);
+          return;
+        }
 
         setUser({
           userId: profile.id_usuario,
@@ -135,15 +144,32 @@ export const AuthProvider = ({ children }) => {
               : null,
         });
 
-        await fetchNotifications();
+        // Solo cargar notificaciones si el usuario existe
+        try {
+          await fetchNotifications();
+        } catch (notifError) {
+          console.error("Error loading notifications:", notifError);
+          // No bloquear el login por errores de notificaciones
+        }
+        
       } catch (err) {
-        setUser(null);
+        console.error("Error in fetchUserProfile:", err);
+        if (isMounted) {
+          setUser(null);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-      setLoading(false);
     };
 
     fetchUserProfile();
-  }, [fetchNotifications]);
+    
+    return () => {
+      isMounted = false; // Cleanup
+    };
+  }, []); // Sin dependencias para ejecutar solo una vez
 
   return (
     <AuthContext.Provider
