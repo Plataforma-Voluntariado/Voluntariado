@@ -33,19 +33,22 @@ export class VoluntariadoService {
         this.findUsuario(creadorId, qr),
       ]);
 
-      if (!creador.verificado)
-        throw new BadRequestException('Tu cuenta debe estar verificada para crear voluntariados.');
+      if (!creador.verificado) throw new BadRequestException('Tu cuenta debe estar verificada para crear voluntariados.');
+
+      const fechaFin = new Date(dto.fechaHoraInicio);
+      fechaFin.setHours(fechaFin.getHours() + dto.horas);
 
       const voluntariado = await qr.manager.save(Voluntariado, {
         titulo: dto.titulo.trim(),
         descripcion: dto.descripcion.trim(),
-        fechaHora: dto.fechaHora,
+        fechaHoraInicio: dto.fechaHoraInicio,
+        fechaHoraFin: fechaFin,
         horas: dto.horas,
         maxParticipantes: dto.maxParticipantes,
-        estado: dto.estado,
         categoria,
         creador,
       });
+
 
       const voluntariadoDb = await qr.manager.findOne(Voluntariado, {
         where: { id_voluntariado: voluntariado.id_voluntariado },
@@ -89,12 +92,17 @@ export class VoluntariadoService {
   }
 
   // ====================== UPDATE ======================
-  async update(id: number, dto: UpdateVoluntariadoDto, user: Usuario, nuevasFotos?: Express.Multer.File[],) {
+  async update(id: number, dto: UpdateVoluntariadoDto, creadorId: number, nuevasFotos?: Express.Multer.File[],) {
     return this.executeTransaction(async (qr) => {
-      if (!user.verificado)
-        throw new BadRequestException('Tu cuenta debe estar verificada para editar voluntariados.');
+      const [user, voluntariado] = await Promise.all([
+        this.findUsuario(creadorId, qr), 
+        this.findVoluntariadoById(id, qr), 
+      ]);
 
-      const voluntariado = await this.findVoluntariadoById(id, qr);
+      if (!user.verificado) {
+        throw new BadRequestException('Tu cuenta debe estar verificada para editar voluntariados.');
+      }
+
       this.validarPermiso(voluntariado, user, 'actualizar');
 
       // Categoria
@@ -140,17 +148,24 @@ export class VoluntariadoService {
         );
       }
 
-      // Campos
+      // calclo fechafin
+      const nuevaFechaInicio = dto.fechaHoraInicio ?? voluntariado.fechaHoraInicio;
+      const nuevasHoras = dto.horas ?? voluntariado.horas;
+
+      const nuevaFechaFin = new Date(nuevaFechaInicio);
+      nuevaFechaFin.setHours(nuevaFechaFin.getHours() + nuevasHoras);
+
       Object.assign(voluntariado, {
         titulo: dto.titulo?.trim() ?? voluntariado.titulo,
         descripcion: dto.descripcion?.trim() ?? voluntariado.descripcion,
-        fechaHora: dto.fechaHora ?? voluntariado.fechaHora,
-        horas: dto.horas ?? voluntariado.horas,
+        fechaHoraInicio: nuevaFechaInicio,
+        horas: nuevasHoras,
+        fechaHoraFin: nuevaFechaFin,
         maxParticipantes: dto.maxParticipantes ?? voluntariado.maxParticipantes,
         estado: dto.estado ?? voluntariado.estado,
       });
 
-      // Reload fotos real desde DB
+      // Reload fotos desde DB
       voluntariado.fotos = await qr.manager.find(FotosVoluntariado, {
         where: { voluntariado: { id_voluntariado: voluntariado.id_voluntariado } },
       });
@@ -167,13 +182,12 @@ export class VoluntariadoService {
   // ====================== DELETE ======================
   async remove(id: number, user: Usuario) {
     const voluntariado = await this.findVoluntariadoById(id);
-
-    if (user.rol === RolUsuario.CREADOR && voluntariado.creador.id_usuario !== user.id_usuario)
-      throw new ForbiddenException('No tiene permiso para eliminar este voluntariado.');
+    
+    if (user.rol === RolUsuario.CREADOR && voluntariado.creador.id_usuario !== user.id_usuario) throw new ForbiddenException('No tiene permiso para eliminar este voluntariado.');
 
     await this.fotosVoluntariadoService.deleteFotosCloudinary(voluntariado.fotos);
     await this.voluntariadoRepo.remove(voluntariado);
-
+    
     return { message: `Voluntariado "${voluntariado.titulo}" eliminado.` };
   }
 

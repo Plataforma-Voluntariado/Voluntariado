@@ -1,6 +1,7 @@
 import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength, Min, ValidateNested, Max, IsNumber, } from 'class-validator';
 import { Type } from 'class-transformer';
 import { EstadoVoluntariado } from '../entity/voluntariado.entity';
+import { IsNotPastDateTime } from 'src/validators/Is-Not-Past-DateTime';
 
 /**
  * DTO para la creación de la ubicación del voluntariado.
@@ -53,9 +54,10 @@ export class CreateVoluntariadoDto {
   @IsNotEmpty({ message: 'La descripción es obligatoria.' })
   descripcion: string;
 
+  @IsNotPastDateTime({message: 'La fecha y hora de inicio del voluntariado no puede ser una fecha y hora pasada.',})
   @IsNotEmpty({ message: 'La fecha y hora son obligatorias.' })
   @Type(() => Date)
-  fechaHora: Date;
+  fechaHoraInicio: Date;
 
   @IsNotEmpty({ message: 'Las horas son obligatorias.' })
   @Type(() => Number)
@@ -69,13 +71,6 @@ export class CreateVoluntariadoDto {
   @Min(1, { message: 'El número máximo de participantes debe ser como mínimo 1.' })
   @Max(100, { message: 'El número máximo de participantes no puede superar 100.' })
   maxParticipantes: number;
-
-  @IsOptional()
-  @IsEnum(EstadoVoluntariado, {
-    message:
-      'El estado debe ser uno de los siguientes valores: PENDIENTE, REALIZADO, NO_REALIZADO o CANCELADO.',
-  })
-  estado?: EstadoVoluntariado;
 
   @IsNotEmpty({ message: 'La categoría es obligatoria.' })
   @Type(() => Number)

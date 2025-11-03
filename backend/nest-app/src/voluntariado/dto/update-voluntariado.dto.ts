@@ -4,6 +4,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { EstadoVoluntariado } from '../entity/voluntariado.entity';
+import { IsNotPastDateTime } from 'src/validators/Is-Not-Past-DateTime';
 
 class UpdateUbicacionAnidadaDto {
   @IsInt({ message: 'El ID de la ciudad debe ser un número entero.' })
@@ -44,9 +45,10 @@ export class UpdateVoluntariadoDto {
   @IsOptional()
   descripcion?: string;
 
+  @IsNotPastDateTime({message: 'La fecha y hora del voluntariado no puede ser una fecha y hora pasada.',})
   @IsOptional()
   @Type(() => Date)
-  fechaHora?: Date;
+  fechaHoraInicio?: Date;
 
   @IsInt({ message: 'Las horas deben ser un número entero.' })
   @Min(1, { message: 'Las horas deben ser como mínimo 1.' })
@@ -62,7 +64,7 @@ export class UpdateVoluntariadoDto {
   maxParticipantes?: number;
 
   @IsEnum(EstadoVoluntariado, {
-    message: 'Estado inválido. Valores permitidos: PENDIENTE, REALIZADO, NO_REALIZADO, CANCELADO.',
+    message: 'Estado inválido. Valores permitidos: PENDIENTE, EN_PROCESO,TERMINADO, CANCELADO.',
   })
   @IsOptional()
   estado?: EstadoVoluntariado;
