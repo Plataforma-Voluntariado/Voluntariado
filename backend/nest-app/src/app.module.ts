@@ -24,6 +24,7 @@ import { FotosVoluntariadoModule } from './fotos_voluntariado/fotos_voluntariado
 import { UbicacionModule } from './ubicacion/ubicacion.module';
 import { InscripcionModule } from './inscripcion/inscripcion.module';
 import { ComentariosVoluntariadoModule } from './comentarios_voluntariado/comentarios_voluntariado.module';
+import { BullMqModule } from './bull/bull.module';
 
 
 @Module({
@@ -68,7 +69,8 @@ import { ComentariosVoluntariadoModule } from './comentarios_voluntariado/coment
     FotosVoluntariadoModule,
     UbicacionModule,
     InscripcionModule,
-    ComentariosVoluntariadoModule
+    ComentariosVoluntariadoModule,
+    BullMqModule
   ],
   controllers: [AppController],
   providers: [AppService],

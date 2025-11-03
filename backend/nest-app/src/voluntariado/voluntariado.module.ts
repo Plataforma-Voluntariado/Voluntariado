@@ -1,4 +1,5 @@
-import { Module } from '@nestjs/common';
+// src/voluntariado/voluntariado.module.ts
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Voluntariado } from './entity/voluntariado.entity';
 import { VoluntariadoService } from './voluntariado.service';
@@ -10,6 +11,10 @@ import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 import { Inscripcion } from 'src/inscripcion/entity/inscripcion.entity';
 import { FotosVoluntariadoModule } from 'src/fotos_voluntariado/fotos_voluntariado.module';
 import { UbicacionModule } from 'src/ubicacion/ubicacion.module';
+import { VoluntariadoSchedulerService } from './VoluntariadoSchedulerService';
+import { VoluntariadoProcessor } from './voluntariado.processor';
+import { BullMqModule } from 'src/bull/bull.module';
+import { InscripcionModule } from 'src/inscripcion/inscripcion.module';
 
 @Module({
   imports: [
@@ -18,14 +23,20 @@ import { UbicacionModule } from 'src/ubicacion/ubicacion.module';
       Categoria,
       Usuario,
       FotosVoluntariado,
-      Inscripcion
+      Inscripcion,
     ]),
     CloudinaryModule,
     FotosVoluntariadoModule,
-    UbicacionModule
+    UbicacionModule,
+    forwardRef(() => BullMqModule),
+    InscripcionModule
   ],
   controllers: [VoluntariadoController],
-  providers: [VoluntariadoService],
-  exports: [VoluntariadoService],
+  providers: [
+    VoluntariadoService,
+    VoluntariadoSchedulerService,
+    VoluntariadoProcessor
+  ],
+  exports: [VoluntariadoService, VoluntariadoSchedulerService],
 })
-export class VoluntariadoModule { }
+export class VoluntariadoModule {}

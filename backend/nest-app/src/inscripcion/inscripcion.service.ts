@@ -2,7 +2,7 @@ import { Injectable, BadRequestException, ForbiddenException, NotFoundException 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { Inscripcion, EstadoInscripcion } from './entity/inscripcion.entity';
-import { Voluntariado } from 'src/voluntariado/entity/voluntariado.entity';
+import { EstadoVoluntariado, Voluntariado } from 'src/voluntariado/entity/voluntariado.entity';
 import { RolUsuario, Usuario } from 'src/usuario/entity/usuario.entity';
 
 @Injectable()
@@ -36,6 +36,8 @@ export class InscripcionService {
             }),
         ]);
 
+        if (voluntariado?.estado != EstadoVoluntariado.PENDIENTE) throw new NotFoundException('Solo se puede inscribir a un voluntariado en estado pendiente');
+
         if (!voluntario) throw new NotFoundException('Usuario no encontrado');
         if (!voluntariado) throw new NotFoundException('Voluntariado no encontrado');
         if (!voluntario.verificado) throw new BadRequestException('Tu cuenta debe estar verificada para inscribirte a voluntariados.');
@@ -43,7 +45,7 @@ export class InscripcionService {
 
         const inscripcionPrev = await this.inscripcionRepo.findOne({
             where: { voluntario, voluntariado },
-            order: { id_inscripcion: 'DESC' }, 
+            order: { id_inscripcion: 'DESC' },
         });
 
 
@@ -78,6 +80,7 @@ export class InscripcionService {
         if (!inscripcion) throw new NotFoundException('Inscripción no encontrada');
         if (inscripcion.voluntariado.creador.id_usuario !== creador.id_usuario) throw new ForbiddenException('Solo el creador puede aceptar');
         if (inscripcion.estado_inscripcion !== EstadoInscripcion.PENDIENTE) throw new BadRequestException('Solo se pueden aceptar inscripciones pendientes');
+        if (inscripcion?.voluntariado.estado != EstadoVoluntariado.PENDIENTE) throw new NotFoundException('Solo se puede aceptar inscripciones a voluntariados en estado pendiente');
 
         await this.validarCupos(inscripcion.voluntariado.id_voluntariado, inscripcion.voluntariado.maxParticipantes);
 
@@ -149,6 +152,33 @@ export class InscripcionService {
         };
 
         return agrupadas;
+    }
+
+    async rechazarPendientesPorVoluntariado(idVoluntariado: number) {
+        await this.inscripcionRepo
+            .createQueryBuilder()
+            .update(Inscripcion)
+            .set({ estado_inscripcion: EstadoInscripcion.RECHAZADA })
+            .where('voluntariado_id = :id', { id: idVoluntariado })
+            .andWhere('estado_inscripcion = :pendiente', { pendiente: EstadoInscripcion.PENDIENTE })
+            .execute();
+    }
+
+    async marcarAsistencia(creador: Usuario, idInscripcion: number, asistencia: boolean) {
+        const inscripcion = await this.inscripcionRepo.findOne({
+            where: { id_inscripcion: idInscripcion },
+            relations: ['voluntariado', 'voluntariado.creador'],
+        });
+
+        if (!inscripcion) throw new NotFoundException('Inscripción no encontrada');
+        if (inscripcion.voluntariado.creador.id_usuario !== creador.id_usuario)
+            throw new ForbiddenException('Solo el creador puede marcar la asistencia');
+        if (inscripcion.voluntariado.estado !== EstadoVoluntariado.TERMINADO)
+            throw new BadRequestException('Solo se puede marcar asistencia a voluntariados terminados');
+        if (inscripcion.estado_inscripcion !== EstadoInscripcion.ACEPTADA)
+            throw new BadRequestException('Solo se puede marcar asistencia a inscripciones aceptadas');
+        inscripcion.asistencia = asistencia;
+        return this.inscripcionRepo.save(inscripcion);
     }
 
 }

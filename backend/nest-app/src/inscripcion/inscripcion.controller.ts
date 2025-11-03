@@ -1,9 +1,10 @@
-import { Controller, Post, Put, Param, Req, UseGuards, BadRequestException, Get } from '@nestjs/common';
+import { Controller, Post, Put, Param, Req, UseGuards, BadRequestException, Get, Body } from '@nestjs/common';
 import { InscripcionService } from './inscripcion.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolUsuario } from 'src/usuario/entity/usuario.entity';
+import { MarcarAsistenciaDto } from './dto/marcar-asistencia.dto';
 
 @Controller('inscripciones')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -45,5 +46,12 @@ export class InscripcionController {
     inscripcionesDeVoluntariado(@Param('id') id: string, @Req() req: any) {
         return this.inscripcionService.inscripcionesDeVoluntariado(req.user, +id);
     }
+
+    @Roles(RolUsuario.CREADOR)
+    @Put('asistencia/:id')
+    marcarAsistencia(@Param('id') id: string,@Body() dto: MarcarAsistenciaDto,@Req() req: any,) {
+        return this.inscripcionService.marcarAsistencia(req.user, +id, dto.asistencia);
+    }
+
 
 }
