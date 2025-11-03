@@ -6,10 +6,10 @@ import { Ubicacion } from 'src/ubicacion/entity/ubicacion.entity';
 import { Inscripcion } from 'src/inscripcion/entity/inscripcion.entity';
 
 export enum EstadoVoluntariado {
-  PENDIENTE = 'PENDIENTE',
-  REALIZADO = 'REALIZADO',
-  NO_REALIZADO = 'NO_REALIZADO',
-  CANCELADO = 'CANCELADO',
+  PENDIENTE = 'pendiente',
+  EN_PROCESO = 'en_proceso',
+  TERMINADO = 'terminado',
+  CANCELADO = 'cancelado'
 }
 
 @Entity('voluntariado')
@@ -23,8 +23,11 @@ export class Voluntariado {
   @Column({ type: 'text', nullable: false })
   descripcion: string;
 
-  @Column({ type: 'datetime', nullable: false, name: 'fecha_hora' })
-  fechaHora: Date;
+  @Column({ type: 'datetime', nullable: false })
+  fechaHoraInicio: Date;
+
+  @Column({ type: 'datetime', nullable: false })
+  fechaHoraFin: Date;
 
   @Column({ type: 'int', unsigned: true, nullable: false })
   horas: number;

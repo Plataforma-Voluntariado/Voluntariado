@@ -1,4 +1,10 @@
-import {ExceptionFilter,Catch,ArgumentsHost,HttpException,HttpStatus,} from '@nestjs/common';
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 
 @Catch()
@@ -9,7 +15,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = 'Ocurrió un error inesperado';
+    let message: any = 'Ocurrió un error inesperado';
     let errorCode = 'INTERNAL_ERROR';
 
     if (exception instanceof HttpException) {
@@ -22,6 +28,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
         const r = res as any;
         message = r.message || message;
         errorCode = r.error || errorCode;
+
+        if (Array.isArray(message)) {
+          message = message.map(err =>
+            Object.values(err.constraints || {}).join(', ')
+          );
+        }
       }
     }
 

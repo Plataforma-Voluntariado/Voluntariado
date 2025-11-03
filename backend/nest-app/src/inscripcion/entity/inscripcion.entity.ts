@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique } from 'typeorm';
 import { Voluntariado } from 'src/voluntariado/entity/voluntariado.entity';
 import { Usuario } from 'src/usuario/entity/usuario.entity';
 
@@ -6,6 +6,7 @@ export enum EstadoInscripcion {
     PENDIENTE = 'PENDIENTE',
     ACEPTADA = 'ACEPTADA',
     RECHAZADA = 'RECHAZADA',
+    CANCELADA = 'CANCELADA',
 }
 
 @Entity('inscripcion')
@@ -13,7 +14,7 @@ export class Inscripcion {
     @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
     id_inscripcion: number;
 
-    @Column({ type: 'date', nullable: false })
+    @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
     fecha_inscripcion: Date;
 
     @Column({
@@ -23,19 +24,18 @@ export class Inscripcion {
     })
     estado_inscripcion: EstadoInscripcion;
 
-    @Column({ type: 'tinyint', width: 1, default: 0 })
-    asistencia: boolean;
+    @Column({ type: 'boolean', nullable: true })
+    asistencia: boolean | null;
 
-    @Column({ type: 'tinyint', width: 1, default: 0 })
-    calificado: boolean;
+    @Column({ type: 'boolean', nullable: true })
+    calificado: boolean | null;
 
-    // Relación con el voluntario que se inscribe
     @ManyToOne(() => Usuario, { nullable: false })
     @JoinColumn({ name: 'voluntario_id' })
     voluntario: Usuario;
 
-    // Relación con el voluntariado al que se inscribe
-    @ManyToOne(() => Voluntariado, { nullable: false })
+    @ManyToOne(() => Voluntariado, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'voluntariado_id' })
     voluntariado: Voluntariado;
+
 }

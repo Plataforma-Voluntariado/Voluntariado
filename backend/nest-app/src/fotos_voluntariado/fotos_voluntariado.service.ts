@@ -49,7 +49,7 @@ export class FotosVoluntariadoService {
 
   async deleteFotosCloudinary(fotos: FotosVoluntariado[]) {
     if (!fotos?.length) return;
-
+    
     await Promise.allSettled(
       fotos.map(async (foto) => {
         const publicId = this.cloudinaryService.extractPublicIdFromUrl(foto.url);
