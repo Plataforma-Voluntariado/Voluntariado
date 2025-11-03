@@ -39,14 +39,11 @@ export class VoluntariadoService {
 
       if (!creador.verificado) throw new BadRequestException('Tu cuenta debe estar verificada para crear voluntariados.');
 
-      const fechaFin = new Date(dto.fechaHoraInicio);
-      fechaFin.setHours(fechaFin.getHours() + dto.horas);
-
+      // Solo guardamos fechaHoraInicio - la tabla no tiene fechaHoraFin
       const voluntariado = await qr.manager.save(Voluntariado, {
         titulo: dto.titulo.trim(),
         descripcion: dto.descripcion.trim(),
         fechaHoraInicio: dto.fechaHoraInicio,
-        fechaHoraFin: fechaFin,
         horas: dto.horas,
         maxParticipantes: dto.maxParticipantes,
         categoria,
@@ -158,19 +155,16 @@ export class VoluntariadoService {
         );
       }
 
-      // calclo fechafin
+      // Preparar nuevos valores
       const nuevaFechaInicio = dto.fechaHoraInicio ?? voluntariado.fechaHoraInicio;
       const nuevasHoras = dto.horas ?? voluntariado.horas;
-
-      const nuevaFechaFin = new Date(nuevaFechaInicio);
-      nuevaFechaFin.setHours(nuevaFechaFin.getHours() + nuevasHoras);
 
       Object.assign(voluntariado, {
         titulo: dto.titulo?.trim() ?? voluntariado.titulo,
         descripcion: dto.descripcion?.trim() ?? voluntariado.descripcion,
         fechaHoraInicio: nuevaFechaInicio,
         horas: nuevasHoras,
-        fechaHoraFin: nuevaFechaFin,
+        // fechaHoraFin no existe en la tabla
         maxParticipantes: dto.maxParticipantes ?? voluntariado.maxParticipantes,
         estado: dto.estado ?? voluntariado.estado,
       });
