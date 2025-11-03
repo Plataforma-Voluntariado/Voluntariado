@@ -12,8 +12,8 @@ function CreatorCase() {
       <li className="navigation-bar-list-item role-item" onClick={() => Navigate("/manage-events")}>
         GESTIONAR EVENTOS
       </li>
-      <li className="navigation-bar-list-item navigation-bar-create-event-button" onClick={() => Navigate("/create-event")}>
-        CREAR EVENTO
+      <li className="navigation-bar-list-item navigation-bar-create-event-button" onClick={() => Navigate("/crear-voluntariado")}>
+        CREAR VOLUNTARIADO
       </li>
     </>
   );

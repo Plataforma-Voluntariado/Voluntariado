@@ -23,11 +23,12 @@ export class Voluntariado {
   @Column({ type: 'text', nullable: false })
   descripcion: string;
 
-  @Column({ type: 'datetime', nullable: false })
+  @Column({ type: 'datetime', nullable: false, name: 'fecha_hora' })
   fechaHoraInicio: Date;
 
-  @Column({ type: 'datetime', nullable: false })
-  fechaHoraFin: Date;
+  // fechaHoraFin no existe en la tabla real - comentado completamente
+  // @Column({ type: 'datetime', nullable: false, name: 'fecha_hora_fin' })
+  // fechaHoraFin?: Date;
 
   @Column({ type: 'int', unsigned: true, nullable: false })
   horas: number;

@@ -18,6 +18,7 @@ import UserManagementPage from "./pages/UserManagementPage/UserManagementPage";
 import UserVerificationPage from "./pages/UserVerificationPage/UserVerificationPage";
 import AboutUsPage from "./pages/AboutUsPage/AboutUsPage";
 import LandingPage from "./pages/LandingPage/LandingPage";
+import CreateVoluntariadoPage from "./pages/CreateVoluntariadoPage/CreateVoluntariadoPage";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -52,6 +53,7 @@ root.render(
         <Route element={<NavbarLayout />}>
           <Route path="/home" element={<HomePage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/crear-voluntariado" element={<CreateVoluntariadoPage />} />
           <Route element={<UnverifiedEmailRoute />}>
             <Route
               path="/verificar-correo"
