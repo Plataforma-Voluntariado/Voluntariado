@@ -4,7 +4,6 @@ import api from "../../config/AxiosConfig";
 export const GetNotifications = async () => {
   try {
     const response = await api.get("/notificaciones");
-    console.log(response)
     return response.data;
   } catch (error) {
     console.error("Error al obtener las notificaciones", error);

@@ -1,0 +1,14 @@
+.home-volunteer-layout{
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: start;
+    gap: 1rem;
+}
+.home-volunteer-layout-title{
+    width: 100%;
+    text-align: center;
+    font-size: 2rem;
+    color: var(--color-title);
+}
