@@ -25,6 +25,7 @@ import { UbicacionModule } from './ubicacion/ubicacion.module';
 import { InscripcionModule } from './inscripcion/inscripcion.module';
 import { ComentariosVoluntariadoModule } from './comentarios_voluntariado/comentarios_voluntariado.module';
 import { BullMqModule } from './bull/bull.module';
+import { EstadisticasVoluntarioModule } from './estadisticas_voluntario/estadisticas_voluntario.module';
 
 
 @Module({
@@ -70,7 +71,8 @@ import { BullMqModule } from './bull/bull.module';
     UbicacionModule,
     InscripcionModule,
     ComentariosVoluntariadoModule,
-    BullMqModule
+    BullMqModule,
+    EstadisticasVoluntarioModule
   ],
   controllers: [AppController],
   providers: [AppService],

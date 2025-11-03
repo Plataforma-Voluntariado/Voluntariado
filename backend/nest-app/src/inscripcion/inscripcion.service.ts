@@ -4,6 +4,7 @@ import { Not, Repository } from 'typeorm';
 import { Inscripcion, EstadoInscripcion } from './entity/inscripcion.entity';
 import { EstadoVoluntariado, Voluntariado } from 'src/voluntariado/entity/voluntariado.entity';
 import { RolUsuario, Usuario } from 'src/usuario/entity/usuario.entity';
+import { EstadisticasVoluntarioService } from 'src/estadisticas_voluntario/estadisticas_voluntario.service';
 
 @Injectable()
 export class InscripcionService {
@@ -14,6 +15,7 @@ export class InscripcionService {
         private voluntariadoRepo: Repository<Voluntariado>,
         @InjectRepository(Usuario)
         private usuarioRepo: Repository<Usuario>,
+        private readonly estadisticasService: EstadisticasVoluntarioService, 
     ) { }
 
     private async validarCupos(voluntariadoId: number, max: number) {
@@ -165,20 +167,31 @@ export class InscripcionService {
     }
 
     async marcarAsistencia(creador: Usuario, idInscripcion: number, asistencia: boolean) {
-        const inscripcion = await this.inscripcionRepo.findOne({
-            where: { id_inscripcion: idInscripcion },
-            relations: ['voluntariado', 'voluntariado.creador'],
-        });
+    const inscripcion = await this.inscripcionRepo.findOne({
+      where: { id_inscripcion: idInscripcion },
+      relations: ['voluntariado', 'voluntariado.creador', 'voluntario'],
+    });
 
-        if (!inscripcion) throw new NotFoundException('Inscripción no encontrada');
-        if (inscripcion.voluntariado.creador.id_usuario !== creador.id_usuario)
-            throw new ForbiddenException('Solo el creador puede marcar la asistencia');
-        if (inscripcion.voluntariado.estado !== EstadoVoluntariado.TERMINADO)
-            throw new BadRequestException('Solo se puede marcar asistencia a voluntariados terminados');
-        if (inscripcion.estado_inscripcion !== EstadoInscripcion.ACEPTADA)
-            throw new BadRequestException('Solo se puede marcar asistencia a inscripciones aceptadas');
-        inscripcion.asistencia = asistencia;
-        return this.inscripcionRepo.save(inscripcion);
+    if (!inscripcion) throw new NotFoundException('Inscripción no encontrada');
+    if (inscripcion.voluntariado.creador.id_usuario !== creador.id_usuario)
+      throw new ForbiddenException('Solo el creador puede marcar la asistencia');
+    if (inscripcion.voluntariado.estado !== EstadoVoluntariado.TERMINADO)
+      throw new BadRequestException('Solo se puede marcar asistencia a voluntariados terminados');
+    if (inscripcion.estado_inscripcion !== EstadoInscripcion.ACEPTADA)
+      throw new BadRequestException('Solo se puede marcar asistencia a inscripciones aceptadas');
+
+    inscripcion.asistencia = asistencia;
+    await this.inscripcionRepo.save(inscripcion);
+
+    //  Si la asistencia es false, recalcular el porcentaje de asistencia
+    if (asistencia === false) {
+      await this.estadisticasService.actualizarEstadisticasPorAsistencia(
+        inscripcion.voluntario.id_usuario,
+        inscripcion.voluntariado.id_voluntariado,
+        asistencia,
+      );
     }
 
+    return inscripcion;
+  }
 }
