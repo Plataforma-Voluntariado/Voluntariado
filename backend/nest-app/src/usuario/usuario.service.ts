@@ -219,6 +219,13 @@ export class UsuarioService {
     //emito novedad al frontend
     this.userGateway.userNovedad(usuario)
 
+    await this.notificacionesService.crearYEnviarNotificacion([usuario.id_usuario], {
+      tipo: TipoNotificacion.INFO,
+      titulo: 'Correo verificado',
+      mensaje: '¡Tu correo electrónico ha sido verificado correctamente!',
+      url_redireccion: '/profile',
+    });
+
     return { message: 'Correo verificado correctamente.' };
   }
 

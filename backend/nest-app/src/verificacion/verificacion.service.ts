@@ -7,6 +7,8 @@ import { Usuario, RolUsuario } from 'src/usuario/entity/usuario.entity';
 import { Administrador } from 'src/administrador/entity/administrador.entity';
 import { Creador } from '../creador/entity/creador.entity'; // 👈 Importación añadida
 import { UsersGateway } from 'src/usuario/usuario.gateway';
+import { TipoNotificacion } from 'src/notificaciones/entity/notificacion.entity';
+import { NotificacionesService } from 'src/notificaciones/notificaciones.service';
 
 @Injectable()
 export class VerificacionService {
@@ -20,6 +22,7 @@ export class VerificacionService {
         @InjectRepository(Creador)
         private readonly creadorRepo: Repository<Creador>,
         private readonly userGateway: UsersGateway,
+        private readonly notificacionesService: NotificacionesService
     ) { }
 
     async validarVerificacionCompleta(usuario: Usuario, admin: Administrador): Promise<Verificacion> {
@@ -55,6 +58,14 @@ export class VerificacionService {
             //Todos aprobados → verificado
             verificacion.estado = EstadoVerificacion.VERIFICADO;
             usuario.verificado = true;
+
+            // Crear notificación
+            await this.notificacionesService.crearYEnviarNotificacion([usuario.id_usuario], {
+                tipo: TipoNotificacion.INFO,
+                titulo: 'Usuario verificado',
+                mensaje: '¡Felicidades! Tu cuenta ha sido verificada correctamente.',
+                url_redireccion: '/profile',
+            });
         } else if (rechazados.length === requeridos.length) {
             //Todos rechazados → rechazado
             verificacion.estado = EstadoVerificacion.RECHAZADO;

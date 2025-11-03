@@ -9,12 +9,14 @@ import { VerificacionModule } from '../verificacion.module';
 import { Usuario } from 'src/usuario/entity/usuario.entity';
 import { VerificacionArchivoGateway } from './verificacion-archivo.gateway';
 import { VerificacionArchivoAdminGateway } from './verificacion-archivo-admin.gateway';
+import { NotificacionesModule } from 'src/notificaciones/notificaciones.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Usuario,VerificacionArchivo,Verificacion]),
     ConfigModule,
-    VerificacionModule
+    VerificacionModule,
+    NotificacionesModule
   ],
   controllers:[VerificacionArchivoController],
   providers: [VerificacionArchivoService,VerificacionArchivoGateway,VerificacionArchivoAdminGateway],

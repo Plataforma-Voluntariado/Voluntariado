@@ -20,6 +20,8 @@ import { Administrador } from 'src/administrador/entity/administrador.entity';
 import { RechazarArchivoDto } from './dto/rechazar-archivo.dto';
 import { VerificacionArchivoGateway } from './verificacion-archivo.gateway';
 import { VerificacionArchivoAdminGateway } from './verificacion-archivo-admin.gateway';
+import { TipoNotificacion } from 'src/notificaciones/entity/notificacion.entity';
+import { NotificacionesService } from 'src/notificaciones/notificaciones.service';
 
 @Injectable()
 export class VerificacionArchivoService {
@@ -37,13 +39,10 @@ export class VerificacionArchivoService {
     private readonly verificacionService: VerificacionService,
     private readonly gateway: VerificacionArchivoGateway,
     private readonly gatewayadmin: VerificacionArchivoAdminGateway,
+    private readonly notificacionesService: NotificacionesService
   ) { }
 
-  private notificarCambioArchivo(
-    userId: number,
-    tipo: 'subido' | 'aprobado' | 'rechazado',
-    archivo: VerificacionArchivo,
-  ) {
+  private notificarCambioArchivo(userId: number, tipo: 'subido' | 'aprobado' | 'rechazado', archivo: VerificacionArchivo,) {
     this.gateway.notificarUsuario(userId, tipo, archivo,);
     this.gatewayadmin.notificarAdmins(tipo, {
       userId,
@@ -130,12 +129,7 @@ export class VerificacionArchivoService {
   }
 
   //Procesamiento final del archivo (carpeta + encriptado + BD)
-  private async procesarArchivo(
-    usuario: Usuario,
-    verificacion: Verificacion,
-    archivo: Express.Multer.File,
-    tipoDocumento: TipoDocumento,
-  ): Promise<VerificacionArchivo> {
+  private async procesarArchivo(usuario: Usuario,verificacion: Verificacion,archivo: Express.Multer.File,tipoDocumento: TipoDocumento,): Promise<VerificacionArchivo> {
     const userFolder = asegurarCarpetaUsuario(
       this.basePath,
       usuario.id_usuario,
@@ -214,10 +208,7 @@ export class VerificacionArchivoService {
     }
   }
 
-  async aceptarArchivo(
-    idArchivo: number,
-    admin: Administrador,
-  ): Promise<VerificacionArchivo> {
+  async aceptarArchivo(idArchivo: number,admin: Administrador,): Promise<VerificacionArchivo> {
     const archivo = await this.archivoRepo.findOne({
       where: { idVerificacionArchivo: idArchivo },
       relations: ['verificacion', 'verificacion.usuario'],
@@ -255,11 +246,7 @@ export class VerificacionArchivoService {
     return archivoActualizado;
   }
 
-  async rechazarArchivo(
-    idArchivo: number,
-    admin: Administrador,
-    dto: RechazarArchivoDto,
-  ): Promise<VerificacionArchivo> {
+  async rechazarArchivo(idArchivo: number,admin: Administrador,dto: RechazarArchivoDto,): Promise<VerificacionArchivo> {
     if (!dto.observaciones || dto.observaciones.trim() === '') {
       throw new BadRequestException(
         'Debe ingresar una observación del rechazo.',
@@ -287,8 +274,17 @@ export class VerificacionArchivoService {
     archivo.fechaRevision = new Date();
     const archivoActualizado = await this.archivoRepo.save(archivo);
 
-    // 🔔 Notificar al usuario (archivo rechazado)
     this.notificarCambioArchivo(archivo.verificacion.usuario.id_usuario, 'rechazado', archivoActualizado);
+
+    await this.notificacionesService.crearYEnviarNotificacion(
+      [archivo.verificacion.usuario.id_usuario],
+      {
+        tipo: TipoNotificacion.ALERTA,
+        titulo: 'Archivo rechazado',
+        mensaje: `Tu archivo ${archivo.tipoDocumento} ha sido rechazado.`,
+        url_redireccion: '/profile',
+      }
+    );
 
 
     // Recalcular el estado general de la verificación
