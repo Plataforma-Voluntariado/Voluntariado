@@ -67,14 +67,12 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
 
         if (selectedImageModal) {
             document.addEventListener('keydown', handleKeyPress);
-            document.body.style.overflow = 'hidden'; // Prevenir scroll del body
-        } else {
-            document.body.style.overflow = 'unset';
         }
 
         return () => {
             document.removeEventListener('keydown', handleKeyPress);
-            document.body.style.overflow = 'unset';
+            // Limpiar clase modal-open en caso de que el componente se desmonte
+            document.body.classList.remove('modal-open');
         };
     }, [selectedImageModal]);
 
@@ -230,55 +228,15 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
     };
 
     const handleFotosChange = (e) => {
-        // Para el input de archivo, reemplazamos todas las imágenes
-        const fileArray = Array.from(e.target.files);
+        // Para el input de archivo, también agregamos (igual que drag & drop)
+        const files = e.target.files;
+        if (files && files.length > 0) {
+            processFiles(files);
+        }
         
-        if (fileArray.length > 5) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Límite excedido',
-                text: 'Máximo 5 fotos permitidas'
-            });
-            return;
-        }
-
-        // Validar tamaño de archivos
-        const maxSize = 5 * 1024 * 1024; // 5MB
-        for (let file of fileArray) {
-            if (file.size > maxSize) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Archivo muy grande',
-                    text: `La foto ${file.name} excede el tamaño máximo de 5MB`
-                });
-                return;
-            }
-        }
-
-        // Reemplazar todas las fotos
-        setFotos(fileArray);
-
-        // Generar nuevas vistas previas
-        const previews = [];
-        fileArray.forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                previews[index] = {
-                    name: file.name,
-                    url: e.target.result
-                };
-                // Actualizar cuando todas las imágenes estén cargadas
-                if (previews.filter(p => p).length === fileArray.length) {
-                    setPreviewImages([...previews]);
-                }
-            };
-            reader.readAsDataURL(file);
-        });
-        
-        // Limpiar error de fotos
-        if (fileArray.length > 0 && errors.fotos) {
-            setErrors(prev => ({ ...prev, fotos: "" }));
-        }
+        // Limpiar el input para permitir seleccionar el mismo archivo nuevamente
+        const input = document.getElementById('fotos');
+        if (input) input.value = '';
     };
 
     // Funciones para drag & drop
@@ -326,10 +284,44 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
     };
 
     const openImageModal = (image, index) => {
-        setSelectedImageModal({ ...image, index });
+        // Guardar posición actual del scroll
+        const scrollY = window.scrollY;
+        
+        // Bloquear scroll del body inmediatamente con múltiples métodos
+        document.body.classList.add('modal-open');
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.width = '100%';
+        document.documentElement.style.overflow = 'hidden';
+        
+        setSelectedImageModal({ ...image, index, scrollY });
+        
+        // Asegurar que el modal se centre y tenga focus
+        setTimeout(() => {
+            const modal = document.querySelector('.image-modal-overlay');
+            if (modal) {
+                modal.focus();
+                modal.scrollTop = 0;
+                modal.scrollLeft = 0;
+            }
+        }, 10);
     };
 
     const closeImageModal = () => {
+        const scrollY = selectedImageModal?.scrollY || 0;
+        
+        // Restaurar scroll del body completamente
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.documentElement.style.overflow = '';
+        
+        // Restaurar posición de scroll
+        window.scrollTo(0, scrollY);
+        
         setSelectedImageModal(null);
     };
 
@@ -498,6 +490,7 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
     }
 
     return (
+        <>
         <div className="create-voluntariado-form-container">
             <form onSubmit={handleSubmit} className="create-voluntariado-form">
                 <div className="form-row">
@@ -695,7 +688,13 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
                         onClick={() => document.getElementById('fotos').click()}
                     >
                         <div className="drag-drop-content">
-                            <div className="upload-icon">📷</div>
+                            <div className="upload-icon">
+                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V8C1 7.46957 1.21071 6.96086 1.58579 6.58579C1.96086 6.21071 2.46957 6 3 6H7L9 3H15L17 6H21C21.5304 6 22.0391 6.21071 22.4142 6.58579C22.7893 6.96086 23 7.46957 23 8V19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <circle cx="12" cy="13" r="4" stroke="currentColor" strokeWidth="2"/>
+                                    <path d="M12 9V17M8 13H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.6"/>
+                                </svg>
+                            </div>
                             <div className="upload-text">
                                 <p className="primary-text">
                                     {previewImages.length > 0 
@@ -704,7 +703,7 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
                                     }
                                     <span className="click-text">
                                         {previewImages.length > 0 
-                                            ? 'haz clic para reemplazar todas'
+                                            ? 'haz clic para agregar más'
                                             : 'haz clic para seleccionar'
                                         }
                                     </span>
@@ -743,11 +742,25 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
                                     onClick={clearAllImages}
                                     title="Limpiar todas las imágenes"
                                 >
-                                    🗑️ Limpiar todo
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M3 6H5H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M10 11V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M14 11V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                    Limpiar todo
                                 </button>
                             </div>
                             <div className="preview-info">
-                                <small>💡 Puedes arrastrar más imágenes para agregar (hasta {5 - previewImages.length} más)</small>
+                                <small>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{marginRight: '6px', verticalAlign: 'middle'}}>
+                                        <path d="M9 21H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M12 3C8.68629 3 6 5.68629 6 9C6 11 7 12 8 13H16C17 12 18 11 18 9C18 5.68629 15.3137 3 12 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M12 7V9" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                        <circle cx="12" cy="11" r="0.5" fill="currentColor"/>
+                                    </svg>
+                                    Puedes arrastrar más imágenes para agregar (hasta {5 - previewImages.length} más)
+                                </small>
                             </div>
                             <div className="image-preview-grid">
                                 {previewImages.map((image, index) => (
@@ -763,7 +776,12 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
                                                 className="preview-image"
                                             />
                                             <div className="image-overlay">
-                                                <span className="zoom-icon">🔍</span>
+                                                <span className="zoom-icon">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
+                                                        <path d="m21 21-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                    </svg>
+                                                </span>
                                             </div>
                                         </div>
                                         <button
@@ -796,56 +814,49 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
                     </button>
                 </div>
             </form>
+        </div>
 
-            {/* Modal de Vista Previa de Imagen */}
-            {selectedImageModal && (
-                <div className="image-modal-overlay" onClick={closeImageModal}>
-                    <div className="image-modal-content" onClick={(e) => e.stopPropagation()}>
-                        <button 
-                            className="image-modal-close" 
-                            onClick={closeImageModal}
-                            title="Cerrar (Esc)"
-                        >
-                            ✕
-                        </button>
-                        <div className="image-modal-header">
-                            <h3>Vista Previa de Imagen</h3>
-                            <span className="image-counter-left">
-                                {selectedImageModal.index + 1} de {previewImages.length}
-                            </span>
-                        </div>
-                        <div className="image-modal-body">
-                            <div className="image-wrapper">
-                                <img 
-                                    src={selectedImageModal.url} 
-                                    alt={selectedImageModal.name}
-                                    className="modal-image"
-                                    onLoad={(e) => {
-                                        // Asegurar que la imagen se muestre completa
-                                        const img = e.target;
-                                        const container = img.parentElement;
-                                        if (container) {
-                                            const containerRect = container.getBoundingClientRect();
-                                            const imgRect = img.getBoundingClientRect();
-                                            
-                                            if (imgRect.height > containerRect.height || imgRect.width > containerRect.width) {
-                                                img.style.maxWidth = '100%';
-                                                img.style.maxHeight = '100%';
-                                                img.style.width = 'auto';
-                                                img.style.height = 'auto';
-                                            }
-                                        }
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div className="image-modal-footer">
-                            <p className="modal-image-name">{selectedImageModal.name}</p>
+        {/* Modal de Vista Previa de Imagen - FUERA del contenedor principal */}
+        {selectedImageModal && (
+            <div 
+                className="image-modal-overlay" 
+                onClick={closeImageModal}
+                tabIndex={-1}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="modal-title"
+            >
+                <div className="image-modal-content" onClick={(e) => e.stopPropagation()}>
+                    <button 
+                        className="image-modal-close" 
+                        onClick={closeImageModal}
+                        title="Cerrar (Esc)"
+                        aria-label="Cerrar modal"
+                    >
+                        ✕
+                    </button>
+                    <div className="image-modal-header">
+                        <h3 id="modal-title">Vista Previa de Imagen</h3>
+                        <span className="image-counter-left">
+                            {selectedImageModal.index + 1} de {previewImages.length}
+                        </span>
+                    </div>
+                    <div className="image-modal-body">
+                        <div className="image-wrapper">
+                            <img 
+                                src={selectedImageModal.url} 
+                                alt={selectedImageModal.name}
+                                className="modal-image"
+                            />
                         </div>
                     </div>
+                    <div className="image-modal-footer">
+                        <p className="modal-image-name">{selectedImageModal.name}</p>
+                    </div>
                 </div>
-            )}
-        </div>
+            </div>
+        )}
+        </>
     );
 }
 
