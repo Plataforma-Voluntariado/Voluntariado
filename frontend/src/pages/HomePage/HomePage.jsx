@@ -3,6 +3,7 @@ import "./HomePage.css";
 import { useAuth } from "../../context/AuthContext";
 import AdministratorPanelLayout from "../../layouts/Admin/AdministratorPanelLayout/AdministratorPanelLayout";
 import FooterWithAuth from "../../components/Footer/FooterWithAuth";
+import HomeVolunteerLayout from "../../layouts/HomeVolunteerLayout/HomeVolunteerLayout";
 function HomePage(){
     const { user } = useAuth();
     const renderLayout = () => {
@@ -11,7 +12,7 @@ function HomePage(){
             case "CREADOR":
                 return <div className="home-page-creator-layout"></div>;
             case "VOLUNTARIO":
-                return <div className="home-page-volunteer-layout"></div>;
+                return <HomeVolunteerLayout />;
             case "ADMIN":
                 return <AdministratorPanelLayout />;
             default:
