@@ -12,6 +12,6 @@ import { Usuario } from 'src/usuario/entity/usuario.entity';
     ],
     controllers: [InscripcionController],
     providers: [InscripcionService],
-    exports: [],
+    exports: [InscripcionService],
 })
 export class InscripcionModule { }

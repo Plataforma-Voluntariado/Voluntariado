@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, In } from 'typeorm';
-import { Voluntariado } from './entity/voluntariado.entity';
+import { EstadoVoluntariado, Voluntariado } from './entity/voluntariado.entity';
 import { Categoria } from '../categoria/entity/categoria.entity';
 import { Usuario, RolUsuario } from '../usuario/entity/usuario.entity';
 import { CreateVoluntariadoDto } from './dto/create-voluntariado.dto';
@@ -11,18 +11,22 @@ import { UbicacionService } from 'src/ubicacion/ubicacion.service';
 import { Ubicacion } from 'src/ubicacion/entity/ubicacion.entity';
 import { FotosVoluntariado } from 'src/fotos_voluntariado/entity/fotos_voluntariado.entity';
 import { Ciudad } from 'src/ciudad/entity/ciudad.entity';
+import { VoluntariadoSchedulerService } from './VoluntariadoSchedulerService';
+import { InscripcionService } from 'src/inscripcion/inscripcion.service';
 
 @Injectable()
 export class VoluntariadoService {
   private readonly logger = new Logger(VoluntariadoService.name);
-  private readonly commonRelations = ['categoria', 'creador', 'fotos', 'ubicacion', 'ubicacion.ciudad'] as const;
-
+  private readonly commonRelations = ['categoria', 'creador', 'fotos', 'ubicacion', 'ubicacion.ciudad','creador.creador'] as const;
   constructor(
     @InjectRepository(Voluntariado) private readonly voluntariadoRepo: Repository<Voluntariado>,
     @InjectRepository(Categoria) private readonly categoriaRepo: Repository<Categoria>,
     private readonly fotosVoluntariadoService: FotosVoluntariadoService,
     private readonly ubicacionService: UbicacionService,
     private readonly dataSource: DataSource,
+    @Inject(forwardRef(() => VoluntariadoSchedulerService))
+    private readonly voluntariadoSchedulerService: VoluntariadoSchedulerService,
+    private readonly inscripcionService: InscripcionService
   ) { }
 
   // ====================== CREATE ======================
@@ -45,6 +49,12 @@ export class VoluntariadoService {
         categoria,
         creador,
       });
+
+      await this.voluntariadoSchedulerService.scheduleVoluntariado(
+        voluntariado.id_voluntariado,
+        voluntariado.fechaHoraInicio,
+        voluntariado.fechaHoraFin,
+      );
 
 
       const voluntariadoDb = await qr.manager.findOne(Voluntariado, {
@@ -92,8 +102,8 @@ export class VoluntariadoService {
   async update(id: number, dto: UpdateVoluntariadoDto, creadorId: number, nuevasFotos?: Express.Multer.File[],) {
     return this.executeTransaction(async (qr) => {
       const [user, voluntariado] = await Promise.all([
-        this.findUsuario(creadorId, qr), 
-        this.findVoluntariadoById(id, qr), 
+        this.findUsuario(creadorId, qr),
+        this.findVoluntariadoById(id, qr),
       ]);
 
       if (!user.verificado) {
@@ -166,6 +176,12 @@ export class VoluntariadoService {
 
       const actualizado = await qr.manager.save(Voluntariado, voluntariado);
 
+      await this.voluntariadoSchedulerService.scheduleVoluntariado(
+        actualizado.id_voluntariado,
+        actualizado.fechaHoraInicio,
+        actualizado.fechaHoraFin,
+      );
+
       return {
         message: 'Voluntariado actualizado correctamente.',
         voluntariado: actualizado,
@@ -176,12 +192,12 @@ export class VoluntariadoService {
   // ====================== DELETE ======================
   async remove(id: number, user: Usuario) {
     const voluntariado = await this.findVoluntariadoById(id);
-    
+
     if (user.rol === RolUsuario.CREADOR && voluntariado.creador.id_usuario !== user.id_usuario) throw new ForbiddenException('No tiene permiso para eliminar este voluntariado.');
 
     await this.fotosVoluntariadoService.deleteFotosCloudinary(voluntariado.fotos);
     await this.voluntariadoRepo.remove(voluntariado);
-    
+
     return { message: `Voluntariado "${voluntariado.titulo}" eliminado.` };
   }
 
@@ -228,4 +244,17 @@ export class VoluntariadoService {
     if (!v) throw new NotFoundException('Voluntariado no encontrado.');
     return v;
   }
+
+  async updateEstado(id: number, estado: EstadoVoluntariado) {
+    const voluntariado = await this.findVoluntariadoById(id);
+    voluntariado.estado = estado;
+
+    if (estado === EstadoVoluntariado.EN_PROCESO) {
+      await this.inscripcionService.rechazarPendientesPorVoluntariado(id);
+    }
+
+    return this.voluntariadoRepo.save(voluntariado);
+  }
+
+
 }
