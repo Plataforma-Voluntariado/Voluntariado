@@ -39,11 +39,14 @@ export class VoluntariadoService {
 
       if (!creador.verificado) throw new BadRequestException('Tu cuenta debe estar verificada para crear voluntariados.');
 
-      // Solo guardamos fechaHoraInicio - la tabla no tiene fechaHoraFin
+      const fechaFin = new Date(dto.fechaHoraInicio);
+      fechaFin.setHours(fechaFin.getHours() + dto.horas);
+
       const voluntariado = await qr.manager.save(Voluntariado, {
         titulo: dto.titulo.trim(),
         descripcion: dto.descripcion.trim(),
         fechaHoraInicio: dto.fechaHoraInicio,
+        fechaHoraFin: fechaFin,
         horas: dto.horas,
         maxParticipantes: dto.maxParticipantes,
         categoria,
@@ -155,16 +158,19 @@ export class VoluntariadoService {
         );
       }
 
-      // Preparar nuevos valores
+      // calclo fechafin
       const nuevaFechaInicio = dto.fechaHoraInicio ?? voluntariado.fechaHoraInicio;
       const nuevasHoras = dto.horas ?? voluntariado.horas;
+
+      const nuevaFechaFin = new Date(nuevaFechaInicio);
+      nuevaFechaFin.setHours(nuevaFechaFin.getHours() + nuevasHoras);
 
       Object.assign(voluntariado, {
         titulo: dto.titulo?.trim() ?? voluntariado.titulo,
         descripcion: dto.descripcion?.trim() ?? voluntariado.descripcion,
         fechaHoraInicio: nuevaFechaInicio,
         horas: nuevasHoras,
-        // fechaHoraFin no existe en la tabla
+        fechaHoraFin: nuevaFechaFin,
         maxParticipantes: dto.maxParticipantes ?? voluntariado.maxParticipantes,
         estado: dto.estado ?? voluntariado.estado,
       });
@@ -198,7 +204,7 @@ export class VoluntariadoService {
     await this.fotosVoluntariadoService.deleteFotosCloudinary(voluntariado.fotos);
     await this.voluntariadoRepo.remove(voluntariado);
 
-    return { message: `Voluntariado "${voluntariado.titulo}" eliminado.` };
+    return { message: 'Voluntariado "${voluntariado.titulo}" eliminado.' };
   }
 
   // ====================== HELPERS ======================
@@ -235,7 +241,7 @@ export class VoluntariadoService {
 
   private validarPermiso(v: Voluntariado, user: Usuario, accion: string) {
     if (user.rol === RolUsuario.CREADOR && v.creador.id_usuario !== user.id_usuario)
-      throw new ForbiddenException(`No tiene permiso para ${accion} este voluntariado.`);
+      throw new ForbiddenException('No tiene permiso para ${accion} este voluntariado.');
   }
 
   private async findVoluntariadoById(id: number, qr?: any) {
@@ -254,7 +260,7 @@ export class VoluntariadoService {
     }
 
     return this.voluntariadoRepo.save(voluntariado);
-  }
+  }
 
 
 }

@@ -5,8 +5,9 @@ import { Verificacion } from './entity/verificacion.entity';
 import { VerificacionArchivo } from './verificacion_archivo/entity/verificacion-archivo.entity';
 import { VerificacionService } from './verificacion.service';
 import { VerificacionController } from './verificacion.controller';
-import { Creador } from '../creador/entity/creador.entity'; // 👈 Importación añadida
+import { Creador } from '../creador/entity/creador.entity';
 import { UsersGateway } from 'src/usuario/usuario.gateway';
+import { NotificacionesModule } from 'src/notificaciones/notificaciones.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { UsersGateway } from 'src/usuario/usuario.gateway';
       VerificacionArchivo, 
       Creador, 
     ]),
+    NotificacionesModule
   ],
   controllers: [VerificacionController],
   providers: [VerificacionService, UsersGateway],
