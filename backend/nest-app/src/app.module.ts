@@ -23,6 +23,7 @@ import { NotificacionesModule } from './notificaciones/notificaciones.module';
 import { FotosVoluntariadoModule } from './fotos_voluntariado/fotos_voluntariado.module';
 import { UbicacionModule } from './ubicacion/ubicacion.module';
 import { InscripcionModule } from './inscripcion/inscripcion.module';
+import { ComentariosVoluntariadoModule } from './comentarios_voluntariado/comentarios_voluntariado.module';
 
 
 @Module({
@@ -66,7 +67,8 @@ import { InscripcionModule } from './inscripcion/inscripcion.module';
     NotificacionesModule,
     FotosVoluntariadoModule,
     UbicacionModule,
-    InscripcionModule
+    InscripcionModule,
+    ComentariosVoluntariadoModule
   ],
   controllers: [AppController],
   providers: [AppService],
