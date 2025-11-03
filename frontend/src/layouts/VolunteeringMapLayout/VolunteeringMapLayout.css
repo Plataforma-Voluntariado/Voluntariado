@@ -1,0 +1,22 @@
+.volunteering-map-layout {
+  width: 90%;
+  max-width: 1400px;
+  display: flex;
+  gap: 1.5rem;
+  border-radius: 24px;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+@media (max-width: 1200px) {
+  .volunteering-map-layout {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .volunteering-map-layout {
+    gap: 1.25rem;
+  }
+}

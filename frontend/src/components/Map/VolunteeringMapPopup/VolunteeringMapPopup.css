@@ -1,0 +1,45 @@
+.volunteering-map-popup {
+  width: 250px;
+  height: auto;
+}
+
+.volunteering-map-popup-image {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  display: block;
+}
+
+.volunteering-map-popup-content {
+  padding: 1rem;
+}
+
+.volunteering-map-popup-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.3;
+}
+
+[data-theme="dark"] .volunteering-map-popup-title {
+  color: #fafafa;
+}
+
+.volunteering-map-popup-description {
+  font-size: 0.85rem;
+  color: #525252;
+  margin: 0 0 0.75rem 0;
+  line-height: 1.4;
+}
+
+[data-theme="dark"] .volunteering-map-popup-description {
+  color: #a3a3a3;
+}
+
+.volunteering-map-popup-date {
+  font-size: 0.8rem;
+  color: #007AFF;
+  font-weight: 500;
+  margin: 0;
+}
