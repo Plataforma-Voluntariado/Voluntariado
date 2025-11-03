@@ -1,0 +1,478 @@
+.volunteering-map-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.volunteering-map-modal-content {
+  width: 100%;
+  max-width: 600px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+[data-theme="dark"] .volunteering-map-modal-content {
+  background: rgba(26, 26, 26, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.volunteering-map-modal-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 36px;
+  height: 36px;
+  background: rgba(0, 0, 0, 0.05);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1a1a1a;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.volunteering-map-modal-close:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .volunteering-map-modal-close {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fafafa;
+}
+
+[data-theme="dark"] .volunteering-map-modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.volunteering-map-modal-header {
+  position: relative;
+  height: 280px;
+  overflow: hidden;
+}
+
+.volunteering-map-modal-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.volunteering-map-modal-title-section {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  padding: 2rem 1.5rem 1.5rem;
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.volunteering-map-modal-title {
+  color: white;
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 0;
+  flex: 1;
+  line-height: 1.2;
+}
+
+.volunteering-map-modal-status {
+  display: inline-block;
+  padding: 0.4rem 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.volunteering-map-modal-status.status-pendiente {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.volunteering-map-modal-status.status-activo {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.volunteering-map-modal-status.status-completado {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+}
+
+.volunteering-map-modal-body {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.volunteering-map-modal-description-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 0.75rem 0;
+}
+
+[data-theme="dark"] .volunteering-map-modal-description-section h3 {
+  color: #fafafa;
+}
+
+.volunteering-map-modal-description-section p {
+  font-size: 0.95rem;
+  color: #525252;
+  line-height: 1.6;
+  margin: 0;
+}
+
+[data-theme="dark"] .volunteering-map-modal-description-section p {
+  color: #d4d4d4;
+}
+
+.volunteering-map-modal-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.volunteering-map-modal-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 12px;
+}
+
+[data-theme="dark"] .volunteering-map-modal-info-item {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.volunteering-map-modal-info-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #525252;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+[data-theme="dark"] .volunteering-map-modal-info-label {
+  color: #a3a3a3;
+}
+
+.volunteering-map-modal-info-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+[data-theme="dark"] .volunteering-map-modal-info-value {
+  color: #fafafa;
+}
+
+.volunteering-map-modal-participants {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.volunteering-map-modal-participants-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.volunteering-map-modal-participants-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+[data-theme="dark"] .volunteering-map-modal-participants-label {
+  color: #fafafa;
+}
+
+.volunteering-map-modal-participants-count {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #007AFF;
+}
+
+.volunteering-map-modal-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .volunteering-map-modal-progress-bar {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.volunteering-map-modal-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #007AFF 0%, #0051D5 100%);
+  transition: width 0.3s ease-out;
+}
+
+.volunteering-map-modal-location {
+  padding: 1.25rem;
+  background: rgba(0, 122, 255, 0.05);
+  border-radius: 12px;
+  border-left: 4px solid #007AFF;
+}
+
+[data-theme="dark"] .volunteering-map-modal-location {
+  background: rgba(0, 122, 255, 0.1);
+}
+
+.volunteering-map-modal-location-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+[data-theme="dark"] .volunteering-map-modal-location-label {
+  color: #fafafa;
+}
+
+.volunteering-map-modal-location-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin: 0 0 0.25rem 0;
+}
+
+[data-theme="dark"] .volunteering-map-modal-location-text {
+  color: #fafafa;
+}
+
+.volunteering-map-modal-location-sector {
+  font-size: 0.9rem;
+  color: #525252;
+  margin: 0;
+}
+
+[data-theme="dark"] .volunteering-map-modal-location-sector {
+  color: #a3a3a3;
+}
+
+.volunteering-map-modal-creator-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .volunteering-map-modal-creator-section {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.volunteering-map-modal-creator-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+[data-theme="dark"] .volunteering-map-modal-creator-label {
+  color: #fafafa;
+}
+
+.volunteering-map-modal-creator {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 12px;
+}
+
+[data-theme="dark"] .volunteering-map-modal-creator {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.volunteering-map-modal-creator-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(0, 122, 255, 0.2);
+}
+
+.volunteering-map-modal-creator-info {
+  flex: 1;
+}
+
+.volunteering-map-modal-creator-email {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin: 0 0 0.25rem 0;
+  word-break: break-all;
+}
+
+[data-theme="dark"] .volunteering-map-modal-creator-email {
+  color: #fafafa;
+}
+
+.volunteering-map-modal-creator-phone {
+  font-size: 0.85rem;
+  color: #525252;
+  margin: 0;
+}
+
+[data-theme="dark"] .volunteering-map-modal-creator-phone {
+  color: #a3a3a3;
+}
+
+.volunteering-map-modal-actions {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.01);
+}
+
+[data-theme="dark"] .volunteering-map-modal-actions {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.volunteering-map-modal-button {
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  color: white;
+}
+
+.volunteering-map-modal-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.volunteering-map-modal-button:hover::before {
+  left: 100%;
+}
+
+.volunteering-map-modal-button.subscribe {
+  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.35);
+}
+
+.volunteering-map-modal-button.subscribe:hover {
+  background: linear-gradient(135deg, #0051D5 0%, #003DA5 100%);
+  box-shadow: 0 8px 24px rgba(0, 122, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.volunteering-map-modal-button.fullscreen {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+}
+
+.volunteering-map-modal-button.fullscreen:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.5);
+  transform: translateY(-2px);
+}
+
+.volunteering-map-modal-button:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 600px) {
+  .volunteering-map-modal-content {
+    max-height: 95vh;
+    border-radius: 20px;
+  }
+
+  .volunteering-map-modal-header {
+    height: 200px;
+  }
+
+  .volunteering-map-modal-title {
+    font-size: 1.5rem;
+  }
+
+  .volunteering-map-modal-body {
+    padding: 1.5rem;
+    gap: 1.5rem;
+  }
+
+  .volunteering-map-modal-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .volunteering-map-modal-actions {
+    flex-direction: column;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .volunteering-map-modal-button {
+    width: 100%;
+  }
+}
