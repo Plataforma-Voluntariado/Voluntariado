@@ -87,7 +87,7 @@ export const createVoluntariado = async (voluntariadoData, fotos = []) => {
 // Obtener voluntariados del usuario creador
 export const getMyVoluntariados = async () => {
     try {
-        const response = await api.get("/voluntariados/mis-voluntariados");
+        const response = await api.get("/voluntariados/owns");
         return response.data;
     } catch (error) {
         console.error("Error obteniendo mis voluntariados: ", error);
