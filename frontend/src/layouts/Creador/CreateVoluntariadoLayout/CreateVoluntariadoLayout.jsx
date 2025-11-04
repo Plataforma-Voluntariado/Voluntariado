@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import "./CreateVoluntariadoLayout.css";
 import CreateVoluntariadoForm from "../../../components/CreateVoluntariadoForm/CreateVoluntariadoForm";
 import { IoArrowBack } from "react-icons/io5";
-import { MdPreview } from "react-icons/md";
 
 function CreateVoluntariadoLayout() {
     const navigate = useNavigate();
@@ -20,11 +19,6 @@ function CreateVoluntariadoLayout() {
 
     const handleCancel = () => {
         navigate("/home");
-    };
-
-    const handlePreview = () => {
-        // TODO: Implementar vista previa del voluntariado
-        console.log("Vista previa - Funcionalidad pendiente");
     };
 
     return (
@@ -46,16 +40,7 @@ function CreateVoluntariadoLayout() {
                     <p>Comparte tu proyecto con la comunidad de voluntarios</p>
                 </div>
 
-                <div className="header-right">
-                    <button 
-                        onClick={handlePreview}
-                        className="preview-button"
-                        title="Vista previa"
-                    >
-                        <MdPreview />
-                        <span>Vista Previa</span>
-                    </button>
-                </div>
+
             </div>
 
             <div className="create-voluntariado-content">
