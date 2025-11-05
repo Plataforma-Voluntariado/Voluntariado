@@ -2,27 +2,24 @@ import React, { useState, useEffect } from "react";
 import "./CreateVoluntariadoForm.css";
 import { getCategorias } from "../../services/categoria/categoriaService";
 import { getDepartamentos, getCiudadesByDepartamento } from "../../services/ubicacion/ubicacionService";
-import { createVoluntariado, verifyAuth } from "../../services/voluntariado/voluntariadoService";
+import { createVoluntariado } from "../../services/voluntariado/voluntariadoService";
 import { useAuth } from "../../context/AuthContext";
-import Swal from "sweetalert2";
+import SuccessAlert from "../../components/alerts/SuccessAlert";
+import WrongAlert from "../../components/alerts/WrongAlert"
+import ImagePreviewModal from "./ImagePreviewModal/ImagePreviewModal";
+import Select from "react-select";
+import { customSelectStylesVoluntariado } from "../../styles/selectStylesVoluntariado";
+import { TextField } from "@mui/material";
+import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+
 
 const MAX_PHOTOS = 5;
-const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_SIZE = 5 * 1024 * 1024;
 const DEFAULT_COORDS = { latitud: -2.9001285, longitud: -76.6124805 };
 
 function CreateVoluntariadoForm({ onSuccess, onCancel }) {
   const { user } = useAuth();
-
-  const [formData, setFormData] = useState({
-    titulo: "",
-    descripcion: "",
-    fechaHoraInicio: "",
-    horas: 1,
-    maxParticipantes: 10,
-    categoria_id: "",
-    ubicacion: { ...DEFAULT_COORDS, direccion: "", ciudad_id: "", nombre_lugar: "", barrio: "", nombre_sector: "" }
-  });
-
   const [categorias, setCategorias] = useState([]);
   const [departamentos, setDepartamentos] = useState([]);
   const [ciudades, setCiudades] = useState([]);
@@ -33,21 +30,24 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
   const [loading, setLoading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedImageModal, setSelectedImageModal] = useState(null);
+  const [formData, setFormData] = useState({
+    titulo: "",
+    descripcion: "",
+    fechaHoraInicio: "",
+    horas: 1,
+    maxParticipantes: 10,
+    categoria_id: "",
+    ubicacion: { ...DEFAULT_COORDS, direccion: "", ciudad_id: "", nombre_sector: "" }
+  });
 
   useEffect(() => {
     (async () => {
-      try { setCategorias(await getCategorias()); } 
-      catch { setCategorias([
-        { id_categoria: 1, nombre: "Medio Ambiente" },
-        { id_categoria: 2, nombre: "Educación" },
-        { id_categoria: 3, nombre: "Salud" }
-      ]); }
-
+      try { setCategorias(await getCategorias()); }
+      catch {
+      }
       try { setDepartamentos(await getDepartamentos()); }
-      catch { setDepartamentos([
-        { id_departamento: 1, departamento: "Cauca" },
-        { id_departamento: 2, departamento: "Valle del Cauca" }
-      ]); }
+      catch {
+      }
     })();
   }, []);
 
@@ -62,20 +62,9 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
         const data = await getCiudadesByDepartamento(selectedDepartamento);
         setCiudades(data);
       } catch {
-        // fallback simple por departamento
-        if (selectedDepartamento === "1") setCiudades([{ id_ciudad: 1, ciudad: "Popayán" }]);
-        else if (selectedDepartamento === "2") setCiudades([{ id_ciudad: 4, ciudad: "Cali" }]);
-        else setCiudades([{ id_ciudad: 7, ciudad: "Pasto" }]);
       }
     })();
   }, [selectedDepartamento]);
-
-  // Manejo global de tecla Escape para cerrar modal
-  useEffect(() => {
-    const handleKey = (e) => { if (e.key === "Escape") setSelectedImageModal(null); };
-    if (selectedImageModal) document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [selectedImageModal]);
 
   const readFileData = (file) =>
     new Promise((res, rej) => {
@@ -89,12 +78,18 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
     const filesArr = Array.from(fileList);
     if (fotos.length + filesArr.length > MAX_PHOTOS) {
       const available = MAX_PHOTOS - fotos.length;
-      Swal.fire({ icon: "warning", title: "Límite excedido", text: `Solo puedes agregar ${available} imagen(es) más.` });
+      await WrongAlert({
+        title: "Límite excedido",
+        message: `Solo puedes agregar ${available} imagen(es) más.`
+      });
       return;
     }
     for (const f of filesArr) {
       if (f.size > MAX_SIZE) {
-        Swal.fire({ icon: "warning", title: "Archivo muy grande", text: `${f.name} supera 5MB.` });
+        await WrongAlert({
+          title: "Archivo muy grande",
+          message: `${f.name} supera 5MB.`
+        });
         return;
       }
     }
@@ -104,7 +99,10 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
       setPreviewImages(prev => [...prev, ...previews]);
       setErrors(prev => ({ ...prev, fotos: "" }));
     } catch {
-      Swal.fire({ icon: "error", title: "Error", text: "No se pudieron procesar las imágenes" });
+      await WrongAlert({
+        title: "Error",
+        message: "No se pudieron procesar las imágenes"
+      });
     }
   };
 
@@ -120,9 +118,22 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: "" }));
   };
 
-  const handleDepartamentoChange = (e) => {
-    setSelectedDepartamento(e.target.value);
-    setFormData(prev => ({ ...prev, ubicacion: { ...prev.ubicacion, ciudad_id: "" } }));
+  const handleSelectChange = (name, selected) => {
+    const value = selected ? selected.value : "";
+    if (name === "departamento") {
+      setSelectedDepartamento(value);
+      setCiudades([]);
+      setFormData(prev => ({ ...prev, ubicacion: { ...prev.ubicacion, ciudad_id: "" } }));
+    } else if (name === "ubicacion.ciudad_id") {
+      setFormData(prev => ({
+        ...prev,
+        ubicacion: { ...prev.ubicacion, ciudad_id: value }
+      }));
+    } else if (name === "categoria_id") {
+      setFormData(prev => ({ ...prev, categoria_id: value }));
+    }
+
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: "" }));
   };
 
   const handleFotosChange = (e) => {
@@ -152,14 +163,6 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
     setSelectedImageModal({ ...image, index, scrollY });
   };
 
-  const closeImageModal = () => {
-    const scrollY = selectedImageModal?.scrollY || 0;
-    document.body.style.position = "";
-    document.body.style.top = "";
-    window.scrollTo(0, scrollY);
-    setSelectedImageModal(null);
-  };
-
   const validateForm = () => {
     const newErrors = {};
     if (!formData.titulo.trim()) newErrors.titulo = "El título es obligatorio";
@@ -172,6 +175,7 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
     else if (formData.maxParticipantes > 100) newErrors.maxParticipantes = "Máximo 100 participantes";
     if (!formData.categoria_id) newErrors.categoria_id = "La categoría es obligatoria";
     if (!formData.ubicacion.direccion.trim()) newErrors["ubicacion.direccion"] = "La dirección es obligatoria";
+    if (!formData.ubicacion.nombre_sector.trim()) newErrors["ubicacion.nombre_sector"] = "El barrio/sector es obligatorio";
     if (!formData.ubicacion.ciudad_id) newErrors["ubicacion.ciudad_id"] = "La ciudad es obligatoria";
     if (!fotos || fotos.length === 0) newErrors.fotos = "Debes subir al menos una foto";
     setErrors(newErrors);
@@ -181,7 +185,7 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
   const resetForm = () => {
     setFormData({
       titulo: "", descripcion: "", fechaHoraInicio: "", horas: 1, maxParticipantes: 10, categoria_id: "",
-      ubicacion: { ...DEFAULT_COORDS, direccion: "", ciudad_id: "", nombre_lugar: "", barrio: "", nombre_sector: "" }
+      ubicacion: { ...DEFAULT_COORDS, direccion: "", ciudad_id: "", nombre_sector: "" }
     });
     setFotos([]); setPreviewImages([]); setSelectedDepartamento("");
     const fileInput = document.getElementById("fotos"); if (fileInput) fileInput.value = "";
@@ -189,26 +193,82 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validar formulario
     if (!validateForm()) {
-      Swal.fire({ icon: "error", title: "Formulario incompleto", text: "Por favor corrige los errores" });
+      await WrongAlert({
+        title: "Formulario incompleto",
+        message: "Por favor completa todos los campos obligatorios"
+      });
       return;
     }
-    if (!user) { Swal.fire({ icon: "error", title: "No autenticado", text: "Debes iniciar sesión" }); return; }
-    if (user.rol !== "CREADOR") { Swal.fire({ icon: "error", title: "Permisos insuficientes", text: "Solo rol CREADOR" }); return; }
+
+    // Validar autenticación y rol
+    if (!user || user.rol !== "CREADOR") {
+      await WrongAlert({
+        title: "Permisos insuficientes",
+        message: "Debes estar autenticado con rol CREADOR para crear voluntariados"
+      });
+      return;
+    }
 
     setLoading(true);
+
     try {
-      await verifyAuth();
+      // Crear voluntariado usando directamente los datos del formulario y fotos
       const result = await createVoluntariado(formData, fotos);
-      Swal.fire({ icon: "success", title: "¡Voluntariado creado!", timer: 1500, showConfirmButton: false });
+      await SuccessAlert({
+        title: "¡Voluntariado creado!",
+        timer: 1500
+      });
+
+      // Resetear formulario y pasar el resultado al callback
       resetForm();
       if (onSuccess) onSuccess(result);
+
     } catch (err) {
-      Swal.fire({ icon: "error", title: "Error al crear voluntariado", text: err?.message || "Ocurrió un error" });
+      console.log(err)
+      await WrongAlert({
+        title: "Error al crear voluntariado",
+        message: err?.message || "Ocurrió un error al intentar crear el voluntariado"
+      });
     } finally {
       setLoading(false);
     }
   };
+
+
+  // Preparar opciones para los selects
+  const departamentoOptions = departamentos.map(dept => ({
+    value: dept.id_departamento,
+    label: dept.departamento
+  }));
+
+  const ciudadOptions = ciudades.map(ciudad => ({
+    value: ciudad.id_ciudad,
+    label: ciudad.ciudad
+  }));
+
+  const categoriaOptions = categorias.map(cat => ({
+    value: cat.id_categoria,
+    label: cat.nombre
+  }));
+
+  // Valores seleccionados para los selects
+  const selectedDeptValue = selectedDepartamento ? {
+    value: selectedDepartamento,
+    label: departamentos.find(dept => dept.id_departamento === selectedDepartamento)?.departamento
+  } : null;
+
+  const selectedCiudadValue = formData.ubicacion.ciudad_id ? {
+    value: formData.ubicacion.ciudad_id,
+    label: ciudades.find(ciudad => ciudad.id_ciudad === formData.ubicacion.ciudad_id)?.ciudad
+  } : null;
+
+  const selectedCategoriaValue = formData.categoria_id ? {
+    value: formData.categoria_id,
+    label: categorias.find(cat => cat.id_categoria === formData.categoria_id)?.nombre
+  } : null;
 
   if (!user || user.rol !== "CREADOR") {
     return (
@@ -229,42 +289,118 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
           {/* Título y categoría */}
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="titulo">Título *</label>
-              <input id="titulo" name="titulo" value={formData.titulo} onChange={handleInputChange} maxLength="255" className={errors.titulo ? "error" : ""} placeholder="Ingresa el título" />
+              <label className="register-form-label">Título *</label>
+              <input
+                className={`register-form-input ${errors.titulo ? "error" : ""}`}
+                value={formData.titulo}
+                onChange={handleInputChange}
+                maxLength="255"
+                placeholder="Ingresa el título"
+                name="titulo"
+              />
               {errors.titulo && <span className="error-text">{errors.titulo}</span>}
             </div>
             <div className="form-group">
-              <label htmlFor="categoria_id">Categoría *</label>
-              <select id="categoria_id" name="categoria_id" value={formData.categoria_id} onChange={handleInputChange} className={errors.categoria_id ? "error" : ""}>
-                <option value="">Selecciona una categoría</option>
-                {categorias.map(c => <option key={c.id_categoria} value={c.id_categoria}>{c.nombre}</option>)}
-              </select>
+              <label className="register-form-label">Categoría *</label>
+              <Select
+                className="register-form-react-select"
+                options={categoriaOptions}
+                value={selectedCategoriaValue}
+                onChange={(selected) => handleSelectChange("categoria_id", selected)}
+                placeholder="Selecciona una categoría"
+                isClearable
+                styles={customSelectStylesVoluntariado}
+                isSearchable={false}
+              />
               {errors.categoria_id && <span className="error-text">{errors.categoria_id}</span>}
             </div>
           </div>
 
           {/* Descripción */}
-          <div className="form-group">
-            <label htmlFor="descripcion">Descripción *</label>
-            <textarea id="descripcion" name="descripcion" value={formData.descripcion} onChange={handleInputChange} rows="4" className={errors.descripcion ? "error" : ""} placeholder="Describe el voluntariado" />
+          <div className="form-group form-group-text-area">
+            <label className="register-form-label">Descripción *</label>
+            <textarea
+              className={`register-form-input ${errors.descripcion ? "error" : ""}`}
+              value={formData.descripcion}
+              onChange={handleInputChange}
+              rows="4"
+              placeholder="Describe el voluntariado"
+              name="descripcion"
+            />
             {errors.descripcion && <span className="error-text">{errors.descripcion}</span>}
           </div>
 
           {/* Fecha / horas / participantes */}
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="fechaHoraInicio">Fecha y Hora de Inicio *</label>
-              <input id="fechaHoraInicio" name="fechaHoraInicio" type="datetime-local" value={formData.fechaHoraInicio} onChange={handleInputChange} min={new Date().toISOString().slice(0, 16)} className={errors.fechaHoraInicio ? "error" : ""} />
+              <div className="fecha-picker-wrapper" style={{ width: "100%" }}>
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <DateTimePicker
+                    label="Fecha y Hora *"
+                    value={formData.fechaHoraInicio ? new Date(formData.fechaHoraInicio) : null}
+                    onChange={(newValue) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        fechaHoraInicio: newValue ? newValue.toISOString() : ""
+                      }));
+                      if (errors.fechaHoraInicio) setErrors(prev => ({ ...prev, fechaHoraInicio: "" }));
+                    }}
+                    minDate={new Date()}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        fullWidth 
+                        className={`register-form-input ${errors.fechaHoraInicio ? "error" : ""}`}
+                        sx={{
+                          "& .MuiInputBase-root": {
+                            fontFamily: "Inter, system-ui, sans-serif",
+                            borderRadius: "12px",
+                            padding: "0.5rem 0.8rem",
+                            backgroundColor: "#fdfdfd",
+                            fontSize: "0.95rem"
+                          },
+                          "& .MuiOutlinedInput-notchedOutline": {
+                            borderColor: errors.fechaHoraInicio ? "#dc2626" : "#cbd5e1"
+                          },
+                          "&:hover .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#2563eb"
+                          },
+                          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#2563eb",
+                            boxShadow: "0 0 0 2px rgba(37, 99, 235, 0.15)"
+                          }
+                        }}
+                      />
+                    )}
+                  />
+                </LocalizationProvider>
+              </div>
               {errors.fechaHoraInicio && <span className="error-text">{errors.fechaHoraInicio}</span>}
             </div>
             <div className="form-group">
-              <label htmlFor="horas">Duración (horas) *</label>
-              <input id="horas" name="horas" type="number" value={formData.horas} onChange={handleInputChange} min="1" max="24" className={errors.horas ? "error" : ""} />
+              <label className="register-form-label">Duración (horas) *</label>
+              <input
+                className={`register-form-input ${errors.horas ? "error" : ""}`}
+                type="number"
+                value={formData.horas}
+                onChange={handleInputChange}
+                min="1"
+                max="24"
+                name="horas"
+              />
               {errors.horas && <span className="error-text">{errors.horas}</span>}
             </div>
             <div className="form-group">
-              <label htmlFor="maxParticipantes">Máximo Participantes *</label>
-              <input id="maxParticipantes" name="maxParticipantes" type="number" value={formData.maxParticipantes} onChange={handleInputChange} min="1" max="100" className={errors.maxParticipantes ? "error" : ""} />
+              <label className="register-form-label">Máx Participantes *</label>
+              <input
+                className={`register-form-input ${errors.maxParticipantes ? "error" : ""}`}
+                type="number"
+                value={formData.maxParticipantes}
+                onChange={handleInputChange}
+                min="1"
+                max="100"
+                name="maxParticipantes"
+              />
               {errors.maxParticipantes && <span className="error-text">{errors.maxParticipantes}</span>}
             </div>
           </div>
@@ -274,41 +410,65 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
             <h3>Ubicación del Voluntariado</h3>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="departamento">Departamento *</label>
-                <select id="departamento" value={selectedDepartamento} onChange={handleDepartamentoChange}>
-                  <option value="">Selecciona un departamento</option>
-                  {departamentos.map(d => <option key={d.id_departamento} value={d.id_departamento}>{d.departamento}</option>)}
-                </select>
+                <label className="register-form-label">Departamento *</label>
+                <Select
+                  className="register-form-react-select"
+                  options={departamentoOptions}
+                  value={selectedDeptValue}
+                  onChange={(selected) => handleSelectChange("departamento", selected)}
+                  placeholder="Selecciona un departamento"
+                  isClearable
+                  styles={customSelectStylesVoluntariado}
+                  isSearchable={false}
+                />
               </div>
               <div className="form-group">
-                <label htmlFor="ubicacion.ciudad_id">Ciudad *</label>
-                <select id="ubicacion.ciudad_id" name="ubicacion.ciudad_id" value={formData.ubicacion.ciudad_id} onChange={handleInputChange} disabled={!selectedDepartamento} className={errors["ubicacion.ciudad_id"] ? "error" : ""}>
-                  <option value="">Selecciona una ciudad</option>
-                  {ciudades.map(c => <option key={c.id_ciudad} value={c.id_ciudad}>{c.ciudad}</option>)}
-                </select>
+                <label className="register-form-label">Ciudad *</label>
+                <Select
+                  className="register-form-react-select"
+                  options={ciudadOptions}
+                  value={selectedCiudadValue}
+                  onChange={(selected) => handleSelectChange("ubicacion.ciudad_id", selected)}
+                  placeholder={selectedDepartamento ? "Selecciona una ciudad" : "Seleccione un departamento"}
+                  isDisabled={!selectedDepartamento}
+                  isClearable
+                  styles={customSelectStylesVoluntariado}
+                  isSearchable={false}
+                />
                 {errors["ubicacion.ciudad_id"] && <span className="error-text">{errors["ubicacion.ciudad_id"]}</span>}
               </div>
             </div>
             <div className="form-group">
-              <label htmlFor="ubicacion.direccion">Dirección *</label>
-              <input id="ubicacion.direccion" name="ubicacion.direccion" value={formData.ubicacion.direccion} onChange={handleInputChange} className={errors["ubicacion.direccion"] ? "error" : ""} placeholder="Dirección completa" />
+              <label className="register-form-label">Dirección *</label>
+              <input
+                className={`register-form-input ${errors["ubicacion.direccion"] ? "error" : ""}`}
+                value={formData.ubicacion.direccion}
+                onChange={handleInputChange}
+                placeholder="Dirección completa"
+                name="ubicacion.direccion"
+              />
               {errors["ubicacion.direccion"] && <span className="error-text">{errors["ubicacion.direccion"]}</span>}
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="ubicacion.nombre_lugar">Nombre del Lugar</label>
-                <input id="ubicacion.nombre_lugar" name="ubicacion.nombre_lugar" value={formData.ubicacion.nombre_lugar} onChange={handleInputChange} placeholder="Ej: Parque Central" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="ubicacion.barrio">Barrio/Sector</label>
-                <input id="ubicacion.barrio" name="ubicacion.barrio" value={formData.ubicacion.barrio} onChange={handleInputChange} placeholder="Barrio o sector" />
+                <label className="register-form-label">Barrio/Sector *</label>
+                <input
+                  className={`register-form-input ${errors["ubicacion.nombre_sector"] ? "error" : ""}`}
+                  value={formData.ubicacion.nombre_sector}
+                  onChange={handleInputChange}
+                  placeholder="Barrio o sector"
+                  name="ubicacion.nombre_sector"
+                />
+                {errors["ubicacion.nombre_sector"] && (
+                  <span className="error-text">{errors["ubicacion.nombre_sector"]}</span>
+                )}
               </div>
             </div>
           </div>
 
           {/* Fotos */}
           <div className="form-group">
-            <label>Fotos del Voluntariado *</label>
+            <label className="register-form-label">Fotos del Voluntariado *</label>
             <div
               className={`drag-drop-zone ${isDragOver ? "drag-over" : ""} ${errors.fotos ? "error" : ""}`}
               onDragOver={handleDragOver}
@@ -319,10 +479,10 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
               <div className="drag-drop-content">
                 <div className="upload-icon">
                   <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M16 13L12 9L8 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M12 9V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M16 13L12 9L8 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M12 9V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
                 <p className="primary-text">{previewImages.length ? `Arrastra más imágenes o haz clic para agregar` : `Arrastra tus imágenes o haz clic para seleccionar`}</p>
@@ -345,7 +505,7 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
                         <img src={image.url} alt={image.name} className="preview-image" />
                         <div className="image-overlay">
                           <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
                           </svg>
                         </div>
                       </div>
@@ -365,99 +525,10 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
         </form>
       </div>
 
-      {selectedImageModal && (
-        <div className="image-modal-overlay" onClick={closeImageModal} role="dialog" aria-modal="true">
-          <div className="image-modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="image-modal-header">
-              <div>
-                <h3>Vista Previa</h3>
-                <small style={{opacity: 0.7, fontSize: '0.8em'}}>Arrastra para mover • Ctrl + Rueda para zoom</small>
-              </div>
-              <div style={{display: 'flex', alignItems: 'center', gap: '15px'}}>
-                <span>{selectedImageModal.index + 1} de {previewImages.length}</span>
-                <button 
-                  className="image-modal-close" 
-                  onClick={closeImageModal} 
-                  aria-label="Cerrar"
-                  style={{
-                    position: 'relative',
-                    top: 0,
-                    right: 0,
-                    margin: 0
-                  }}
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-            <div 
-              className="image-modal-body" 
-              style={{
-                maxHeight: '80vh',
-                overflowY: 'auto',
-                overflowX: 'auto',
-                scrollbarWidth: 'none', // Firefox
-                msOverflowStyle: 'none', // IE/Edge
-              }}
-              onWheel={(e) => {
-                if (e.ctrlKey) {
-                  e.preventDefault();
-                  const img = e.currentTarget.querySelector('img');
-                  const currentScale = parseFloat(img.style.transform?.match(/scale\(([^)]+)\)/)?.[1] || '1');
-                  const delta = e.deltaY > 0 ? 0.9 : 1.1;
-                  const newScale = Math.min(Math.max(currentScale * delta, 0.5), 3);
-                  img.style.transform = `scale(${newScale})`;
-                  img.style.transformOrigin = 'center';
-                }
-              }}
-            >
-              <style jsx>{`
-                .image-modal-body::-webkit-scrollbar {
-                  display: none; /* Chrome, Safari, Opera */
-                }
-              `}</style>
-              <img 
-                src={selectedImageModal.url} 
-                alt={selectedImageModal.name} 
-                className="modal-image" 
-                style={{
-                  maxWidth: 'none',
-                  maxHeight: 'none',
-                  width: 'auto',
-                  height: 'auto',
-                  cursor: 'grab'
-                }}
-                onMouseDown={(e) => {
-                  e.target.style.cursor = 'grabbing';
-                  const startX = e.pageX - e.target.offsetLeft;
-                  const startY = e.pageY - e.target.offsetTop;
-                  const scrollLeft = e.target.parentElement.scrollLeft;
-                  const scrollTop = e.target.parentElement.scrollTop;
-                  
-                  const handleMouseMove = (e) => {
-                    const x = e.pageX - e.target.offsetLeft;
-                    const y = e.pageY - e.target.offsetTop;
-                    const walkX = (x - startX) * 2;
-                    const walkY = (y - startY) * 2;
-                    e.target.parentElement.scrollLeft = scrollLeft - walkX;
-                    e.target.parentElement.scrollTop = scrollTop - walkY;
-                  };
-                  
-                  const handleMouseUp = () => {
-                    e.target.style.cursor = 'grab';
-                    document.removeEventListener('mousemove', handleMouseMove);
-                    document.removeEventListener('mouseup', handleMouseUp);
-                  };
-                  
-                  document.addEventListener('mousemove', handleMouseMove);
-                  document.addEventListener('mouseup', handleMouseUp);
-                }}
-              />
-            </div>
-            <div className="image-modal-footer"><p>{selectedImageModal.name}</p></div>
-          </div>
-        </div>
-      )}
+      <ImagePreviewModal
+        image={selectedImageModal}
+        onClose={() => setSelectedImageModal(null)}
+      />
     </>
   );
 }

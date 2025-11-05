@@ -2,7 +2,6 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./routes/ProtectedRoute";
-import PublicRoute from "./routes/PublicRoute";
 import UnverifiedEmailRoute from "./routes/UnverifiedEmailRoute";
 import { AuthProvider } from "./context/AuthContext";
 import NavbarLayout from "./layouts/NavbarLayout/NavbarLayout";

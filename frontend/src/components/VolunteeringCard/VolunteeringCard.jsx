@@ -2,20 +2,20 @@ import "./VolunteeringCard.css"
 
 function VolunteeringCard({ volunteering }) {
   const {
-    id_voluntariado,
     titulo,
     descripcion,
     fechaHoraInicio,
-    fechaHoraFin,
     horas,
     maxParticipantes,
     estado,
     creador,
     categoria,
     fotos,
-    ubicacion,
-    nombre_entidad,
+    ubicacion
   } = volunteering
+
+  // Nombre entidad seguro
+  const nombreEntidad = creador?.creador?.nombre_entidad
 
   const formatDate = (dateString) => {
     const date = new Date(dateString)
@@ -36,16 +36,11 @@ function VolunteeringCard({ volunteering }) {
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
-      case "pendiente":
-        return "pending"
-      case "activo":
-        return "active"
-      case "completado":
-        return "completed"
-      case "cancelado":
-        return "cancelled"
-      default:
-        return "pending"
+      case "pendiente": return "pending"
+      case "activo": return "active"
+      case "completado": return "completed"
+      case "cancelado": return "cancelled"
+      default: return "pending"
     }
   }
 
@@ -60,7 +55,9 @@ function VolunteeringCard({ volunteering }) {
     <div className="volunteering-card">
       <div className="volunteering-card-image">
         <img src={photoUrl || "/placeholder.svg"} alt={titulo} />
-        <div className="volunteering-card-category-badge">{categoria?.nombre}</div>
+        <div className="volunteering-card-category-badge">
+          {categoria?.nombre}
+        </div>
       </div>
 
       <div className="volunteering-card-content">
@@ -71,7 +68,9 @@ function VolunteeringCard({ volunteering }) {
           </span>
         </div>
 
-        <p className="volunteering-card-description">{truncateText(descripcion, 100)}</p>
+        <p className="volunteering-card-description">
+          {truncateText(descripcion, 100)}
+        </p>
 
         <div className="volunteering-card-creator">
           <img
@@ -82,8 +81,10 @@ function VolunteeringCard({ volunteering }) {
           <div className="volunteering-card-creator-info">
             <span className="volunteering-card-creator-label">Creador</span>
             <p className="volunteering-card-creator-name">
-              {nombre_entidad ||
-                (creador?.nombre && creador?.apellido ? `${creador.nombre} ${creador.apellido}` : creador?.correo)}
+              {nombreEntidad ||
+                (creador?.nombre && creador?.apellido
+                  ? `${creador.nombre} ${creador.apellido}`
+                  : creador?.correo)}
             </p>
           </div>
         </div>
@@ -110,9 +111,7 @@ function VolunteeringCard({ volunteering }) {
           <div className="volunteering-card-meta-item">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
-              <text x="12" y="16" textAnchor="middle" fontSize="10">
-                {horas}h
-              </text>
+              <text x="12" y="16" textAnchor="middle" fontSize="10">{horas}h</text>
             </svg>
             <span>{horas} horas</span>
           </div>
@@ -121,12 +120,14 @@ function VolunteeringCard({ volunteering }) {
         <div className="volunteering-card-footer">
           <button className="volunteering-card-location-btn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"></path>
               <circle cx="12" cy="10" r="3"></circle>
             </svg>
             {ubicacion?.nombre_sector || ubicacion?.direccion}
           </button>
-          <span className="volunteering-card-participants">{maxParticipantes} participantes</span>
+          <span className="volunteering-card-participants">
+            {maxParticipantes} participantes
+          </span>
         </div>
       </div>
     </div>
