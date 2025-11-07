@@ -15,6 +15,7 @@ import { VoluntariadoSchedulerService } from './VoluntariadoSchedulerService';
 import { VoluntariadoProcessor } from './voluntariado.processor';
 import { BullMqModule } from 'src/bull/bull.module';
 import { InscripcionModule } from 'src/inscripcion/inscripcion.module';
+import { ResenaVoluntariado } from 'src/resena_voluntariado/entity/resenas_voluntariado.entity';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { InscripcionModule } from 'src/inscripcion/inscripcion.module';
       Usuario,
       FotosVoluntariado,
       Inscripcion,
+      ResenaVoluntariado
     ]),
     CloudinaryModule,
     FotosVoluntariadoModule,

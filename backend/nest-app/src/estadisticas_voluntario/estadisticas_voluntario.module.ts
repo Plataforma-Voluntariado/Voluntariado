@@ -6,6 +6,7 @@ import { EstadisticasVoluntario } from './entity/estadisticas_voluntario.entity'
 import { Usuario } from 'src/usuario/entity/usuario.entity';
 import { Voluntariado } from 'src/voluntariado/entity/voluntariado.entity';
 import { Inscripcion } from 'src/inscripcion/entity/inscripcion.entity';
+import { Voluntario } from 'src/voluntario/entity/voluntario.entity';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { Inscripcion } from 'src/inscripcion/entity/inscripcion.entity';
       Usuario,
       Voluntariado,
       Inscripcion,
+      Voluntario
     ]),
   ],
   controllers: [EstadisticasVoluntarioController],

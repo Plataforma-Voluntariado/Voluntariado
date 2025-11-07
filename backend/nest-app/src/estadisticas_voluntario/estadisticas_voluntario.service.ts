@@ -1,115 +1,113 @@
-import {
-    Injectable,
-    NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { EstadisticasVoluntario } from './entity/estadisticas_voluntario.entity';
-import { Usuario, RolUsuario } from 'src/usuario/entity/usuario.entity';
+import { RolUsuario } from 'src/usuario/entity/usuario.entity';
 import { Inscripcion, EstadoInscripcion } from 'src/inscripcion/entity/inscripcion.entity';
-import { Voluntariado } from 'src/voluntariado/entity/voluntariado.entity';
+import { Voluntario } from 'src/voluntario/entity/voluntario.entity';
 
 @Injectable()
 export class EstadisticasVoluntarioService {
-    constructor(
-        @InjectRepository(EstadisticasVoluntario)
-        private readonly estadisticasRepo: Repository<EstadisticasVoluntario>,
+  constructor(
+    @InjectRepository(EstadisticasVoluntario)
+    private readonly estadisticasRepo: Repository<EstadisticasVoluntario>,
 
-        @InjectRepository(Usuario)
-        private readonly usuarioRepo: Repository<Usuario>,
+    @InjectRepository(Voluntario)
+    private readonly voluntarioRepo: Repository<Voluntario>,
 
-        @InjectRepository(Inscripcion)
-        private readonly inscripcionRepo: Repository<Inscripcion>,
+    @InjectRepository(Inscripcion)
+    private readonly inscripcionRepo: Repository<Inscripcion>,
+  ) { }
 
-        @InjectRepository(Voluntariado)
-        private readonly voluntariadoRepo: Repository<Voluntariado>,
-    ) { }
 
-    // Crear estadísticas base para un voluntario si no existen
-    async crearEstadisticasSiNoExisten(voluntario_id: number) {
-        const voluntario = await this.usuarioRepo.findOne({
-            where: { id_usuario: voluntario_id },
-        });
+  async crearEstadisticasSiNoExisten(voluntario_id: number) {
+    const voluntario = await this.voluntarioRepo.findOne({
+      where: { id_usuario: voluntario_id },
+      relations: ['usuario', 'estadisticas'],
+    });
 
-        if (!voluntario)
-            throw new NotFoundException('Voluntario no encontrado.');
-
-        if (voluntario.rol !== RolUsuario.VOLUNTARIO)
-            throw new NotFoundException('El usuario no es un voluntario.');
-
-        let estadisticas = await this.estadisticasRepo.findOne({
-            where: { voluntario: { id_usuario: voluntario_id } },
-        });
-
-        if (!estadisticas) {
-            estadisticas = this.estadisticasRepo.create({
-                voluntario,
-                horas_trabajadas: 0,
-                participaciones: 0,
-                porcentaje_asistencia: 0,
-            });
-            await this.estadisticasRepo.save(estadisticas);
-        }
-
-        return estadisticas;
+    if (!voluntario || voluntario.usuario.rol !== RolUsuario.VOLUNTARIO) {
+      throw new NotFoundException('El usuario no es un voluntario o no existe.');
     }
 
-    async actualizarEstadisticasPorAsistencia(
-        voluntario_id: number,
-        voluntariado_id: number,
-        asistencia: boolean,
-    ) {
-        const estadisticas = await this.crearEstadisticasSiNoExisten(voluntario_id);
+    if (voluntario.estadisticas) return voluntario.estadisticas;
 
-        const voluntariado = await this.voluntariadoRepo.findOne({
-            where: { id_voluntariado: voluntariado_id },
-        });
+    const estadisticas = this.estadisticasRepo.create({
+      voluntario,
+      horas_trabajadas: 0,
+      participaciones: 0,
+      porcentaje_asistencia: 0,
+    });
 
-        if (!voluntariado)
-            throw new NotFoundException('Voluntariado no encontrado.');
+    return this.estadisticasRepo.save(estadisticas);
+  }
 
-        // Solo sumar horas y participaciones si asistió
-        if (asistencia) {
-            estadisticas.horas_trabajadas += voluntariado.horas || 0;
-            estadisticas.participaciones += 1;
-        }
 
-        // Calcular el total de inscripciones aceptadas
-        const totalInscripciones = await this.inscripcionRepo.count({
-            where: {
-                voluntario: { id_usuario: voluntario_id },
-                estado_inscripcion: EstadoInscripcion.ACEPTADA,
-            },
-        });
+  async actualizarEstadisticasPorAsistencia(voluntario_id: number, voluntariado_id: number) {
+    try {
+      const inscripcion = await this.inscripcionRepo.findOne({
+        where: {
+          voluntario: { id_usuario: voluntario_id },
+          voluntariado: { id_voluntariado: voluntariado_id },
+        },
+      });
 
-        // Calcular las asistencias verdaderas
-        const totalAsistencias = await this.inscripcionRepo.count({
-            where: {
-                voluntario: { id_usuario: voluntario_id },
-                asistencia: true,
-                estado_inscripcion: EstadoInscripcion.ACEPTADA,
-            },
-        });
+      if (!inscripcion) {
+        console.error('Inscripción no encontrada', { voluntario_id, voluntariado_id });
+        throw new NotFoundException('Inscripción no encontrada.');
+      }
 
-        // Actualizar el porcentaje
+      if (inscripcion.asistencia === null) return null;
+
+      const estadisticas = await this.crearEstadisticasSiNoExisten(voluntario_id);
+
+      const resumen = await this.inscripcionRepo
+        .createQueryBuilder('i')
+        .leftJoin('i.voluntariado', 'v')
+        .where('i.voluntario_id = :voluntario_id', { voluntario_id }) // <-- corregido
+        .andWhere('i.estado_inscripcion = :estado', { estado: EstadoInscripcion.ACEPTADA })
+        .select('COUNT(i.id_inscripcion)', 'totalInscripciones')
+        .addSelect('SUM(CASE WHEN i.asistencia = true THEN 1 ELSE 0 END)', 'totalAsistencias')
+        .addSelect('SUM(CASE WHEN i.asistencia = true AND i.calificado = true THEN v.horas ELSE 0 END)', 'horasTrabajadas')
+        .addSelect('SUM(CASE WHEN i.asistencia = true AND i.calificado = true THEN 1 ELSE 0 END)', 'participaciones')
+        .getRawOne();
+
+      const totalInscripciones = parseInt(resumen.totalInscripciones, 10);
+      const totalAsistencias = parseInt(resumen.totalAsistencias, 10);
+      const horasTrabajadas = parseInt(resumen.horasTrabajadas, 10) || 0;
+      const participaciones = parseInt(resumen.participaciones, 10) || 0;
+
+      const actualizarHorasYParticipaciones = inscripcion.asistencia === true && inscripcion.calificado;
+      if (actualizarHorasYParticipaciones) {
+        estadisticas.horas_trabajadas = horasTrabajadas;
+        estadisticas.participaciones = participaciones;
+      }
+
+      if (inscripcion.asistencia === false || actualizarHorasYParticipaciones) {
         estadisticas.porcentaje_asistencia = totalInscripciones
-            ? Math.round((totalAsistencias / totalInscripciones) * 100)
-            : 0;
+          ? Math.round((totalAsistencias / totalInscripciones) * 100)
+          : 0;
+      }
 
-        return this.estadisticasRepo.save(estadisticas);
+      return await this.estadisticasRepo.save(estadisticas);
+
+    } catch (error) {
+      console.error('Error actualizando estadísticas por asistencia:', error);
+      throw error;
+    }
+  }
+
+
+  async obtenerEstadisticas(voluntario_id: number) {
+    const estadisticas = await this.estadisticasRepo.findOne({
+      where: { voluntario: { id_usuario: voluntario_id } },
+      relations: ['voluntario', 'voluntario.usuario'],
+    });
+
+    if (!estadisticas) {
+      throw new NotFoundException('No se encontraron estadísticas para este voluntario.');
     }
 
-
-    // Obtener estadísticas de un voluntario
-    async obtenerEstadisticas(voluntario_id: number) {
-        const estadisticas = await this.estadisticasRepo.findOne({
-            where: { voluntario: { id_usuario: voluntario_id } },
-            relations: ['voluntario'],
-        });
-
-        if (!estadisticas)
-            throw new NotFoundException('No se encontraron estadísticas para este voluntario.');
-
-        return estadisticas;
-    }
+    return estadisticas;
+  }
 }

@@ -15,7 +15,7 @@ export class InscripcionService {
         private voluntariadoRepo: Repository<Voluntariado>,
         @InjectRepository(Usuario)
         private usuarioRepo: Repository<Usuario>,
-        private readonly estadisticasService: EstadisticasVoluntarioService, 
+        private readonly estadisticasService: EstadisticasVoluntarioService,
     ) { }
 
     private async validarCupos(voluntariadoId: number, max: number) {
@@ -38,12 +38,11 @@ export class InscripcionService {
             }),
         ]);
 
-        if (voluntariado?.estado != EstadoVoluntariado.PENDIENTE) throw new NotFoundException('Solo se puede inscribir a un voluntariado en estado pendiente');
-
         if (!voluntario) throw new NotFoundException('Usuario no encontrado');
         if (!voluntariado) throw new NotFoundException('Voluntariado no encontrado');
         if (!voluntario.verificado) throw new BadRequestException('Tu cuenta debe estar verificada para inscribirte a voluntariados.');
         if (voluntario.rol !== RolUsuario.VOLUNTARIO) throw new ForbiddenException('Solo los voluntarios pueden inscribirse a voluntariados');
+        if (voluntariado?.estado != EstadoVoluntariado.PENDIENTE) throw new NotFoundException('Solo se puede inscribir a un voluntariado en estado pendiente');
 
         const inscripcionPrev = await this.inscripcionRepo.findOne({
             where: { voluntario, voluntariado },
@@ -166,32 +165,41 @@ export class InscripcionService {
             .execute();
     }
 
-    async marcarAsistencia(creador: Usuario, idInscripcion: number, asistencia: boolean) {
-    const inscripcion = await this.inscripcionRepo.findOne({
-      where: { id_inscripcion: idInscripcion },
-      relations: ['voluntariado', 'voluntariado.creador', 'voluntario'],
-    });
+    async marcarAsistencia(creador: Usuario,idInscripcion: number,asistencia: boolean | null,) {
+        const inscripcion = await this.inscripcionRepo.findOne({
+            where: { id_inscripcion: idInscripcion },
+            relations: ['voluntariado', 'voluntariado.creador', 'voluntario'],
+        });
 
-    if (!inscripcion) throw new NotFoundException('Inscripción no encontrada');
-    if (inscripcion.voluntariado.creador.id_usuario !== creador.id_usuario)
-      throw new ForbiddenException('Solo el creador puede marcar la asistencia');
-    if (inscripcion.voluntariado.estado !== EstadoVoluntariado.TERMINADO)
-      throw new BadRequestException('Solo se puede marcar asistencia a voluntariados terminados');
-    if (inscripcion.estado_inscripcion !== EstadoInscripcion.ACEPTADA)
-      throw new BadRequestException('Solo se puede marcar asistencia a inscripciones aceptadas');
+        if (!inscripcion) throw new NotFoundException('Inscripción no encontrada');
+        if (inscripcion.voluntariado.creador.id_usuario !== creador.id_usuario)
+            throw new ForbiddenException('Solo el creador puede marcar la asistencia');
+        if (inscripcion.voluntariado.estado !== EstadoVoluntariado.TERMINADO)
+            throw new BadRequestException('Solo se puede marcar asistencia a voluntariados terminados');
+        if (inscripcion.estado_inscripcion !== EstadoInscripcion.ACEPTADA)
+            throw new BadRequestException('Solo se puede marcar asistencia a inscripciones aceptadas');
 
-    inscripcion.asistencia = asistencia;
-    await this.inscripcionRepo.save(inscripcion);
+        if (inscripcion.asistencia !== null) {
+            throw new BadRequestException('La asistencia ya fue marcada y no se puede modificar');
+        }
 
-    //  Si la asistencia es false, recalcular el porcentaje de asistencia
-    if (asistencia === false) {
-      await this.estadisticasService.actualizarEstadisticasPorAsistencia(
-        inscripcion.voluntario.id_usuario,
-        inscripcion.voluntariado.id_voluntariado,
-        asistencia,
-      );
+        // Marcar asistencia
+        inscripcion.asistencia = asistencia;
+        await this.inscripcionRepo.save(inscripcion);
+
+        try {
+            await this.estadisticasService.actualizarEstadisticasPorAsistencia(
+                inscripcion.voluntario.id_usuario,
+                inscripcion.voluntariado.id_voluntariado,
+            );
+        } catch (error) {
+            console.error('Error actualizando estadísticas por asistencia:', error);
+        }
+
+        return inscripcion;
     }
 
-    return inscripcion;
-  }
+
+
+
 }

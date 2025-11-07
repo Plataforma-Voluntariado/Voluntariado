@@ -17,7 +17,7 @@ import { InscripcionService } from 'src/inscripcion/inscripcion.service';
 @Injectable()
 export class VoluntariadoService {
   private readonly logger = new Logger(VoluntariadoService.name);
-  private readonly commonRelations = ['categoria', 'creador', 'fotos', 'ubicacion', 'ubicacion.ciudad','creador.creador'] as const;
+  private readonly commonRelations = ['categoria', 'creador', 'fotos', 'ubicacion', 'ubicacion.ciudad', 'creador.creador','inscripciones'] as const;
   constructor(
     @InjectRepository(Voluntariado) private readonly voluntariadoRepo: Repository<Voluntariado>,
     @InjectRepository(Categoria) private readonly categoriaRepo: Repository<Categoria>,
@@ -260,7 +260,7 @@ export class VoluntariadoService {
     }
 
     return this.voluntariadoRepo.save(voluntariado);
-  }
+  }
 
 
 }

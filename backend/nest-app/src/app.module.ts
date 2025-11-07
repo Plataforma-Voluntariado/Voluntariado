@@ -23,9 +23,9 @@ import { NotificacionesModule } from './notificaciones/notificaciones.module';
 import { FotosVoluntariadoModule } from './fotos_voluntariado/fotos_voluntariado.module';
 import { UbicacionModule } from './ubicacion/ubicacion.module';
 import { InscripcionModule } from './inscripcion/inscripcion.module';
-import { ComentariosVoluntariadoModule } from './comentarios_voluntariado/comentarios_voluntariado.module';
 import { BullMqModule } from './bull/bull.module';
 import { EstadisticasVoluntarioModule } from './estadisticas_voluntario/estadisticas_voluntario.module';
+import { ResenaVoluntariadoModule } from './resena_voluntariado/resena_voluntariado.module';
 
 
 @Module({
@@ -70,7 +70,7 @@ import { EstadisticasVoluntarioModule } from './estadisticas_voluntario/estadist
     FotosVoluntariadoModule,
     UbicacionModule,
     InscripcionModule,
-    ComentariosVoluntariadoModule,
+    ResenaVoluntariadoModule,
     BullMqModule,
     EstadisticasVoluntarioModule
   ],
