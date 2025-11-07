@@ -131,6 +131,67 @@ textarea:focus {
     /* o la medida que necesites */
 }
 
+/* ---- Buttons ---- */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: .8rem;
+  margin-top: 2rem;
+}
+
+/* Buttons */
+.btn-submit,
+.btn-cancel {
+  padding: .85rem 1.6rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.btn-submit {
+  background: #2563eb;
+  color: #fff;
+}
+
+.btn-submit:hover {
+  background: #1d4ed8;
+}
+
+.btn-cancel {
+  background: #ef4444;
+  color: #fff;
+}
+
+.btn-cancel:hover {
+  background: #dc2626;
+}
+
+/* 📱 Mobile friendly buttons */
+@media (max-width: 640px) {
+  .form-actions {
+    flex-direction: column-reverse;
+    /* Cancelar abajo */
+    align-items: stretch;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .btn-submit,
+  .btn-cancel {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Tablet tweaks */
+@media (max-width: 900px) {
+  .form-actions {
+    justify-content: center;
+  }
+}
+
 
 
 

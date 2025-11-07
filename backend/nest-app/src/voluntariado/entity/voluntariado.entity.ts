@@ -3,7 +3,9 @@ import { Categoria } from '../../categoria/entity/categoria.entity';
 import { Usuario } from '../../usuario/entity/usuario.entity';
 import { FotosVoluntariado } from 'src/fotos_voluntariado/entity/fotos_voluntariado.entity';
 import { Ubicacion } from 'src/ubicacion/entity/ubicacion.entity';
-import { Inscripcion } from 'src/inscripcion/entity/inscripcion.entity';
+import { EstadoInscripcion, Inscripcion } from 'src/inscripcion/entity/inscripcion.entity';
+import { Expose } from 'class-transformer';
+import { ResenaVoluntariado } from 'src/resena_voluntariado/entity/resenas_voluntariado.entity';
 
 export enum EstadoVoluntariado {
   PENDIENTE = 'pendiente',
@@ -70,4 +72,16 @@ export class Voluntariado {
     cascade: true,
   })
   inscripciones: Inscripcion[];
+
+  @OneToMany(() => ResenaVoluntariado, (resena) => resena.voluntariado, { cascade: true })
+  resenas: ResenaVoluntariado[];
+
+
+  @Expose()
+  get participantesAceptados(): number {
+    if (!this.inscripciones) return 0;
+    return this.inscripciones.filter(
+      (i) => i.estado_inscripcion === EstadoInscripcion.ACEPTADA
+    ).length;
+  }
 }

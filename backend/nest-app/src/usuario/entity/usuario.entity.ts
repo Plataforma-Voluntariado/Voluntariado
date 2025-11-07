@@ -7,6 +7,7 @@ import { Token } from '../../token/entity/token.entity';
 import { Verificacion } from 'src/verificacion/entity/verificacion.entity';
 import { Voluntariado } from 'src/voluntariado/entity/voluntariado.entity';
 import { Notificacion } from 'src/notificaciones/entity/notificacion.entity';
+import { Exclude } from 'class-transformer';
 
 export enum RolUsuario {
   ADMIN = 'ADMIN',
@@ -33,6 +34,7 @@ export class Usuario {
   @Column({ type: 'varchar', length: 255, nullable: false, unique: true })
   correo: string;
 
+  @Exclude()
   @Column({ type: 'varchar', length: 255, nullable: false })
   contrasena: string;
 
@@ -68,7 +70,7 @@ export class Usuario {
   @OneToOne(() => Creador, (creador) => creador.usuario)
   creador?: Creador;
 
-  @OneToOne(() => Voluntario, (voluntario) => voluntario.usuario)
+  @OneToOne(() => Voluntario, (voluntario) => voluntario.usuario, { cascade: true, onDelete: 'CASCADE' })
   voluntario?: Voluntario;
 
   @OneToOne(() => Administrador, (admin) => admin.usuario)
