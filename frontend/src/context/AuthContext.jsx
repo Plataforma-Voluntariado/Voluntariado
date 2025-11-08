@@ -169,7 +169,7 @@ export const AuthProvider = ({ children }) => {
     return () => {
       isMounted = false; // Cleanup
     };
-  }, []); // Sin dependencias para ejecutar solo una vez
+  }, [fetchNotifications]); // Sin dependencias para ejecutar solo una vez
 
   return (
     <AuthContext.Provider
