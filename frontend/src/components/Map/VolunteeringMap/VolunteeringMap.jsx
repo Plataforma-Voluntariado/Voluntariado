@@ -49,8 +49,8 @@ const VolunteeringMap = ({ volunteerings }) => {
         mapStyle="mapbox://styles/mapbox/streets-v12"
         mapboxAccessToken={token}
         onStyleLoad={handleStyleLoad}
-        dragPan={isInteractive}      // 👈 solo se puede arrastrar si está activo
-        scrollZoom={isInteractive}   // 👈 bloquea zoom con scroll
+        dragPan={isInteractive}
+        scrollZoom={isInteractive}   
         boxZoom={isInteractive}
         keyboard={isInteractive}
         doubleClickZoom={isInteractive}

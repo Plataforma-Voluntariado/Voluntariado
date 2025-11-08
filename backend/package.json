@@ -1,0 +1,14 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "concurrently -n NEST,SENTI,FASTAPI -c orange,green,yellow \"npm run start:nest\" \"npm run start:sentimiento\" \"npm run start:verificador\"",
+    "start:nest": "cd nest-app && npm run start:dev",
+    "start:sentimiento": "cd api-sentimiento && python app.py",
+    "start:verificador": "cd fastapi-verificador && python -m uvicorn main:app --reload",
+    "redis-cli": "start cmd /k \"docker exec -it mi-redis redis-cli\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

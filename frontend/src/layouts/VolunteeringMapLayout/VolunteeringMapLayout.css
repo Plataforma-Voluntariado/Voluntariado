@@ -1,6 +1,5 @@
 .volunteering-map-layout {
-  width: 90%;
-  max-width: 1400px;
+  width: 80%;
   display: flex;
   gap: 1.5rem;
   border-radius: 24px;
@@ -10,6 +9,7 @@
 
 @media (max-width: 1200px) {
   .volunteering-map-layout {
+    width: 100%;
     flex-direction: column;
     gap: 1.5rem;
   }
@@ -17,6 +17,7 @@
 
 @media (max-width: 768px) {
   .volunteering-map-layout {
+    width: 100%;
     gap: 1.25rem;
   }
 }

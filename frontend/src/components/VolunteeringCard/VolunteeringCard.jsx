@@ -11,10 +11,11 @@ function VolunteeringCard({ volunteering }) {
     creador,
     categoria,
     fotos,
-    ubicacion
+    ubicacion,
+    inscripciones,
+    participantesAceptados
   } = volunteering
 
-  // Nombre entidad seguro
   const nombreEntidad = creador?.creador?.nombre_entidad
 
   const formatDate = (dateString) => {
@@ -51,6 +52,10 @@ function VolunteeringCard({ volunteering }) {
 
   const photoUrl = fotos && fotos.length > 0 ? fotos[0].url : "/volunteering.jpg"
 
+  const inscritos = inscripciones?.length || 0
+  const aceptados = participantesAceptados || 0
+  const ocupacionPorcentaje = maxParticipantes ? Math.round((inscritos / maxParticipantes) * 100) : 0
+
   return (
     <div className="volunteering-card">
       <div className="volunteering-card-image">
@@ -72,6 +77,7 @@ function VolunteeringCard({ volunteering }) {
           {truncateText(descripcion, 100)}
         </p>
 
+        {/* <CHANGE> Creator section separated */}
         <div className="volunteering-card-creator">
           <img
             src={creador?.url_imagen || "/placeholder.svg"}
@@ -89,6 +95,7 @@ function VolunteeringCard({ volunteering }) {
           </div>
         </div>
 
+        {/* <CHANGE> Meta section with date and time */}
         <div className="volunteering-card-meta">
           <div className="volunteering-card-meta-item">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -111,10 +118,35 @@ function VolunteeringCard({ volunteering }) {
           <div className="volunteering-card-meta-item">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
-              <text x="12" y="16" textAnchor="middle" fontSize="10">{horas}h</text>
             </svg>
             <span>{horas} horas</span>
           </div>
+        </div>
+
+        {/* <CHANGE> Participants stats section separated */}
+        <div className="volunteering-card-participants-stats">
+          <div className="volunteering-card-stat">
+            <span className="volunteering-card-stat-number">{inscritos}</span>
+            <span className="volunteering-card-stat-label">Inscritos</span>
+          </div>
+          <div className="volunteering-card-stat">
+            <span className="volunteering-card-stat-number">{aceptados}</span>
+            <span className="volunteering-card-stat-label">Aceptados</span>
+          </div>
+          <div className="volunteering-card-stat">
+            <span className="volunteering-card-stat-number">{maxParticipantes}</span>
+            <span className="volunteering-card-stat-label">Cupos</span>
+          </div>
+        </div>
+
+        <div className="volunteering-card-occupancy">
+          <div className="volunteering-card-occupancy-bar">
+            <div
+              className="volunteering-card-occupancy-fill"
+              style={{ width: `${ocupacionPorcentaje}%` }}
+            ></div>
+          </div>
+          <span className="volunteering-card-occupancy-text">{ocupacionPorcentaje}% ocupado</span>
         </div>
 
         <div className="volunteering-card-footer">
@@ -125,9 +157,6 @@ function VolunteeringCard({ volunteering }) {
             </svg>
             {ubicacion?.nombre_sector || ubicacion?.direccion}
           </button>
-          <span className="volunteering-card-participants">
-            {maxParticipantes} participantes
-          </span>
         </div>
       </div>
     </div>
