@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, UseGuards, Param } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, Param, Req } from '@nestjs/common';
 import { CreateResenaVoluntariadoDto } from './dto/create-resena_voluntariado.dto';
 import { ResenaVoluntariadoService } from './resena_voluntariado.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -12,9 +12,14 @@ export class ResenaVoluntariadoController {
   constructor(private readonly resenaVoluntariadoService: ResenaVoluntariadoService) { }
 
   @Roles(RolUsuario.VOLUNTARIO)
-  @Post()
-  async crearResena(@Body() dto: CreateResenaVoluntariadoDto) {
-    return this.resenaVoluntariadoService.crearResena(dto);
+  @Post(':voluntariado_id')
+  async crearResena(
+    @Req() req,
+    @Param('voluntariado_id') voluntariado_id: number,
+    @Body() dto: CreateResenaVoluntariadoDto
+  ) {
+    const voluntario_id = req.user.id_usuario;
+    return this.resenaVoluntariadoService.crearResena({ ...dto, voluntario_id, voluntariado_id });
   }
 
   @Get(':id')
