@@ -1,6 +1,8 @@
+// ...existing code...
+import React, { useEffect, useRef, useState } from "react";
 import "./VolunteeringCard.css"
 
-function VolunteeringCard({ volunteering }) {
+function VolunteeringCard({ volunteering, onFocusMap }) {
   const {
     titulo,
     descripcion,
@@ -10,7 +12,7 @@ function VolunteeringCard({ volunteering }) {
     estado,
     creador,
     categoria,
-    fotos,
+    fotos = [],
     ubicacion,
     inscripciones,
     participantesAceptados
@@ -56,10 +58,105 @@ function VolunteeringCard({ volunteering }) {
   const aceptados = participantesAceptados || 0
   const ocupacionPorcentaje = maxParticipantes ? Math.round((inscritos / maxParticipantes) * 100) : 0
 
+  // Carousel logic
+  const [index, setIndex] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
+  const autoplayRef = useRef(null)
+  const FOTO_COUNT = Array.isArray(fotos) ? fotos.length : 0
+  const AUTOPLAY_INTERVAL = 4000 // ms
+
+  useEffect(() => {
+    // reset index if fotos length changes
+    setIndex((i) => {
+      if (FOTO_COUNT === 0) return 0
+      return i >= FOTO_COUNT ? 0 : i
+    })
+  }, [FOTO_COUNT])
+
+  useEffect(() => {
+    if (FOTO_COUNT <= 1) return
+    if (isPaused) {
+      if (autoplayRef.current) {
+        clearInterval(autoplayRef.current)
+        autoplayRef.current = null
+      }
+      return
+    }
+    autoplayRef.current = setInterval(() => {
+      setIndex((i) => (i + 1) % FOTO_COUNT)
+    }, AUTOPLAY_INTERVAL)
+
+    return () => {
+      if (autoplayRef.current) {
+        clearInterval(autoplayRef.current)
+        autoplayRef.current = null
+      }
+    }
+  }, [FOTO_COUNT, isPaused])
+
+  const prev = (e) => {
+    e?.stopPropagation()
+    setIndex((i) => (i - 1 + FOTO_COUNT) % FOTO_COUNT)
+  }
+  const next = (e) => {
+    e?.stopPropagation()
+    setIndex((i) => (i + 1) % FOTO_COUNT)
+  }
+  const goTo = (i) => {
+    setIndex(i)
+  }
+
   return (
     <div className="volunteering-card">
-      <div className="volunteering-card-image">
-        <img src={photoUrl || "/placeholder.svg"} alt={titulo} />
+      <div
+        className="volunteering-card-image"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
+        {FOTO_COUNT > 0 ? (
+          <>
+            <img
+              src={fotos[index].url}
+              alt={`${titulo} - ${index + 1}`}
+              className="volunteering-card-main-image"
+            />
+
+            {FOTO_COUNT > 1 && (
+              <>
+                <button
+                  className="volunteering-card-carousel-btn left"
+                  onClick={prev}
+                  aria-label="Anterior imagen"
+                >
+                  ‹
+                </button>
+                <button
+                  className="volunteering-card-carousel-btn right"
+                  onClick={next}
+                  aria-label="Siguiente imagen"
+                >
+                  ›
+                </button>
+
+                <div className="volunteering-card-carousel-indicators">
+                  {fotos.map((f, i) => (
+                    <button
+                      key={f.id_foto ?? i}
+                      className={`indicator ${i === index ? "active" : ""}`}
+                      onClick={() => goTo(i)}
+                      aria-label={`Ir a imagen ${i + 1}`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            <img src={photoUrl || "/placeholder.svg"} alt={titulo} />
+          </>
+        )}
+
         <div className="volunteering-card-category-badge">
           {categoria?.nombre}
         </div>
@@ -77,7 +174,7 @@ function VolunteeringCard({ volunteering }) {
           {truncateText(descripcion, 100)}
         </p>
 
-        {/* <CHANGE> Creator section separated */}
+        {/* Creator section */}
         <div className="volunteering-card-creator">
           <img
             src={creador?.url_imagen || "/placeholder.svg"}
@@ -95,7 +192,7 @@ function VolunteeringCard({ volunteering }) {
           </div>
         </div>
 
-        {/* <CHANGE> Meta section with date and time */}
+        {/* Meta section with date and time */}
         <div className="volunteering-card-meta">
           <div className="volunteering-card-meta-item">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -123,7 +220,7 @@ function VolunteeringCard({ volunteering }) {
           </div>
         </div>
 
-        {/* <CHANGE> Participants stats section separated */}
+        {/* Participants stats */}
         <div className="volunteering-card-participants-stats">
           <div className="volunteering-card-stat">
             <span className="volunteering-card-stat-number">{inscritos}</span>
@@ -148,9 +245,11 @@ function VolunteeringCard({ volunteering }) {
           </div>
           <span className="volunteering-card-occupancy-text">{ocupacionPorcentaje}% ocupado</span>
         </div>
-
         <div className="volunteering-card-footer">
-          <button className="volunteering-card-location-btn">
+          <button className="volunteering-card-inscribe-btn">
+            Inscribete ahora
+          </button>
+          <button className="volunteering-card-location-btn"onClick={() => onFocusMap?.()}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"></path>
               <circle cx="12" cy="10" r="3"></circle>
@@ -164,3 +263,4 @@ function VolunteeringCard({ volunteering }) {
 }
 
 export default VolunteeringCard
+// ...existing code...

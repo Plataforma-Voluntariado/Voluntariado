@@ -78,8 +78,8 @@
 }
 
 .volunteering-card-title {
-  font-size: 1.125rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: #1a1a1a;
   margin: 0;
   line-height: 1.4;
@@ -313,7 +313,24 @@
 [data-theme="dark"] .volunteering-card-footer {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
-
+.volunteering-card-inscribe-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-success);
+  border: 1px solid var(--color-success);
+  border-radius: 10px;
+  color: var(--color-bg);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .volunteering-card-location-btn {
   flex: 1;
   display: flex;
@@ -321,7 +338,7 @@
   gap: 0.5rem;
   padding: 0.75rem 1rem;
   background: var(--color-primary);
-  border: none;
+  border: 1px solid var(--color-primary);
   border-radius: 10px;
   color: var(--color-bg);
   font-size: 1rem;
@@ -337,6 +354,11 @@
   background: rgba(0, 122, 255, 0.1);
   border-color: #0051d5;
   color: #0051d5;
+}
+.volunteering-card-inscribe-btn:hover {
+  background: rgba(0, 255, 38, 0.1);
+  border-color: var(--color-success);
+  color: var(--color-success);
 }
 
 [data-theme="dark"] .volunteering-card-location-btn {
@@ -441,3 +463,83 @@
     width: 100%;
   }
 }
+/* ...existing code... */
+
+/* Carousel controls (añadido) */
+.volunteering-card-image { position: relative; } /* ya existe pero confirmo que sea relative */
+
+.volunteering-card-carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 30;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.9);
+  color: var(--color-primary, #0051d5);
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 26px rgba(0,0,0,0.12);
+  transition: transform .12s ease, opacity .12s;
+  opacity: 0.98;
+}
+.volunteering-card-carousel-btn.left { left: 12px; }
+.volunteering-card-carousel-btn.right { right: 12px; }
+.volunteering-card-carousel-btn:hover { transform: translateY(-50%) scale(1.06); }
+
+/* Small touch target on mobile */
+@media (max-width: 480px) {
+  .volunteering-card-carousel-btn { width: 40px; height: 40px; font-size: 18px; }
+}
+
+/* Indicators (dots / pills) */
+.volunteering-card-carousel-indicators {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 32;
+}
+.volunteering-card-carousel-indicators .indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.72);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  cursor: pointer;
+  padding: 0;
+  transition: all .15s ease;
+}
+.volunteering-card-carousel-indicators .indicator.active {
+  width: 28px;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg,#cfe8ff,#a8d6ff);
+  box-shadow: 0 8px 22px rgba(10,60,110,0.10);
+}
+
+/* Ensure image covers area and transitions nicely */
+.volunteering-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .35s cubic-bezier(.2,.9,.3,1);
+}
+
+/* keep hover scale for image when card hovered */
+.volunteering-card:hover .volunteering-card-image img {
+  transform: scale(1.03);
+}
+
+/* ...existing code... */

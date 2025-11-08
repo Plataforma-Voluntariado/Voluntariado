@@ -10,6 +10,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
   z-index: 1000;
   padding: 1rem;
   animation: fadeIn 0.2s ease-out;
@@ -32,82 +33,87 @@
   -webkit-backdrop-filter: blur(30px);
   border-radius: 24px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.5);
   animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   max-height: 90vh;
   overflow-y: auto;
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.volunteering-map-modal-content::-webkit-scrollbar {
+  background: transparent;
+  display: none;
+  width: 12px;
 }
 
-[data-theme="dark"] .volunteering-map-modal-content {
-  background: rgba(26, 26, 26, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
 
-.volunteering-map-modal-close {
+.volunteering-map-modal-close-wrapper {
   position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
-  width: 36px;
-  height: 36px;
-  background: rgba(0, 0, 0, 0.05);
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
+  top: 14px;
+  right: 14px;
+  z-index: 40;
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none; /* wrapper doesn't handle clicks, button will */
+}
+
+/* Close button with liquid glass background so it's visible over any image */
+.volunteering-map-modal-close {
+  pointer-events: auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.5);
+  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(245,245,255,0.85));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
   color: #1a1a1a;
-  transition: all 0.2s;
-  z-index: 10;
+  box-shadow: 0 8px 24px rgba(7,26,60,0.12);
+  transition: transform .12s ease, box-shadow .12s ease;
 }
-
 .volunteering-map-modal-close:hover {
-  background: rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(7,26,60,0.16);
 }
 
+/* Dark theme variant for close button */
 [data-theme="dark"] .volunteering-map-modal-close {
-  background: rgba(255, 255, 255, 0.05);
+  background: linear-gradient(180deg, rgba(20,20,20,0.7), rgba(10,10,10,0.6));
+  border: 1px solid rgba(255,255,255,0.12);
   color: #fafafa;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
 }
-
 [data-theme="dark"] .volunteering-map-modal-close:hover {
-  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.7);
 }
 
+/* ensure header remains positioned relative to allow absolute close wrapper */
 .volunteering-map-modal-header {
   position: relative;
   height: 280px;
   overflow: hidden;
 }
 
-.volunteering-map-modal-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
+/* reduce z-index conflicts so close sits above image and gradient */
 .volunteering-map-modal-title-section {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
   padding: 2rem 1.5rem 1.5rem;
   display: flex;
   align-items: flex-end;
   gap: 1rem;
+  z-index: 30;
+}
+
+.volunteering-map-modal-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .volunteering-map-modal-title {

@@ -1,0 +1,169 @@
+.search-volunteerings{
+  width: 60%;
+  min-width: 320px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  position:relative;
+  padding:24px;
+  border-radius:14px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow:
+    0 6px 20px rgba(6,18,40,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  overflow: hidden;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.search-volunteerings::before{
+  content: "";
+  position: absolute;
+  left: -40%;
+  top: -60%;
+  width: 180%;
+  height: 220%;
+  background: linear-gradient(90deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.12) 45%, rgba(255,255,255,0.02) 100%);
+  transform: rotate(25deg) translateY(0);
+  opacity: 0.22;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  transition: transform 0.9s cubic-bezier(.2,.9,.3,1), opacity .45s;
+}
+
+
+.search-volunteerings:hover{
+  transform: translateY(-3px);
+  box-shadow:
+    0 10px 30px rgba(6,18,40,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.search-volunteerings:hover::before{
+  transform: rotate(25deg) translateY(-12%);
+  opacity: 0.32;
+}
+
+.search-box{
+  display:flex;
+  flex-wrap: wrap;
+  gap:10px;
+  align-items:center;
+  width:100%;
+}
+
+.search-input{
+  flex:1;
+  padding:12px 14px;
+  border-radius:10px;
+  border: 1px solid rgba(6,25,60,0.2);
+  background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
+  color: var(--color-text);
+  font-weight:500;
+  outline: none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+.search-input::placeholder{
+  color: rgba(4,43,79,0.45);
+  font-weight:500;
+}
+.search-input:focus{
+  border-color: rgba(6,80,150,0.32);
+  box-shadow: 0 6px 18px rgba(10,50,110,0.06);
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+.search-volunteerings .btn-ghost,
+.search-volunteerings .btn-clear,
+.search-volunteerings .btn-tags{
+  padding:8px 12px;
+  border-radius:10px;
+  border: 1px solid rgba(10,40,80,0.2);
+  cursor:pointer;
+  font-weight:700;
+  font-size:1rem;
+  transition: transform .12s ease, box-shadow .12s ease, opacity .12s;
+  background: var(--color-primary);
+  color:white;
+  box-shadow: 0 4px 14px rgba(7,26,60,0.06);
+}
+.search-volunteerings .btn-ghost:hover,
+.search-volunteerings .btn-clear:hover,
+.search-volunteerings .btn-tags:hover{
+  transform: translateY(-2px);
+  color: var(--color-primary);
+  background: var(--color-surface);
+  box-shadow: 0 8px 20px rgba(7,26,60,0.09);
+}
+
+.search-volunteerings .btn-clear{
+  background: transparent;
+  border: 1px dashed rgba(6,30,60,0.06);
+  color: rgba(4,43,79,0.78);
+  box-shadow: none;
+}
+.search-volunteerings .btn-clear:hover{
+  background: rgba(255,255,255,0.015);
+}
+
+.tags-panel,
+.tags-inline{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+  padding-top:6px;
+}
+
+.tag-item{
+  padding:7px 12px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(8,30,60,0.2);
+  cursor:pointer;
+  font-size: 1rem;
+  color: var(--color-text);
+  transition: transform .12s ease, box-shadow .12s ease, background .12s;
+  box-shadow: 0 2px 8px rgba(6,18,40,0.03);
+}
+.tag-item:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(6,18,40,0.06);
+}
+
+.tag-item.selected{
+  color: white;
+  background:var(--color-success);
+  font-weight:600;
+  border-color: rgba(10,60,110,0.18);
+  box-shadow: 0 8px 24px rgba(10,60,110,0.08);
+}
+
+.tag-item.small{
+  padding:8px 15px;
+  font-size:0.9rem;
+}
+
+.tag-more{
+  background: transparent;
+  border: none;
+  color: #0b63a5;
+  cursor: pointer;
+  padding:8px;
+  font-weight:700;
+}
+.tag-more:hover{ text-decoration:underline; }
+
+@media (max-width:720px){
+  .search-volunteerings{ padding:10px; gap:8px; }
+  .search-input{ width: 100%; padding:10px; font-size:0.95rem; }
+  .actions{ width: 100%; gap:6px; }
+  .tag-item{ padding:6px 10px; font-size:0.85rem; }
+}
