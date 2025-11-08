@@ -36,5 +36,5 @@ export const useVerificacionArchivoSocket = (userId, onArchivoEvent,rol) => {
             socket.disconnect();
             socketRef.current = null;
         };
-    }, [userId, onArchivoEvent]);
+    }, [userId, onArchivoEvent,rol]);
 };

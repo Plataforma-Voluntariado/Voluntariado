@@ -1,138 +1,116 @@
-import { Injectable, BadRequestException, ForbiddenException, NotFoundException, } from '@nestjs/common';
+import { Injectable, BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
+import axios from 'axios';
 import { ResenaVoluntariado } from './entity/resenas_voluntariado.entity';
-import { CreateResenaVoluntariadoDto } from './dto/create-resena_voluntariado.dto';
 import { Voluntariado } from 'src/voluntariado/entity/voluntariado.entity';
 import { Inscripcion, EstadoInscripcion } from 'src/inscripcion/entity/inscripcion.entity';
 import { Usuario, RolUsuario } from 'src/usuario/entity/usuario.entity';
-import { EstadisticasVoluntario } from 'src/estadisticas_voluntario/entity/estadisticas_voluntario.entity';
+import { ConfigService } from '@nestjs/config';
+import { FASTAPISENTIMIENTO_URL } from 'src/config/constants';
+import { EstadisticasVoluntarioService } from 'src/estadisticas_voluntario/estadisticas_voluntario.service';
+import { CreateResenaVoluntariadoDto } from './dto/create-resena_voluntariado.dto';
 
 @Injectable()
 export class ResenaVoluntariadoService {
   constructor(
     @InjectRepository(ResenaVoluntariado)
-    private resenaRepo: Repository<ResenaVoluntariado>,
+    private readonly resenaRepo: Repository<ResenaVoluntariado>,
 
     @InjectRepository(Voluntariado)
-    private voluntariadoRepo: Repository<Voluntariado>,
+    private readonly voluntariadoRepo: Repository<Voluntariado>,
 
     @InjectRepository(Inscripcion)
-    private inscripcionRepo: Repository<Inscripcion>,
+    private readonly inscripcionRepo: Repository<Inscripcion>,
 
     @InjectRepository(Usuario)
-    private usuarioRepo: Repository<Usuario>,
+    private readonly usuarioRepo: Repository<Usuario>,
 
-    @InjectRepository(EstadisticasVoluntario)
-    private estadisticasRepo: Repository<EstadisticasVoluntario>,
+    private readonly configService: ConfigService,
+    private readonly estadisticasService: EstadisticasVoluntarioService,
+    private dataSource: DataSource
   ) { }
 
-  async crearResena(dto: CreateResenaVoluntariadoDto) {
+  private async enviarAFastAPIComentario(comentario: string): Promise<number> {
+    try {
+      const fastApiUrl = this.configService.get<string>(FASTAPISENTIMIENTO_URL);
+      if (!fastApiUrl) throw new BadRequestException('La URL de FastAPI para sentimiento no está configurada.');
+      const response = await axios.post(fastApiUrl, { comentario });
+      return response.data.estrellas;
+    } catch (error) {
+      console.error('Error al analizar comentario con FastAPI:', error?.response?.data || error);
+      throw new BadRequestException('No se pudo analizar el comentario con la IA.');
+    }
+  }
+
+  async crearResena(dto: CreateResenaVoluntariadoDto & { voluntario_id: number; voluntariado_id: number }) {
     const { voluntario_id, voluntariado_id, comentario } = dto;
 
-    // Buscar voluntario
-    const voluntario = await this.usuarioRepo.findOne({ where: { id_usuario: voluntario_id } });
+    // Buscar voluntario y voluntariado en paralelo
+    const [voluntario, voluntariado] = await Promise.all([
+      this.usuarioRepo.findOne({ where: { id_usuario: voluntario_id } }),
+      this.voluntariadoRepo.findOne({ where: { id_voluntariado: voluntariado_id }, relations: ['creador'] })
+    ]);
+
     if (!voluntario) throw new NotFoundException('Voluntario no encontrado');
-    if (voluntario.rol !== RolUsuario.VOLUNTARIO)
-      throw new ForbiddenException('Solo los voluntarios pueden dejar reseñas.');
-
-    // Buscar voluntariado
-    const voluntariado = await this.voluntariadoRepo.findOne({
-      where: { id_voluntariado: voluntariado_id },
-      relations: ['creador'],
-    });
+    if (voluntario.rol !== RolUsuario.VOLUNTARIO) throw new ForbiddenException('Solo los voluntarios pueden dejar reseñas.');
     if (!voluntariado) throw new NotFoundException('Voluntariado no encontrado');
-    if (voluntariado.estado !== 'terminado')
-      throw new BadRequestException('Solo se pueden reseñar voluntariados terminados.');
+    if (voluntariado.estado !== 'terminado') throw new BadRequestException('Solo se pueden reseñar voluntariados terminados.');
 
-    // Verificar inscripción válida y asistencia
-    const inscripcion = await this.inscripcionRepo.findOne({
-      where: {
-        voluntario: { id_usuario: voluntario_id },
-        voluntariado: { id_voluntariado: voluntariado.id_voluntariado },
-        estado_inscripcion: EstadoInscripcion.ACEPTADA,
-      },
-    });
-    if (!inscripcion)
-      throw new ForbiddenException('No puedes reseñar este voluntariado, no estás inscrito.');
-    if (!inscripcion.asistencia)
-      throw new ForbiddenException('Solo puedes reseñar si asististe al voluntariado.');
+    // Buscar inscripción y reseña existente en paralelo
+    const [inscripcion, resenaExistente] = await Promise.all([
+      this.inscripcionRepo.findOne({
+        where: { voluntario: { id_usuario: voluntario_id }, voluntariado: { id_voluntariado: voluntariado_id }, estado_inscripcion: EstadoInscripcion.ACEPTADA }
+      }),
+      this.resenaRepo.findOne({
+        where: { voluntario: { id_usuario: voluntario_id }, voluntariado: { id_voluntariado: voluntariado_id } }
+      })
+    ]);
 
-    // Verificar reseña previa
-    const resenaExistente = await this.resenaRepo.findOne({
-      where: {
-        voluntario: { id_usuario: voluntario_id },
-        voluntariado: { id_voluntariado: voluntariado.id_voluntariado },
-      },
-    });
-    if (resenaExistente)
-      throw new BadRequestException('Ya has dejado una reseña para este voluntariado.');
+    if (!inscripcion) throw new ForbiddenException('No puedes reseñar este voluntariado');
+    if (!inscripcion.asistencia) throw new ForbiddenException('Solo puedes reseñar si asististe al voluntariado.');
+    if (resenaExistente) throw new BadRequestException('Ya has dejado una reseña para este voluntariado.');
 
-    // -------------------------------
-    // Aquí deberías llamar a tu API de sentimiento
-    // por ejemplo:
-    // const { calificacion, sentimiento } = await procesarResena(comentario);
-    // -------------------------------
+    const estrellas = await this.enviarAFastAPIComentario(comentario);
 
-    // Crear la reseña
-    const nuevaResena = this.resenaRepo.create({
-      voluntario,
-      voluntariado,
-      comentario,
-      // calificacion, // se agregaría según la API de sentimiento
-    });
+    // Crear y guardar reseña
+    const nuevaResena = this.resenaRepo.create({ voluntario, voluntariado, comentario, calificacion: estrellas });
     const guardado = await this.resenaRepo.save(nuevaResena);
 
-    // Marcar inscripción como calificada
-    inscripcion.calificado = true;
-    await this.inscripcionRepo.save(inscripcion);
-
-    // Actualizar estadísticas del voluntario
-    let estadisticas = await this.estadisticasRepo.findOne({
-      where: { voluntario: { id_usuario: voluntario.id_usuario } },
-      relations: ['voluntario'],
-    });
-
-    if (!estadisticas) {
-      estadisticas = this.estadisticasRepo.create({
-        voluntario,
-        horas_trabajadas: voluntariado.horas || 0,
-        participaciones: 1,
-        porcentaje_asistencia: 100,
-      });
-    } else {
-      estadisticas.horas_trabajadas += voluntariado.horas || 0;
-      estadisticas.participaciones += 1;
-
-      const totalInscripciones = await this.inscripcionRepo.count({
-        where: {
-          voluntario: { id_usuario: voluntario.id_usuario },
-          estado_inscripcion: EstadoInscripcion.ACEPTADA,
-        },
-      });
-      const totalAsistencias = await this.inscripcionRepo.count({
-        where: {
-          voluntario: { id_usuario: voluntario.id_usuario },
-          asistencia: true,
-          estado_inscripcion: EstadoInscripcion.ACEPTADA,
-        },
-      });
-      estadisticas.porcentaje_asistencia = totalInscripciones
-        ? Math.round((totalAsistencias / totalInscripciones) * 100)
-        : 0;
-    }
-
-    await this.estadisticasRepo.save(estadisticas);
+    // Actualizar inscripción y estadísticas en paralelo
+    await Promise.all([
+      (async () => { inscripcion.calificado = true; await this.inscripcionRepo.save(inscripcion); })(),
+      this.estadisticasService.actualizarEstadisticasPorAsistencia(voluntario_id, voluntariado_id)
+    ]);
 
     return guardado;
   }
 
   async listarResenasPorVoluntariado(voluntariado_id: number) {
-    return this.resenaRepo.find({
-      where: { voluntariado: { id_voluntariado: voluntariado_id } },
-      relations: ['voluntario', 'voluntariado', 'voluntariado.creador'],
-      order: { id_resena: 'DESC' },
-    });
-  }
+    const voluntariado = await this.dataSource
+      .getRepository(Voluntariado)
+      .createQueryBuilder('v')
+      .where('v.id_voluntariado = :id', { id: voluntariado_id })
+      .getOne();
 
+    if (!voluntariado) {
+      throw new NotFoundException(`El voluntariado con id ${voluntariado_id} no existe`);
+    }
+
+    const resenas = await this.dataSource
+      .getRepository(ResenaVoluntariado)
+      .createQueryBuilder('r')
+      .leftJoinAndSelect('r.voluntario', 'voluntario')
+      .leftJoinAndSelect('r.voluntariado', 'voluntariado')
+      .leftJoinAndSelect('voluntariado.creador', 'creador')
+      .where('voluntariado.id_voluntariado = :id', { id: voluntariado_id })
+      .orderBy('r.id_resena', 'DESC')
+      .getMany();
+
+    if (!resenas || resenas.length === 0) {
+      throw new NotFoundException(`El voluntariado con id ${voluntariado_id} no tiene reseñas`);
+    }
+
+    return resenas;
+  }
 }

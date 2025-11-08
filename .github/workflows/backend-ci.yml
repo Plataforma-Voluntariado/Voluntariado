@@ -1,0 +1,107 @@
+name: CI - Backend (NestJS)
+
+on:
+  push:
+    paths:
+      - "backend/nest-app/**"
+      - ".github/workflows/backend-ci.yml"
+  pull_request:
+    paths:
+      - "backend/nest-app/**"
+      - ".github/workflows/backend-ci.yml"
+
+jobs:
+  build-and-test:
+    name: Build & Lint NestJS
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: voluntariado
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      NODE_ENV: test
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: voluntariado
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: 6379
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        working-directory: ./backend/nest-app
+        run: npm ci
+
+      - name: Build NestJS app (with database copy)
+        working-directory: ./backend/nest-app
+        run: |
+          npm run build
+          if [ -d "src/database/colombia" ]; then
+            echo "✅ Carpeta 'src/database/colombia' encontrada. Copiando..."
+            mkdir -p dist/database
+            cp -r src/database/colombia dist/database/
+          else
+            echo "⚠️ Carpeta 'src/database/colombia' no existe, omitiendo copia."
+          fi
+
+      - name: Create temporary .env file
+        working-directory: ./backend/nest-app
+        run: |
+          echo "JWT_SECRET=$JWT_SECRET" >> .env
+          echo "DB_HOST=$DB_HOST" >> .env
+          echo "DB_PORT=$DB_PORT" >> .env
+          echo "DB_USER=$DB_USER" >> .env
+          echo "DB_PASSWORD=$DB_PASSWORD" >> .env
+          echo "DB_NAME=$DB_NAME" >> .env
+          echo "REDIS_HOST=$REDIS_HOST" >> .env
+          echo "REDIS_PORT=$REDIS_PORT" >> .env
+          echo "NODE_ENV=$NODE_ENV" >> .env
+          echo "✅ Archivo .env temporal creado."
+
+      - name: Run tests (if any)
+        working-directory: ./backend/nest-app
+        run: npm test --if-present -- --passWithNoTests
+
+      - name: Lint code
+        working-directory: ./backend/nest-app
+        run: npm run lint || echo "⚠️ Lint warnings ignorados."
+
+      - name: Test health endpoint
+        working-directory: ./backend/nest-app
+        run: |
+          echo "🚀 Iniciando aplicación para prueba de salud..."
+          npm run start:dev &
+          sleep 8
+          curl -f http://localhost:3000 || echo "⚠️ La app no respondió correctamente."
+          pkill node

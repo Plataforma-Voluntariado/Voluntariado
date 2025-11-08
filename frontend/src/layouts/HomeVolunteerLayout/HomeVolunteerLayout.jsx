@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import "./HomeVolunteerLayout.css"
 import { GetAllVolunteerings } from "../../services/volunteering/VolunteeringService";
 import VolunteeringCard from "../../components/VolunteeringCard/VolunteeringCard";
-import VolunteeringMap from "../../components/Map/VolunteeringMap/VolunteeringMap";
 import VolunteeringMapLayout from "../VolunteeringMapLayout/VolunteeringMapLayout";
 
 function HomeVolunteerLayout(){
