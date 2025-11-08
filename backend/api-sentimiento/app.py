@@ -11,6 +11,12 @@ analyzer = create_analyzer(task="sentiment", lang="es")
 
 app = FastAPI(title="API de Sentimientos")
 
+
+@app.get("/")
+def root():
+    return {"mensaje": "✅ API SENTIMIENTO funcionando correctamente"}
+
+
 class ComentarioRequest(BaseModel):
     comentario: str
 
