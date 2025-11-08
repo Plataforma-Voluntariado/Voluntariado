@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build && xcopy src\\database\\colombia dist\\database\\colombia /E /I /Y",
+    "build": "nest build && node copy-db.js",
     "start": "node dist/main.js",
     "start:dev": "npm run build && node dist/main.js",
     "start:debug": "nest start --debug --watch ",
