@@ -4,6 +4,7 @@ import VolunteeringMap from "../../components/Map/VolunteeringMap/VolunteeringMa
 import VolunteeringMapInfo from "../../components/Map/VolunteeringMapInfo/VolunteeringMapInfo";
 
 function VolunteeringMapLayout({volunteerings}){
+    console.log(volunteerings)
     return(
         <div className="volunteering-map-layout">
             <VolunteeringMap volunteerings={volunteerings} />

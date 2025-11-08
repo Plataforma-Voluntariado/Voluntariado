@@ -23,12 +23,12 @@ function HomeVolunteerLayout(){
             volunteerings={volunteerings}
             />
             <h1 className="home-volunteer-layout-title">Eventos disponibles</h1>
-            {volunteerings.map((volunteering) => (
+            {volunteerings ? volunteerings.map((volunteering) => (
                 <VolunteeringCard 
                     key={volunteering.id_voluntariado}
                     volunteering={volunteering}
                 />
-            ))}
+            )):null}
         </div>
     )
 }
