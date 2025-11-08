@@ -11,6 +11,7 @@ export class Administrador {
   @JoinColumn({ name: 'id_usuario' })
   usuario: Usuario;
 
+  
   @OneToMany(() => Verificacion, (verificacion) => verificacion.admin)
   verificacionesRevisadas: Verificacion[];
 
