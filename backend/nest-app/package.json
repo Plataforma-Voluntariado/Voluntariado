@@ -6,8 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build && mkdir -p dist/database/colombia && cp -r src/database/colombia/* dist/database/colombia/ || echo '⚠️ Carpeta src/database/colombia no encontrada, omitiendo copia.'",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "build": "nest build && xcopy src\\database\\colombia dist\\database\\colombia /E /I /Y",
     "start": "node dist/main.js",
     "start:dev": "npm run build && node dist/main.js",
     "start:debug": "nest start --debug --watch ",
