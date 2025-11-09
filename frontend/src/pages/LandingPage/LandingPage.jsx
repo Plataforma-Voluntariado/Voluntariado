@@ -1,14 +1,14 @@
-import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./LandingPage.css";
 import Footer from "../../components/Footer/Footer";
 import { MdVolunteerActivism, MdVerifiedUser, MdPublic, MdGroups } from "react-icons/md";
 import { HiDocumentText } from "react-icons/hi2";
 import VoluntariadoLogo from "../../assets/photos/logo.png";
+import fondo from '../../assets/photos/voluntarios_landing.jpg'
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  
+
   const handleLogoClick = () => {
     navigate("/");
   };
@@ -19,9 +19,9 @@ const LandingPage = () => {
       <header className="landing-header">
         <div className="container">
           <div className="logo logo-clickable" onClick={handleLogoClick}>
-            <img 
-              src={VoluntariadoLogo} 
-              alt="Logo Voluntariado" 
+            <img
+              src={VoluntariadoLogo}
+              alt="Logo Voluntariado"
               className="header-logo"
             />
           </div>
@@ -38,6 +38,13 @@ const LandingPage = () => {
 
       {/* Hero Section */}
       <section className="hero">
+        <img
+          src={fondo}
+          alt="Voluntarios ayudando en comunidad"
+          className="hero-bg"
+          loading="lazy"
+          fetchPriority="low"
+        />
         <div className="container">
           <div className="hero-content">
             <h1 className="hero-title">

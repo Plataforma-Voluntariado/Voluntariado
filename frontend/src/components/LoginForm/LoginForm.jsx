@@ -1,38 +1,26 @@
 import React, { useState } from "react";
-import "./LoginForm.css";
+import { useNavigate, Link } from "react-router-dom";
 import VoluntariadoLogo from "../../assets/photos/logo.png";
-import { useNavigate } from "react-router-dom";
 import WrongAlert from "../../components/alerts/WrongAlert";
 import RedirectAlert from "../alerts/RedirectAlert";
 import { login } from "../../services/auth/AuthService";
+import "./LoginForm.css";
 
 function LoginForm() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ correo: "", contrasena: "" });
-  
-  //obtener datos del formulario
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-  //Manejo de errores
-  const showError = async (error) => {
-    if (Array.isArray(error)) {
-      await WrongAlert({ title: "Error en inicio de sesión", message: error.join("\n") });
-    } else if (typeof error === "string") {
-      await WrongAlert({ title: "Error en inicio de sesión", message: error });
-    } else {
-      await WrongAlert({ title: "Error inesperado", message: "Ocurrió un problema. Por favor, intenta de nuevo." });
-    }
-  };
+  const [correo, setCorreo] = useState("");
+  const [contrasena, setContrasena] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      const response = await login(formData.correo, formData.contrasena);
+    if (loading) return;
+    setLoading(true);
 
-      // Login exitoso
+    try {
+      const response = await login(correo, contrasena);
+
       if (response?.status === 200) {
         await RedirectAlert({
           title: "¡Inicio de sesión exitoso!",
@@ -41,61 +29,87 @@ function LoginForm() {
           position: "top-end",
         });
         navigate("/home");
-        return;
+      } else {
+        await WrongAlert({
+          title: "Error",
+          message: "Ocurrió un problema al iniciar sesión.",
+        });
       }
-
-      // Si status no es 200, error genérico
-      await showError("Ocurrió un problema al iniciar sesión.");
-
     } catch (error) {
-      await showError(error); // muestra error según tipo (array, string, otro)
+      const message = Array.isArray(error)
+        ? error.join("\n")
+        : typeof error === "string"
+        ? error
+        : "Ocurrió un problema. Intenta nuevamente.";
+
+      await WrongAlert({
+        title: "Error en inicio de sesión",
+        message,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <form className="login-form" onSubmit={handleSubmit}>
+      <div className="login-form-logo-container" onClick={() => navigate("/")}>
+        <img
+          className="login-form-logo-img"
+          src={VoluntariadoLogo}
+          alt="Voluntariado Logo"
+          loading="lazy"
+        />
+      </div>
+
       <h1 className="login-form-title">Inicia Sesión</h1>
 
-      <label className="login-form-label">Correo</label>
+      <label className="login-form-label" htmlFor="correo">
+        Correo
+      </label>
       <input
+        id="correo"
         className="login-form-input"
         type="email"
         name="correo"
-        value={formData.correo}
-        onChange={handleChange}
+        value={correo}
+        onChange={(e) => setCorreo(e.target.value)}
         placeholder="ejemplo@ejemplo.com"
         required
       />
 
-      <label className="login-form-label">Contraseña</label>
+      <label className="login-form-label" htmlFor="contrasena">
+        Contraseña
+      </label>
       <input
+        id="contrasena"
         className="login-form-input"
         type="password"
         name="contrasena"
-        value={formData.contrasena}
-        onChange={handleChange}
+        value={contrasena}
+        onChange={(e) => setContrasena(e.target.value)}
         placeholder="Contraseña"
         required
       />
 
       <div className="login-form-recovery-link">
-        <a href="/recuperar-contrasena">¿Olvidaste tu contraseña?</a>
+        <Link to="/recuperar-contrasena">¿Olvidaste tu contraseña?</Link>
       </div>
 
-      <button className="login-form-button" type="submit">
-        Iniciar Sesión
+      <button
+        className="login-form-button"
+        type="submit"
+        disabled={loading}
+      >
+        {loading ? "Iniciando..." : "Iniciar Sesión"}
       </button>
 
       <p className="login-form-no-account">
         ¿No tienes una cuenta?{" "}
-        <a href="/register" className="login-form-no-account-link">
+        <Link to="/register" className="login-form-no-account-link">
           Regístrate
-        </a>
+        </Link>
       </p>
-
-      <div className="login-form-logo-container" onClick={() => navigate("/")}>
-        <img className="login-form-logo-img" src={VoluntariadoLogo} alt="Voluntariado Logo" />
-      </div>
     </form>
   );
 }

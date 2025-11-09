@@ -1,6 +1,6 @@
 import "./RegisterPage.css";
 import RegisterForm from "../../layouts/RegisterFormLayout/RegisterFormLayout";
-import ImgHandsBackground from "../../assets/photos/manos-voluntariado-bg.jpg";
+import ImgHandsBackground from "../../assets/photos/fondo.jpg";
 
 function RegisterPage() {
   return (

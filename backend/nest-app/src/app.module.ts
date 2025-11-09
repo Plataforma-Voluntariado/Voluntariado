@@ -47,7 +47,7 @@ import { ResenaVoluntariadoModule } from './resena_voluntariado/resena_voluntari
         synchronize: false,
         logging: false,
         migrations: [__dirname + '/database/migrations/*{.ts,.js}'],
-        migrationsRun: true,
+        migrationsRun: false,
       }),
       inject: [ConfigService],
     }),

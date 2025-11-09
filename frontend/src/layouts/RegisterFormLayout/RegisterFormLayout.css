@@ -6,17 +6,34 @@
   justify-content: center;
   gap: 1rem;
   padding: 1rem 3rem;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+
+
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 0.9) 0%,   /* más blanco abajo */
+    rgba(255, 255, 255, 0.75) 50%, /* transición suave */
+    rgba(255, 255, 255, 0.6) 100%  /* más transparente arriba */
+  );
+  backdrop-filter: blur(25px) saturate(170%);
+  -webkit-backdrop-filter: blur(25px) saturate(170%);
+
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: var(--radius-large);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15),
-              0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.25) inset;
+
   transition: all var(--transition);
   margin-top: 2rem;
   margin-bottom: 2rem;
+  box-sizing: border-box;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+
 
 
 .register-form-title {
@@ -44,7 +61,7 @@
   padding: 0.8rem 1.5rem;
   border-radius: var(--radius-medium);
   border: none;
-  background: #e0e0e0;
+  background: #d0cdcd;
   color: #1a1a1a;
   font-weight: 500;
   cursor: pointer;
@@ -89,13 +106,6 @@
   width: 98%;
   display: flex;
   flex-wrap: wrap;
-}
-.register-form-label {
-  width: 100%;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #2a2a2a;
-
 }
 
 .register-form-input {
@@ -230,6 +240,35 @@
   color: #0051d5;
   text-decoration: underline;
 }
+
+/* Logo responsivo */
+.register-form-logo-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.register-form-logo-img {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+/* Efecto hover suave */
+.register-form-logo-container:hover .register-form-logo-img {
+  transform: scale(1.05);
+}
+
+/* Ajustes para pantallas pequeñas */
+@media screen and (max-width: 600px) {
+  .register-form-logo-img {
+    max-width: 200px;
+  }
+}
+
 
 @media screen and (max-width: 880px) {
   .register-form-input-container{

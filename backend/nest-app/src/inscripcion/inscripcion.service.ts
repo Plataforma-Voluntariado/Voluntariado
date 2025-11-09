@@ -112,7 +112,8 @@ export class InscripcionService {
         if (!inscripcion) throw new NotFoundException('Inscripción no encontrada');
         if (inscripcion.estado_inscripcion === EstadoInscripcion.CANCELADA) throw new NotFoundException('Inscripción ya cancelada');
         if (inscripcion.voluntario.id_usuario !== voluntario.id_usuario) throw new ForbiddenException('No puedes cancelar esta inscripción');
-
+        if (inscripcion.voluntariado.estado === EstadoVoluntariado.TERMINADO) throw new BadRequestException('No puedes cancelar un voluntariado que ya terminó');
+        if (inscripcion.voluntariado.estado === EstadoVoluntariado.EN_PROCESO)throw new BadRequestException('No puedes cancelar un voluntariado que ya esta en proceso');
         const ahora = new Date();
         if (inscripcion.voluntariado.fechaHoraInicio <= ahora) throw new BadRequestException('No puedes cancelar después de que el voluntariado empezó');
 
@@ -165,7 +166,7 @@ export class InscripcionService {
             .execute();
     }
 
-    async marcarAsistencia(creador: Usuario,idInscripcion: number,asistencia: boolean | null,) {
+    async marcarAsistencia(creador: Usuario, idInscripcion: number, asistencia: boolean | null,) {
         const inscripcion = await this.inscripcionRepo.findOne({
             where: { id_inscripcion: idInscripcion },
             relations: ['voluntariado', 'voluntariado.creador', 'voluntario'],
