@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./ResetPasswordPage.css";
-import ImgHandsBackground from "../../assets/photos/manos-voluntariado-bg.jpg";
+import ImgHandsBackground from "../../assets/photos/fondo.jpg";
 import { useNavigate, useLocation } from "react-router-dom";
 import WrongAlert from "../../components/alerts/WrongAlert";
 import SuccessAlert from "../../components/alerts/SuccessAlert";

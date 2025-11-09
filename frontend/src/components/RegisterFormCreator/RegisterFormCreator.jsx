@@ -8,6 +8,7 @@ import { GetDepartments, GetCities } from "../../services/auth/LocationService.j
 import { ValidatePasswordFormat } from "../../services/validators/ValidatePasswordFormat.jsx";
 import { customSelectStyles } from "../../styles/selectStyles.js";
 import Select from "react-select";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 
 // Configuración inicial del formulario
 const initialFormData = {
@@ -30,6 +31,7 @@ function RegisterFormCreator() {
   const [departments, setDepartments] = useState([]);
   const [cities, setCities] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // Cargar departamentos al montar el componente
   useEffect(() => {
@@ -265,18 +267,30 @@ function RegisterFormCreator() {
         />
       </div>
 
-      {passwordFields.map(field => (
+      {passwordFields.map((field, index) => (
         <div key={field.name} className="register-form-input-container">
           <label className="register-form-label">{field.label}</label>
-          <input
-            className="register-form-input"
-            type="password"
-            name={field.name}
-            value={formData[field.name]}
-            onChange={handleInputChange}
-            placeholder={field.placeholder}
-            required
-          />
+          <div className="password-wrapper">
+            <input
+              className="register-form-input"
+              type={showPassword ? "text" : "password"}
+              name={field.name}
+              value={formData[field.name]}
+              onChange={handleInputChange}
+              placeholder={field.placeholder}
+              required
+            />
+
+            <button
+              type="button"
+              className="toggle-password-btn"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label="Mostrar u ocultar contraseñas"
+            >
+              {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
+            </button>
+
+          </div>
         </div>
       ))}
 

@@ -4,10 +4,12 @@ import WrongAlert from "../alerts/WrongAlert.jsx";
 import RedirectAlert from "../alerts/RedirectAlert.jsx";
 import { register } from "../../services/auth/AuthService.jsx";
 import { useNavigate } from "react-router";
-import { GetDepartments,GetCities } from "../../services/auth/LocationService.jsx";
+import { GetDepartments, GetCities } from "../../services/auth/LocationService.jsx";
 import { ValidatePasswordFormat } from "../../services/validators/ValidatePasswordFormat.jsx";
 import { customSelectStyles } from "../../styles/selectStyles.js";
 import Select from "react-select";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+
 
 // Configuración inicial del formulario
 const initialFormData = {
@@ -28,6 +30,8 @@ function RegisterFormVolunteer() {
   const [departments, setDepartments] = useState([]);
   const [cities, setCities] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
 
   // Cargar departamentos al montar el componente
   useEffect(() => {
@@ -76,11 +80,11 @@ function RegisterFormVolunteer() {
   // Utilidades de alertas
   const showError = async (error) => {
     let message = "Ocurrió un problema. Por favor intenta de nuevo.";
-    
+
     if (Array.isArray(error)) message = error.join("\n");
     else if (typeof error === "string") message = error;
     else if (error?.response?.data?.message) message = error.response.data.message;
-    
+
     await WrongAlert({ title: "Error al registrar", message });
   };
 
@@ -143,24 +147,24 @@ function RegisterFormVolunteer() {
   };
 
   // Configuración de selects
-  const departmentOptions = departments.map(dep => ({ 
-    value: dep.id_departamento, 
-    label: dep.departamento 
+  const departmentOptions = departments.map(dep => ({
+    value: dep.id_departamento,
+    label: dep.departamento
   }));
 
-  const cityOptions = cities.map(city => ({ 
-    value: city.id_ciudad, 
-    label: city.ciudad 
+  const cityOptions = cities.map(city => ({
+    value: city.id_ciudad,
+    label: city.ciudad
   }));
 
-  const selectedDeptValue = selectedDepartment ? { 
-    value: selectedDepartment, 
-    label: departments.find(dep => dep.id_departamento === selectedDepartment)?.departamento 
+  const selectedDeptValue = selectedDepartment ? {
+    value: selectedDepartment,
+    label: departments.find(dep => dep.id_departamento === selectedDepartment)?.departamento
   } : null;
 
-  const selectedCityValue = formData.idCiudad ? { 
-    value: formData.idCiudad, 
-    label: cities.find(city => city.id_ciudad === formData.idCiudad)?.ciudad 
+  const selectedCityValue = formData.idCiudad ? {
+    value: formData.idCiudad,
+    label: cities.find(city => city.id_ciudad === formData.idCiudad)?.ciudad
   } : null;
 
   // Campos del formulario para hacerlo más mantenible
@@ -173,18 +177,17 @@ function RegisterFormVolunteer() {
 
   return (
     <form className="register-form-volunteer" onSubmit={handleSubmit}>
-      {/* Campos de texto normales */}
       {formFields.map(field => (
         <div key={field.name} className="register-form-input-container">
           <label className="register-form-label">{field.label}</label>
-          <input 
-            className="register-form-input" 
-            type={field.type} 
-            name={field.name} 
-            value={formData[field.name]} 
-            onChange={handleInputChange} 
-            placeholder={field.placeholder} 
-            required 
+          <input
+            className="register-form-input"
+            type={field.type}
+            name={field.name}
+            value={formData[field.name]}
+            onChange={handleInputChange}
+            placeholder={field.placeholder}
+            required
           />
         </div>
       ))}
@@ -220,41 +223,62 @@ function RegisterFormVolunteer() {
       {/* Campos restantes */}
       <div className="register-form-text-area-container">
         <label className="register-form-label">Fecha de nacimiento</label>
-        <input 
-          className="register-form-input" 
-          type="date" 
-          name="fechaNacimiento" 
-          value={formData.fechaNacimiento} 
-          onChange={handleInputChange} 
-          required 
+        <input
+          className="register-form-input"
+          type="date"
+          name="fechaNacimiento"
+          value={formData.fechaNacimiento}
+          onChange={handleInputChange}
+          required
         />
       </div>
 
       <div className="register-form-input-container">
         <label className="register-form-label">Contraseña</label>
-        <input 
-          className="register-form-input" 
-          type="password" 
-          name="contrasena" 
-          value={formData.contrasena} 
-          onChange={handleInputChange} 
-          placeholder="Contraseña" 
-          required 
-        />
+        <div className="password-wrapper">
+          <input
+            className="register-form-input"
+            type={showPassword ? "text" : "password"}
+            name="contrasena"
+            value={formData.contrasena}
+            onChange={handleInputChange}
+            placeholder="Contraseña"
+            required
+          />
+          <button
+            type="button"
+            className="toggle-password-btn"
+            onClick={() => setShowPassword(!showPassword)}
+            aria-label="Mostrar u ocultar contraseña"
+          >
+            {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
+          </button>
+        </div>
       </div>
 
       <div className="register-form-input-container">
         <label className="register-form-label">Confirmar Contraseña</label>
-        <input 
-          className="register-form-input" 
-          type="password" 
-          name="confirmarContrasena" 
-          value={formData.confirmarContrasena} 
-          onChange={handleInputChange} 
-          placeholder="Contraseña" 
-          required 
-        />
+        <div className="password-wrapper">
+          <input
+            className="register-form-input"
+            type={showPassword ? "text" : "password"}
+            name="confirmarContrasena"
+            value={formData.confirmarContrasena}
+            onChange={handleInputChange}
+            placeholder="Contraseña"
+            required
+          />
+          <button
+            type="button"
+            className="toggle-password-btn"
+            onClick={() => setShowPassword(!showPassword)}
+            aria-label="Mostrar u ocultar contraseña"
+          >
+            {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
+          </button>
+        </div>
       </div>
+
 
       <button className="register-form-button" type="submit">
         Registrarse

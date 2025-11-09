@@ -13,14 +13,6 @@
   flex-wrap: wrap;
 }
 
-.register-form-select-container .register-form-label {
-  width: 100%;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #2a2a2a;
-  margin-bottom: 0.4rem;
-}
-
 /* Estilos para react-select */
 .register-form-react-select {
   width: 100% !important;

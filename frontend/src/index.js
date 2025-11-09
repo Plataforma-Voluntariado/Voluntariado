@@ -18,11 +18,14 @@ import UserVerificationPage from "./pages/UserVerificationPage/UserVerificationP
 import AboutUsPage from "./pages/AboutUsPage/AboutUsPage";
 import LandingPage from "./pages/LandingPage/LandingPage";
 import CreateVoluntariadoPage from "./pages/CreateVoluntariadoPage/CreateVoluntariadoPage";
+import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
+
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <BrowserRouter>
+    <ScrollToTop />
     <Routes>
       {/* Rutas públicas - SIN AuthProvider para evitar verificaciones innecesarias */}
       <Route path="/" element={<LandingPage />} />
@@ -82,7 +85,6 @@ root.render(
         </Route>
       </Route>
 
-      {/* Ruta fallback - redirige a landing page */}
       <Route path="*" element={<LandingPage />} />
     </Routes>
   </BrowserRouter>

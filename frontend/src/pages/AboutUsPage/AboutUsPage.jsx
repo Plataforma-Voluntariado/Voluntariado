@@ -40,14 +40,11 @@ function AboutUsPage() {
 
   const handleStartHelping = () => {
     if (!user) {
-      // Si no está logueado, redirigir a registro
       navigate("/register");
     }
-    // Si está logueado, no mostrar el botón (se maneja en el render)
   };
 
   const handleLogoClick = () => {
-    // Si está logueado, ir a home, sino ir a landing
     if (user) {
       navigate("/home");
     } else {
@@ -57,7 +54,6 @@ function AboutUsPage() {
 
   return (
     <div className={`about-us-page ${user ? 'with-navbar' : ''}`}>
-      {/* Header - NavigationBar para usuarios logueados, header simple para no logueados */}
       {user ? (
         <NavigationBar />
       ) : (
@@ -181,7 +177,6 @@ function AboutUsPage() {
           )}
         </div>
         
-        {/* Footer */}
         <Footer showUserLinks={!!user} showAuthLinks={!user} />
     </div>
   );

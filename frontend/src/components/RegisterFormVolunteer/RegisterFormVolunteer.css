@@ -19,14 +19,38 @@
   display: flex;
   flex-wrap: wrap;
 }
-
-.register-form-select-container .register-form-label {
+.password-wrapper {
+  position: relative;
   width: 100%;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #2a2a2a;
-  margin-bottom: 0.4rem;
 }
+
+.password-wrapper .register-form-input {
+  width: 100%;
+  padding-right: 2.5rem; /* deja espacio para el ojito */
+  box-sizing: border-box;
+}
+
+.toggle-password-btn {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.toggle-password-btn:hover {
+  color: #111;
+}
+
+
 
 /* Estilos para react-select */
 .register-form-react-select {
