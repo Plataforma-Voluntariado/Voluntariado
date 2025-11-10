@@ -20,6 +20,7 @@ export class SeedVoluntariadosIniciales1751107500000 implements MigrationInterfa
         ('Apoyo escolar', 'Refuerzo educativo a niños en situación vulnerable.', '2026-02-10 08:00:00', '2026-02-10 12:00:00', 4, 18, 'pendiente', 8, 12);
     `);
   }
+  
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`DELETE FROM voluntariado;`);
