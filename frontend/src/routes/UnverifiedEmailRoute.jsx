@@ -12,15 +12,12 @@ const UnverifiedEmailRoute = () => {
     );
   }
 
-  // Si no hay usuario, ir a landing page
   if (!user) return <Navigate to="/" replace />;
 
-  // Si el correo ya está verificado, ir a perfil
   if (user.correo_verificado === 1 || user.correo_verificado === "1" || user.correo_verificado === true) {
     return <Navigate to="/profile" replace />;
   }
 
-  // Si el correo no está verificado, permitir acceso al outlet
   return <Outlet />;
 };
 

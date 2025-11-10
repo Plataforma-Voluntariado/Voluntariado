@@ -98,6 +98,7 @@ export class InscripcionService {
         if (!inscripcion) throw new NotFoundException('Inscripción no encontrada');
         if (inscripcion.estado_inscripcion === EstadoInscripcion.ACEPTADA) throw new ForbiddenException('No puedes rechazar una inscripcion ya aceptada');
         if (inscripcion.voluntariado.creador.id_usuario !== creador.id_usuario) throw new ForbiddenException('Solo el creador puede rechazar');
+        if (inscripcion?.voluntariado.estado != EstadoVoluntariado.PENDIENTE) throw new NotFoundException('Solo se puede rechazar inscripciones a voluntariados en estado pendiente');
 
         inscripcion.estado_inscripcion = EstadoInscripcion.RECHAZADA;
         return this.inscripcionRepo.save(inscripcion);

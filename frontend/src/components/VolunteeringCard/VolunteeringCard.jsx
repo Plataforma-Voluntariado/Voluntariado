@@ -56,7 +56,7 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
 
   const inscritos = inscripciones?.length || 0
   const aceptados = participantesAceptados || 0
-  const ocupacionPorcentaje = maxParticipantes ? Math.round((inscritos / maxParticipantes) * 100) : 0
+  const ocupacionPorcentaje = maxParticipantes ? Math.round((aceptados / maxParticipantes) * 100) : 0
 
   // Carousel logic
   const [index, setIndex] = useState(0)
@@ -249,7 +249,7 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
           <button className="volunteering-card-inscribe-btn">
             Inscribete ahora
           </button>
-          <button className="volunteering-card-location-btn"onClick={() => onFocusMap?.()}>
+          <button className="volunteering-card-location-btn" onClick={() => onFocusMap?.()}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"></path>
               <circle cx="12" cy="10" r="3"></circle>

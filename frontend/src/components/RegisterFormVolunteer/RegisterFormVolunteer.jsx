@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./RegisterFormVolunteer.css";
-import WrongAlert from "../alerts/WrongAlert.jsx";
-import RedirectAlert from "../alerts/RedirectAlert.jsx";
+import { WrongAlert } from "../../utils/ToastAlerts.js";
 import { register } from "../../services/auth/AuthService.jsx";
 import { useNavigate } from "react-router";
 import { GetDepartments, GetCities } from "../../services/auth/LocationService.jsx";
@@ -9,6 +8,7 @@ import { ValidatePasswordFormat } from "../../services/validators/ValidatePasswo
 import { customSelectStyles } from "../../styles/selectStyles.js";
 import Select from "react-select";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { SuccessAlert } from "../../utils/ToastAlerts.js";
 
 
 // Configuración inicial del formulario
@@ -133,7 +133,7 @@ function RegisterFormVolunteer() {
     try {
       const response = await register(userData);
       if (response?.status === 201 || response?.statusCode === 201) {
-        await RedirectAlert({
+        await SuccessAlert({
           title: "¡Registro exitoso!",
           message: "Voluntario creado correctamente.",
         });

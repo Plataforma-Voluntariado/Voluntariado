@@ -2,8 +2,8 @@ import React from "react";
 import "./ProfileEmail.css";
 import iconoCorreo from "../../../assets/photos/icono-correo.jpg";
 import { sendVerificationEmail } from "../../../services/auth/authEmailVerificationService";
-import SuccessAlert from "../../alerts/SuccessAlert";
-import WrongAlert from "../../alerts/WrongAlert";
+import { SuccessAlert } from "../../../utils/ToastAlerts";
+import { WrongAlert } from "../../../utils/ToastAlerts";
 import { useNavigate } from "react-router-dom";
 
 function ProfileEmail({ user }) {

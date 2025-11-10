@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./UploadProfilePhotoModal.css";
 import { UploadProfilePhoto, DeleteProfilePhoto } from "../../../services/auth/UserManagementService";
-import SuccessAlert from "../../alerts/SuccessAlert";
-import WrongAlert from "../../alerts/WrongAlert";
+import { SuccessAlert } from "../../../utils/ToastAlerts";
+import { WrongAlert } from "../../../utils/ToastAlerts";
 
 function UploadProfilePhotoModal({ currentPhotoUrl, onClose }) {
   const [selectedFile, setSelectedFile] = useState(null);

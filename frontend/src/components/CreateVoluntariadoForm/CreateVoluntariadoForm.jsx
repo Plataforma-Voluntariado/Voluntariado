@@ -4,8 +4,8 @@ import { getCategorias } from "../../services/categoria/categoriaService";
 import { getDepartamentos, getCiudadesByDepartamento } from "../../services/ubicacion/ubicacionService";
 import { createVoluntariado } from "../../services/voluntariado/voluntariadoService";
 import { useAuth } from "../../context/AuthContext";
-import SuccessAlert from "../../components/alerts/SuccessAlert";
-import WrongAlert from "../../components/alerts/WrongAlert"
+import { SuccessAlert } from "../../utils/ToastAlerts";
+import { WrongAlert } from "../../utils/ToastAlerts";
 import ImagePreviewModal from "./ImagePreviewModal/ImagePreviewModal";
 import Select from "react-select";
 import { customSelectStylesVoluntariado } from "../../styles/selectStylesVoluntariado";

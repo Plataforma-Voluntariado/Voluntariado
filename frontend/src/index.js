@@ -19,6 +19,11 @@ import AboutUsPage from "./pages/AboutUsPage/AboutUsPage";
 import LandingPage from "./pages/LandingPage/LandingPage";
 import CreateVoluntariadoPage from "./pages/CreateVoluntariadoPage/CreateVoluntariadoPage";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
+import { Toaster } from "react-hot-toast";
+import CreatorRoute from "./routes/CreatorRoute";
+import CreatorInscripcionPage from "./pages/ManagementEventosPage/CreatorInscripcionPage/CreatorInscripcionPage"
+import CreatorVolunteerPage from "./pages/ManagementEventosPage/CreatorVolunteerPage/CreatorVolunteerPage";
+
 
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -26,25 +31,17 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
     <ScrollToTop />
+    <Toaster position="top-right" />
     <Routes>
-      {/* Rutas públicas - SIN AuthProvider para evitar verificaciones innecesarias */}
+      {/* Rutas Publicas */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/recuperar-contrasena" element={<PasswordRecoveryPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/about-us" element={<AuthProvider><AboutUsPage /></AuthProvider>} />
 
-      {/* Ruta About Us - CON AuthProvider para verificación de usuario */}
-      <Route
-        path="/about-us"
-        element={
-          <AuthProvider>
-            <AboutUsPage />
-          </AuthProvider>
-        }
-      />
-
-      {/* Rutas privadas - CON AuthProvider */}
+      {/* Rutas privadas*/}
       <Route
         element={
           <AuthProvider>
@@ -56,16 +53,11 @@ root.render(
           <Route path="/home" element={<HomePage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/crear-voluntariado" element={<CreateVoluntariadoPage />} />
-          <Route element={<UnverifiedEmailRoute />}>
-            <Route
-              path="/verificar-correo"
-              element={<EmailVerificationPage />}
-            />
-          </Route>
+          <Route element={<UnverifiedEmailRoute />}><Route path="/verificar-correo" element={<EmailVerificationPage />} /></Route>
         </Route>
       </Route>
 
-      {/* Rutas de administración - CON AuthProvider */}
+      {/* Rutas de administración*/}
       <Route
         element={
           <AuthProvider>
@@ -85,6 +77,22 @@ root.render(
         </Route>
       </Route>
 
+      {/* Rutas de creadores */}
+      <Route
+        element={
+          <AuthProvider>
+            <CreatorRoute/>
+          </AuthProvider>
+        }
+      >
+        <Route element={<NavbarLayout />}>
+          <Route path="/manage-events"element={<CreatorVolunteerPage/>}/>
+          <Route path="/manage-events/:eventId" element={<CreatorInscripcionPage/>} />
+        </Route>
+      </Route>
+
+
+      {/* Ruta 404 */}
       <Route path="*" element={<LandingPage />} />
     </Routes>
   </BrowserRouter>

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./EmailVerificationPage.css";
 import { verifyEmail } from "../../services/auth/authEmailVerificationService";
-import SuccessAlert from "../../components/alerts/SuccessAlert";
-import WrongAlert from "../../components/alerts/WrongAlert";
+import { SuccessAlert } from "../../utils/ToastAlerts";
+import { WrongAlert } from "../../utils/ToastAlerts";
 
 function EmailVerificationPage() {
   const [verificationCode, setVerificationCode] = useState("");

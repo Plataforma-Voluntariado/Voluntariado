@@ -17,7 +17,7 @@ import { InscripcionService } from 'src/inscripcion/inscripcion.service';
 @Injectable()
 export class VoluntariadoService {
   private readonly logger = new Logger(VoluntariadoService.name);
-  private readonly commonRelations = ['categoria', 'creador', 'fotos', 'ubicacion', 'ubicacion.ciudad', 'creador.creador','inscripciones'] as const;
+  private readonly commonRelations = ['categoria', 'creador', 'fotos', 'ubicacion', 'ubicacion.ciudad', 'creador.creador', 'inscripciones'] as const;
   constructor(
     @InjectRepository(Voluntariado) private readonly voluntariadoRepo: Repository<Voluntariado>,
     @InjectRepository(Categoria) private readonly categoriaRepo: Repository<Categoria>,
@@ -88,12 +88,23 @@ export class VoluntariadoService {
   }
 
   async findAllByCreator(idUsuario: number) {
-    return this.voluntariadoRepo.find({
+    const voluntariados = await this.voluntariadoRepo.find({
       where: { creador: { id_usuario: idUsuario } },
       relations: this.commonRelations as any,
       order: { id_voluntariado: 'DESC' },
     });
+
+    // Clasificar por estado
+    const agrupados = {
+      pendientes: voluntariados.filter(v => v.estado === 'pendiente'),
+      en_proceso: voluntariados.filter(v => v.estado === 'en_proceso'),
+      terminados: voluntariados.filter(v => v.estado === 'terminado'),
+      cancelados: voluntariados.filter(v => v.estado === 'cancelado'),
+    };
+
+    return agrupados;
   }
+
 
   async findOne(id: number, user: Usuario) {
     const voluntariado = await this.findVoluntariadoById(id);
@@ -199,13 +210,18 @@ export class VoluntariadoService {
   async remove(id: number, user: Usuario) {
     const voluntariado = await this.findVoluntariadoById(id);
 
-    if (user.rol === RolUsuario.CREADOR && voluntariado.creador.id_usuario !== user.id_usuario) throw new ForbiddenException('No tiene permiso para eliminar este voluntariado.');
+    if (user.rol === RolUsuario.CREADOR && voluntariado.creador.id_usuario !== user.id_usuario) {
+      throw new ForbiddenException('No tiene permiso para cancelar este voluntariado.');
+    }
 
-    await this.fotosVoluntariadoService.deleteFotosCloudinary(voluntariado.fotos);
-    await this.voluntariadoRepo.remove(voluntariado);
+    // Soft delete: solo cambiar el estado
+    voluntariado.estado = EstadoVoluntariado.CANCELADO;
+    await this.voluntariadoRepo.save(voluntariado);
 
-    return { message: 'Voluntariado "${voluntariado.titulo}" eliminado.' };
+    // No borrar fotos de Cloudinary
+    return { message: `Voluntariado "${voluntariado.titulo}" cancelado correctamente.` };
   }
+
 
   // ====================== HELPERS ======================
   private async executeTransaction<T>(operation: (qr: any) => Promise<T>): Promise<T> {

@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import "./PasswordRecoveryPage.css";
 import ImgHandsBackground from "../../assets/photos/fondo.jpg";
 import { useNavigate } from "react-router-dom";
-import WrongAlert from "../../components/alerts/WrongAlert";
-import SuccessAlert from "../../components/alerts/SuccessAlert";
+import { WrongAlert } from "../../utils/ToastAlerts";
+import { SuccessAlert } from "../../utils/ToastAlerts";
 import { requestPasswordRecovery } from "../../services/auth/authPasswordRecoveryService";
 import VoluntariadoLogo from "../../assets/photos/logo.png";
 

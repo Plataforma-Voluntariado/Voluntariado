@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./RegisterFormCreator.css";
-import WrongAlert from "../alerts/WrongAlert.jsx";
-import SuccessAlert from "../alerts/SuccessAlert.jsx";
+import { WrongAlert } from "../../utils/ToastAlerts.js";
+import { SuccessAlert } from "../../utils/ToastAlerts.js";
 import { register } from "../../services/auth/AuthService.jsx";
 import { useNavigate } from "react-router";
 import { GetDepartments, GetCities } from "../../services/auth/LocationService.jsx";
