@@ -19,8 +19,8 @@ function VolunteeringMapModal({ volunteering, onClose }) {
     });
   };
 
-  const participantPercentage = (volunteering.maxParticipantes) ? 
-    Math.round((volunteering.participantes?.length || 0) / volunteering.maxParticipantes * 100) : 0;
+
+  const participantPercentage = (volunteering.maxParticipantes) ? Math.round((volunteering.participantesAceptados || 0) / volunteering.maxParticipantes * 100) : 0;
 
   return (
     <div className="volunteering-map-modal-overlay" onClick={onClose}>
@@ -91,7 +91,7 @@ function VolunteeringMapModal({ volunteering, onClose }) {
             <div className="volunteering-map-modal-participants-header">
               <span className="volunteering-map-modal-participants-label">Participantes</span>
               <span className="volunteering-map-modal-participants-count">
-                {volunteering.participantes?.length || 0} / {volunteering.maxParticipantes}
+                {volunteering.participantesAceptados} / {volunteering.maxParticipantes}
               </span>
             </div>
             <div className="volunteering-map-modal-progress-bar">

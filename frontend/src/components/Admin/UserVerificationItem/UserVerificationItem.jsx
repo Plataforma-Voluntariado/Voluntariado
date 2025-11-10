@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./UserVerificationItem.css";
 import ConfirmAlert from "../../alerts/ConfirmAlert";
-import SuccessAlert from "../../alerts/SuccessAlert";
-import WrongAlert from "../../alerts/WrongAlert";
+import { SuccessAlert } from "../../../utils/ToastAlerts";
+import { WrongAlert } from "../../../utils/ToastAlerts";
 import TextAreaAlert from "../../alerts/TextAreaAlert";
 import { AcceptUserFile, RejectUserFile } from "../../../services/auth/UserManagementService";
 

@@ -63,3 +63,27 @@ export const getVoluntariadoById = async (id) => {
     throw new Error(handleError(error, "Error al obtener voluntariado"));
   }
 };
+
+// obtener mis voluntariados
+export const getEventsByCreatorId = async () => {
+  try {
+    const { data } = await api.get("/voluntariados/owns");
+    return data;
+  } catch (error) {
+    throw new Error(handleError(error, "Error al obtener los voluntariados del creador"));
+  }
+};
+
+
+// Cancelar voluntariado (soft delete)
+export const cancelarVoluntariado = async (id) => {
+  try {
+    const { data } = await api.delete(`/voluntariados/${id}`);
+    return data; 
+  } catch (error) {
+    if (error.response?.status === 403) {
+      throw new Error("No tienes permisos para cancelar este voluntariado.");
+    }
+    throw new Error(handleError(error, "Error al cancelar voluntariado"));
+  }
+};

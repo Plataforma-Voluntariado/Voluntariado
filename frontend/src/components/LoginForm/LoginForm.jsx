@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import VoluntariadoLogo from "../../assets/photos/logo.png";
-import WrongAlert from "../../components/alerts/WrongAlert";
-import RedirectAlert from "../alerts/RedirectAlert";
+import { WrongAlert } from "../../utils/ToastAlerts";
 import { login } from "../../services/auth/AuthService";
 import "./LoginForm.css";
+import { SuccessAlert } from "../../utils/ToastAlerts";
 
 function LoginForm() {
   const navigate = useNavigate();
@@ -22,11 +22,11 @@ function LoginForm() {
       const response = await login(correo, contrasena);
 
       if (response?.status === 200) {
-        await RedirectAlert({
+        await SuccessAlert({
           title: "¡Inicio de sesión exitoso!",
           message: "Serás redirigido al inicio.",
           timer: 1500,
-          position: "top-end",
+          position: "top-right",
         });
         navigate("/home");
       } else {

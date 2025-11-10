@@ -2,10 +2,10 @@ import React from "react";
 import "./ProfileLogout.css";
 import { TbLogout2 } from "react-icons/tb";
 import { logout } from "../../../services/auth/AuthService";
-import WrongAlert from "../../alerts/WrongAlert";
-import RedirectAlert from "../../alerts/RedirectAlert";
+import { WrongAlert } from "../../../utils/ToastAlerts";
 import ConfirmAlert from "../../alerts/ConfirmAlert";
 import { useNavigate } from "react-router-dom";
+import { SuccessAlert } from "../../../utils/ToastAlerts";
 
 function ProfileLogout() {
   const navigate = useNavigate();
@@ -24,13 +24,11 @@ function ProfileLogout() {
     try {
       const success = await logout();
 
-      await RedirectAlert({
+      await SuccessAlert({
         title: success ? "Has cerrado sesión" : "Error al cerrar sesión",
         message: success
           ? "Esperamos que vuelvas pronto"
           : "No se pudo finalizar tu sesión correctamente",
-        position: "top-end",
-        timer: 1500,
       });
 
       navigate("/");

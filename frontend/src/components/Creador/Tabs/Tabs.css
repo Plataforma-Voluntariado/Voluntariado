@@ -1,0 +1,117 @@
+.creator-events-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  /* un poco más compacto */
+  justify-content: center;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+
+.creator-tab-btn {
+  flex: 1 1 22%;
+  min-width: 100px;
+  max-width: 220px;
+  padding: 10px 12px;
+  border: 2px solid #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+  font-weight: 500;
+  font-size: 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+  white-space: nowrap;
+}
+
+.creator-tab-btn:hover {
+  color: #475569;
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.creator-tab-btn.active {
+  color: #3b82f6;
+  border-color: #3b82f6;
+  background: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 3px 12px rgba(59, 130, 246, 0.15);
+  transform: translateY(-1px);
+}
+
+.creator-tab-btn.alert::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 5px;
+  height: 5px;
+  background-color: #3b82f6;
+  border-radius: 50%;
+  animation: pulse-dot 1.5s infinite;
+}
+
+@keyframes pulse-dot {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0.8);
+    opacity: 0.6;
+  }
+}
+
+
+
+
+/* Efecto al hacer click */
+.creator-tab-btn:active {
+  transform: scale(0.97);
+}
+
+/* Responsive progresivo */
+@media (max-width: 1024px) {
+  .creator-tab-btn {
+    flex: 1 1 28%;
+    /* 3 por fila aprox */
+    font-size: 13px;
+    padding: 9px 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .creator-tab-btn {
+    flex: 1 1 45%;
+    /* 2 por fila */
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .creator-tab-btn {
+    flex: 1 1 48%;
+    /* 2 por fila, tamaño mínimo */
+    font-size: 11px;
+    padding: 6px 8px;
+  }
+}
+
+/* Foco para accesibilidad */
+.creator-tab-btn:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
