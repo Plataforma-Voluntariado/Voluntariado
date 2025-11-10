@@ -2,7 +2,7 @@ import { MigrationInterface, QueryRunner } from "typeorm";
 import * as fs from "fs";
 import * as path from "path";
 
-export class SeedDepartamentoCiudad1760391810393 implements MigrationInterface {
+export class SeedDepartamentoCiudad1700391810393 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     
     const existing: any = await queryRunner.query(
