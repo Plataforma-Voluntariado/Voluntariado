@@ -11,9 +11,9 @@ const token = process.env.REACT_APP_MAPBOX_TOKEN;
 
 const VolunteeringMap = ({ volunteerings, mapApiRef }) => {
   const [viewState, setViewState] = useState({
-    longitude: -76.648213,
-    latitude: 1.1465863,
-    zoom: 14,
+    longitude: -76.6465421,
+    latitude: 1.1491254,
+    zoom: 17,
   });
   const [hovered, setHovered] = useState(null);
   const [selected, setSelected] = useState(null);
