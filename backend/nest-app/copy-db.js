@@ -1,6 +1,5 @@
-// copy-db.js
-import fs from "fs";
-import path from "path";
+const fs = require("fs");
+const path = require("path");
 
 const src = path.join("src", "database", "colombia");
 const dest = path.join("dist", "database", "colombia");

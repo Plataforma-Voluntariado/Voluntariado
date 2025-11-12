@@ -41,7 +41,16 @@ export const GetVolunteerings = async (filters = {}) => {
   }
 };
 
-// Compatibilidad con llamadas previas que usaban GetAllVolunteerings
 export const GetAllVolunteerings = async () => {
   return await GetVolunteerings();
 };
+
+export const InscribeIntoVolunteering = async (id_voluntariado) =>{
+  try{
+    const response = await api.post("/inscripciones/"+id_voluntariado);
+    console.log(response)
+    return response.data;
+  }catch(error){
+    return error;
+  }
+}

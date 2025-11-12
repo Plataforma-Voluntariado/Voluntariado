@@ -153,6 +153,12 @@
   box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
 }
 
+.volunteering-map-modal-status.status-available {
+  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.35);
+}
+
 .volunteering-map-modal-body {
   padding: 2rem;
   display: flex;

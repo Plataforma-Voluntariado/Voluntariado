@@ -125,6 +125,12 @@
   box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 }
 
+.volunteering-card-status-available {
+  background: linear-gradient(135deg, var(--color-primary, #007aff) 0%, #0051d5 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
 .volunteering-card-description {
   font-size: 0.95rem;
   color: #525252;
@@ -460,6 +466,9 @@
   }
 
   .volunteering-card-location-btn {
+    width: 100%;
+  }
+  .volunteering-card-inscribe-btn {
     width: 100%;
   }
 }
