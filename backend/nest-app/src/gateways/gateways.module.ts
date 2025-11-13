@@ -1,9 +1,9 @@
 import { Module, Global } from '@nestjs/common';
-import { BaseGateway } from './base.gateway';
+import { InscripcionGateway } from '../inscripcion/inscripcion.gateway';
 
-@Global() 
+@Global()
 @Module({
-  providers: [],
-  exports: [],
+  providers: [InscripcionGateway],
+  exports: [InscripcionGateway],
 })
 export class GatewaysModule {}

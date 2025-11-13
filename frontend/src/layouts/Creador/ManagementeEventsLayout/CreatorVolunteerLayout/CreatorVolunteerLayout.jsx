@@ -1,9 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import VolunteerCard from "../../../../components/Creador/VolunteerCard/VolunteerCard";
 import "./CreatorVolunteerLayout.css";
 
-function CreatorVolunteerLayout({ voluntariados, loading, tipo, onCancelarGlobal }) {
+function CreatorVolunteerLayout({
+  voluntariados,
+  loading,
+  tipo,
+  onCancelarGlobal,
+  pendingAsistenciaIds = [],
+}) {
   const [voluntariadosState, setVoluntariadosState] = useState([]);
+
+  const pendingAsistenciaSet = useMemo(
+    () => new Set(pendingAsistenciaIds),
+    [pendingAsistenciaIds]
+  );
 
   // Cada vez que cambien las props, actualizamos el estado
   useEffect(() => {
@@ -50,6 +61,9 @@ function CreatorVolunteerLayout({ voluntariados, loading, tipo, onCancelarGlobal
           key={v.id_voluntariado}
           voluntariado={v}
           onCancelar={handleCancelar}
+          highlightAsistencia={
+            tipo === "terminados" && pendingAsistenciaSet.has(v.id_voluntariado)
+          }
         />
       ))}
     </div>

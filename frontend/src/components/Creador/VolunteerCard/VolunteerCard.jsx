@@ -2,11 +2,11 @@
 import { useNavigate } from "react-router-dom";
 import { FaClock, FaUsers, FaMapMarkerAlt, FaCalendarAlt, FaTimesCircle, } from "react-icons/fa";
 import { cancelarVoluntariado } from "../../../services/voluntariado/voluntariadoService";
-import ConfirmAlert from "../../../components/alerts/ConfirmAlert"
-import { SuccessAlert , WrongAlert } from "../../../utils/ToastAlerts";
+import ConfirmAlert from "../../../components/alerts/ConfirmAlert";
+import { SuccessAlert, WrongAlert } from "../../../utils/ToastAlerts";
 import "./VolunteerCard.css";
 
-const VolunteerCard = ({ voluntariado, onCancelar }) => {
+const VolunteerCard = ({ voluntariado, onCancelar, highlightAsistencia = false }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -34,9 +34,16 @@ const VolunteerCard = ({ voluntariado, onCancelar }) => {
       WrongAlert({message:error.message})
     }
   };
+  const cardClassName = [
+    "volunteer-card-horizontal",
+    highlightAsistencia ? "highlight-asistencia" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <div
-      className="volunteer-card-horizontal"
+      className={cardClassName}
       onClick={handleClick}
       style={{ cursor: "pointer", position: "relative" }}
     >
@@ -55,6 +62,11 @@ const VolunteerCard = ({ voluntariado, onCancelar }) => {
 
       <div className="volunteer-card-horizontal-info">
         <h3 className="volunteer-card-title">{voluntariado.titulo}</h3>
+        {highlightAsistencia && (
+          <span className="volunteer-card-alert-badge">
+            Pendiente por marcar asistencia
+          </span>
+        )}
         <p className="volunteer-card-description">
           {voluntariado.descripcion.length > 150
             ? voluntariado.descripcion.slice(0, 150) + "..."

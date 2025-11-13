@@ -23,6 +23,8 @@ import { Toaster } from "react-hot-toast";
 import CreatorRoute from "./routes/CreatorRoute";
 import CreatorInscripcionPage from "./pages/ManagementEventosPage/CreatorInscripcionPage/CreatorInscripcionPage"
 import CreatorVolunteerPage from "./pages/ManagementEventosPage/CreatorVolunteerPage/CreatorVolunteerPage";
+import VolunteerRoute from "./routes/VolunteerRoute";
+import VolunteerInscripcionPage from "./pages/ManagementIncripcionPage/VolunteerInscripcionPage/VolunteerInscripcionPage";
 
 
 
@@ -81,13 +83,26 @@ root.render(
       <Route
         element={
           <AuthProvider>
-            <CreatorRoute/>
+            <CreatorRoute />
           </AuthProvider>
         }
       >
         <Route element={<NavbarLayout />}>
-          <Route path="/manage-events"element={<CreatorVolunteerPage/>}/>
-          <Route path="/manage-events/:eventId" element={<CreatorInscripcionPage/>} />
+          <Route path="/manage-events" element={<CreatorVolunteerPage />} />
+          <Route path="/manage-events/:eventId" element={<CreatorInscripcionPage />} />
+        </Route>
+      </Route>
+
+      {/* Ruras de Voluntarios */}
+      <Route
+        element={
+          <AuthProvider>
+            <VolunteerRoute/>
+          </AuthProvider>
+        }
+      >
+        <Route element={<NavbarLayout />}>
+          <Route path="/manage-inscripciones" element={<VolunteerInscripcionPage/>} />
         </Route>
       </Route>
 

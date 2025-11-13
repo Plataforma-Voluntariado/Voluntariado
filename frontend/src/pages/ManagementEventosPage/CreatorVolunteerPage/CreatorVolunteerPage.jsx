@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import "./CreatorVolunteerPage.css";
 import { useAuth } from "../../../context/AuthContext";
 import CreatorVolunteerLayout from "../../../layouts/Creador/ManagementeEventsLayout/CreatorVolunteerLayout/CreatorVolunteerLayout";
@@ -17,9 +17,8 @@ function CreatorVolunteerPage() {
   const [activeTab, setActiveTab] = useState("pendientes");
   const [voluntariados, setVoluntariados] = useState({});
   const [loading, setLoading] = useState(true);
-  const [tabAlert, setTabAlert] = useState(null);
-
-  // 🔹 Obtener los voluntariados del creador
+  const [tabAlerts, setTabAlerts] = useState([]);
+  
   useEffect(() => {
     const fetchVoluntariados = async () => {
       try {
@@ -35,13 +34,30 @@ function CreatorVolunteerPage() {
     fetchVoluntariados();
   }, [user]);
 
+  const terminadosList = useMemo(
+    () => voluntariados?.terminados || [],
+    [voluntariados]
+  );
+
+  const pendingAsistenciaIds = useMemo(() => {
+    return terminadosList
+      .filter((vol) =>
+        vol?.inscripciones?.some((ins) => {
+          const estado = ins?.estado_inscripcion?.toUpperCase();
+          return estado === "TERMINADA" && ins?.asistencia === null;
+        })
+      )
+      .map((vol) => vol.id_voluntariado);
+  }, [terminadosList]);
+
+  const hasPendingAsistencia = pendingAsistenciaIds.length > 0;
+
   useEffect(() => {
-    if (voluntariados.en_proceso?.length > 0) {
-      setTabAlert("en_proceso");
-    } else {
-      setTabAlert(null);
-    }
-  }, [voluntariados]);
+    const alerts = [];
+    if (voluntariados.en_proceso?.length > 0) alerts.push("en_proceso");
+    if (hasPendingAsistencia) alerts.push("terminados");
+    setTabAlerts(alerts);
+  }, [voluntariados, hasPendingAsistencia]);
 
   const handleCancelarVoluntariado = (idVoluntariadoCancelado) => {
     setVoluntariados((prev) => {
@@ -74,7 +90,7 @@ function CreatorVolunteerPage() {
         tabs={tabsConfig}
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        tabAlert={tabAlert}
+        tabAlerts={tabAlerts}
       />
 
       <CreatorVolunteerLayout
@@ -83,6 +99,7 @@ function CreatorVolunteerPage() {
         loading={loading}
         tipo={activeTab}
         onCancelarGlobal={handleCancelarVoluntariado}
+        pendingAsistenciaIds={pendingAsistenciaIds}
       />
     </section>
   );

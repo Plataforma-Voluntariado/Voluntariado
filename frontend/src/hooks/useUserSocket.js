@@ -32,7 +32,6 @@ export const useUserSocket = (userId, onUserUpdate) => {
       console.error('💥 Error de conexión:', error);
     });
 
-    // 🧹 Cleanup al desmontar o al cambiar userId
     return () => {
       console.log('🧹 Cerrando conexión WebSocket...');
       socket.disconnect();

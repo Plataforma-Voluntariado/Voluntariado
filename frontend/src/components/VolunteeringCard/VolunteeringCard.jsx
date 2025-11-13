@@ -1,32 +1,57 @@
-// ...existing code...
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import "./VolunteeringCard.css";
 import ConfirmAlert from "../alerts/ConfirmAlert";
 import { InscribeIntoVolunteering } from "../../services/volunteering/VolunteeringService";
 import Swal from "sweetalert2";
 import { SuccessAlert, WrongAlert } from "../../utils/ToastAlerts";
+import { useAuth } from "../../context/AuthContext";
 
 function VolunteeringCard({ volunteering, onFocusMap }) {
-  const {
-    titulo,
-    descripcion,
-    fechaHoraInicio,
-    horas,
-    maxParticipantes,
-    estado,
-    creador,
-    categoria,
-    fotos = [],
-    ubicacion,
-    inscripciones,
-    participantesAceptados,
-  } = volunteering;
-
+  const { titulo, descripcion, fechaHoraInicio, horas, maxParticipantes, estado, creador, categoria, fotos = [], ubicacion, inscripciones, participantesAceptados, } = volunteering;
   const [inscribing, setInscribing] = useState(false);
+  const [localInscribed, setLocalInscribed] = useState(false);
   const nombreEntidad = creador?.creador?.nombre_entidad;
+  const { user } = useAuth();
+  const isLogged = !!user;
+
+  const { myInscripcion, isInscrito, isRechazado, isCreatorOwner } = useMemo(() => {
+    const result = {
+      myInscripcion: null,
+      isInscrito: false,
+      isRechazado: false,
+      isCreatorOwner: false,
+    };
+
+    if (!isLogged) return result;
+
+    const userId = Number(user.userId);
+
+    result.isCreatorOwner = user.rol === "CREADOR" && Number(creador?.id_usuario) === userId;
+
+    if (!Array.isArray(inscripciones)) return result;
+    const sorted = [...inscripciones].sort((a, b) => {
+      const idA = Number(a?.id_inscripcion ?? a?.id ?? 0);
+      const idB = Number(b?.id_inscripcion ?? b?.id ?? 0);
+      return idB - idA;
+    });
+    const ins = sorted.find((i) => {
+      const voluntarioId = Number(i?.voluntario?.id_usuario || i?.usuario?.id_usuario || i?.id_usuario || i?.voluntario || i?.usuario);
+      return !Number.isNaN(voluntarioId) && voluntarioId === userId;
+    }) || null;
+
+    if (!ins) return result;
+
+    result.myInscripcion = ins;
+    const status = (ins?.estado_inscripcion || "").toString().toLowerCase();
+    result.isInscrito = status && !["cancelada", "rechazada"].includes(status);
+    result.isRechazado = status === "rechazada";
+
+    return result;
+  }, [inscripciones, user, creador]);
 
   const handleInscribe = async () => {
     if (!volunteering?.id_voluntariado || inscribing) return;
+    if (isInscrito || isCreatorOwner) return;
     const confirmed = await ConfirmAlert({
       title: "Inscribirte",
       message: "¿Deseas inscribirte a este voluntariado?",
@@ -43,6 +68,7 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
           message: resp.response.data.message,
         });
       }
+      setLocalInscribed(true);
       return await SuccessAlert({
         title: "¡Inscripción exitosa!",
         message: "Esperarás ser aceptado pronto.",
@@ -99,16 +125,10 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
       : text;
   };
 
-  const photoUrl =
-    fotos && fotos.length > 0 ? fotos[0].url : "/volunteering.jpg";
-
-  const inscritos = inscripciones?.length || 0;
+  const photoUrl = fotos && fotos.length > 0 ? fotos[0].url : "/volunteering.jpg";
+  const inscritos = inscripciones?.filter((i) => i.estado_inscripcion?.toLowerCase() === "pendiente").length || 0;
   const aceptados = participantesAceptados || 0;
-  const ocupacionPorcentaje = maxParticipantes
-    ? Math.round((aceptados / maxParticipantes) * 100)
-    : 0;
-
-  // Carousel logic
+  const ocupacionPorcentaje = maxParticipantes ? Math.round((aceptados / maxParticipantes) * 100) : 0;
   const [index, setIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const autoplayRef = useRef(null);
@@ -211,8 +231,8 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
             {estado?.toLowerCase() === "pendiente"
               ? "DISPONIBLE"
               : estado
-              ? estado.charAt(0).toUpperCase() + estado.slice(1).toLowerCase()
-              : ""}
+                ? estado.charAt(0).toUpperCase() + estado.slice(1).toLowerCase()
+                : ""}
           </span>
         </div>
 
@@ -313,13 +333,23 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
         </div>
 
         <div className="volunteering-card-footer">
-          <button
-            className="volunteering-card-inscribe-btn"
-            onClick={handleInscribe}
-            disabled={inscribing}
-          >
-            {inscribing ? "Inscribiendo..." : "Inscríbete ahora"}
-          </button>
+          {!isCreatorOwner && (
+            <button
+              className={`volunteering-card-inscribe-btn ${isInscrito ? "inscribed" : isRechazado ? "rejected" : ""
+                }`}
+              onClick={handleInscribe}
+              disabled={inscribing || isInscrito || isRechazado}
+            >
+              {inscribing
+                ? "Inscribiendo..."
+                : isInscrito
+                  ? "Inscrito"
+                  : isRechazado
+                    ? "Inscripción Rechazada"
+                    : "Inscribirse"}
+            </button>
+          )}
+
           <button
             className="volunteering-card-location-btn"
             onClick={() => onFocusMap?.()}

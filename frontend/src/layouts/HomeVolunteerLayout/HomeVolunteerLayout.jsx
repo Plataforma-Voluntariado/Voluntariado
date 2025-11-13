@@ -13,7 +13,6 @@ function HomeVolunteerLayout() {
     setFilters(newFilters || {});
   };
 
-  // Memo para evitar cambiar la referencia y provocar refetch en el hijo
   const handleVolunteeringsChange = useCallback((list) => {
     setVolunteeringsForMap(Array.isArray(list) ? list : []);
   }, []);

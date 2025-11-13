@@ -13,7 +13,6 @@ function SidebarNotificationWrapper() {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Verificar si el click fue fuera del botón Y fuera del modal
       const isClickInsideButton = buttonRef.current && buttonRef.current.contains(event.target);
       const isClickInsideModal = modalRef.current && modalRef.current.contains(event.target);
       

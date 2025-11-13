@@ -7,6 +7,7 @@ export enum EstadoInscripcion {
     ACEPTADA = 'ACEPTADA',
     RECHAZADA = 'RECHAZADA',
     CANCELADA = 'CANCELADA',
+    TERMINADA = 'TERMINADA',
 }
 
 @Entity('inscripcion')

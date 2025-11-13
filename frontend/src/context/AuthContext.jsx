@@ -3,7 +3,9 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { getUserData } from "../services/auth/AuthService";
 import { useUserSocket } from "../hooks/useUserSocket";
 import { useNotificacionesSocket } from "../hooks/useNotificacionesSocket";
+import useInscripcionSocket from "../hooks/useInscripcionSocket";
 import { GetNotifications } from "../services/notificaciones/notificacionesService";
+import { SuccessAlert } from "../utils/ToastAlerts";
 
 const AuthContext = createContext(null);
 
@@ -13,25 +15,41 @@ export const useAuth = () => {
   return context;
 };
 
-// Hook personalizado para manejar sockets de usuario y notificaciones
-const useAuthSockets = (userId,handleUserUpdate,handleNotifications,handleNotificationVista,handleNotificationEliminada) => {
+const useAuthSockets = (userId,handleUserUpdate,handleNotifications,handleNotificationVista,handleNotificationEliminada,setNotifications) => {
   useUserSocket(userId, handleUserUpdate);
 
   const memoizedEventHandler = useCallback(
     (event) => {
       if (!event) return;
-      switch (event.tipo) {
-        case "VISTA":
-          handleNotificationVista(event.id_notificacion);
-          break;
-        case "ELIMINADA":
-          handleNotificationEliminada(event.id_notificacion);
-          break;
-        default:
-          handleNotifications();
+      if (event.tipo === "VISTA") {
+        handleNotificationVista(event.id_notificacion);
+        return;
       }
+      if (event.tipo === "ELIMINADA") {
+        handleNotificationEliminada(event.id_notificacion);
+        return;
+      }
+
+      if (event && (event.titulo || event.id_notificacion)) {
+        try {
+          const title = event.titulo || "Nueva notificación";
+          const message = event.mensaje || "";
+          SuccessAlert({ title, message, timer: 2500 });
+        } catch (e) {
+          console.error('Error mostrando SuccessAlert para notificación entrante', e);
+        }
+        setNotifications((prev) => ({
+          vistas: prev.vistas,
+          noVistas: [event, ...(prev.noVistas || [])],
+        }));
+
+        handleNotifications();
+        return;
+      }
+
+      handleNotifications();
     },
-    [handleNotificationVista, handleNotificationEliminada, handleNotifications]
+    [handleNotificationVista, handleNotificationEliminada, handleNotifications, setNotifications]
   );
 
   useNotificacionesSocket(userId, memoizedEventHandler);
@@ -41,11 +59,8 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState({ vistas: [], noVistas: [] });
-
-  // Contador de no vistas siempre derivado del estado
   const unreadCount = notifications.noVistas.length;
 
-  // Actualiza datos del usuario desde socket
   const handleUserUpdate = useCallback((userData) => {
     setUser((prev) => {
       if (!prev) return prev;
@@ -86,7 +101,6 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // Marcar notificación como vista en estado local
   const handleNotificationVista = useCallback((id_notificacion) => {
     setNotifications((prev) => {
       const noti = prev.noVistas.find((n) => n.id_notificacion === id_notificacion);
@@ -98,7 +112,6 @@ export const AuthProvider = ({ children }) => {
     });
   }, []);
 
-  // Eliminar notificación (vistas o no vistas)
   const handleNotificationEliminada = useCallback((id_notificacion) => {
     setNotifications((prev) => ({
       vistas: prev.vistas.filter((n) => n.id_notificacion !== id_notificacion),
@@ -106,18 +119,17 @@ export const AuthProvider = ({ children }) => {
     }));
   }, []);
 
-  // Inicializa sockets
-  useAuthSockets(user?.userId, handleUserUpdate, fetchNotifications, handleNotificationVista, handleNotificationEliminada);
+  useAuthSockets(user?.userId, handleUserUpdate, fetchNotifications, handleNotificationVista, handleNotificationEliminada, setNotifications);
+  useInscripcionSocket(!!user);
 
-  // Cargar usuario y notificaciones al iniciar
   useEffect(() => {
-    let isMounted = true; // Flag para evitar actualizaciones de estado en componentes desmontados
+    let isMounted = true; 
     
     const fetchUserProfile = async () => {
       try {
         const profile = await getUserData();
         
-        if (!isMounted) return; // No actualizar si el componente se desmontó
+        if (!isMounted) return; 
         
         if (!profile) {
           setUser(null);
@@ -144,12 +156,10 @@ export const AuthProvider = ({ children }) => {
               : null,
         });
 
-        // Solo cargar notificaciones si el usuario existe
         try {
           await fetchNotifications();
         } catch (notifError) {
           console.error("Error loading notifications:", notifError);
-          // No bloquear el login por errores de notificaciones
         }
         
       } catch (err) {
@@ -167,9 +177,9 @@ export const AuthProvider = ({ children }) => {
     fetchUserProfile();
     
     return () => {
-      isMounted = false; // Cleanup
+      isMounted = false;
     };
-  }, [fetchNotifications]); // Sin dependencias para ejecutar solo una vez
+  }, [fetchNotifications]); 
 
   return (
     <AuthContext.Provider

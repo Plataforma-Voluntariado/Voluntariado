@@ -81,7 +81,6 @@ export class NotificacionesService {
         notificacion.estado = EstadoNotificacion.ELIMINADO;
         const guardada = await this.notificacionRepo.save(notificacion);
 
-        // Emitir un evento para que el front la elimine en caliente
         this.notificacionesGateway.notificacionEliminada([usuarioId], notificacionId);
 
         return guardada;

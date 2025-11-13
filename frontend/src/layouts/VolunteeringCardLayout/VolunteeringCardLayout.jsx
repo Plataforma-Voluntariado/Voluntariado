@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import "./VolunteeringCardLayout.css";
 import { GetVolunteerings } from "../../services/volunteering/VolunteeringService";
 import VolunteeringCard from "../../components/VolunteeringCard/VolunteeringCard";
@@ -14,35 +14,43 @@ export default function VolunteeringCardLayout({ filters = {}, mapApiRef = null,
     onChangeRef.current = onVolunteeringsChange;
   }, [onVolunteeringsChange]);
 
+  const fetchVolunteerings = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await GetVolunteerings(filters);
+      const list = Array.isArray(data) ? data : [];
+      setVolunteerings(list);
+      setPage(1);
+      onChangeRef.current?.(list);
+    } catch (e) {
+      console.error("Error cargando voluntariados", e);
+      setVolunteerings([]);
+      setPage(1);
+      onChangeRef.current?.([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [filters]);
+
   useEffect(() => {
     let cancelled = false;
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const data = await GetVolunteerings(filters);
-        const list = Array.isArray(data) ? data : [];
-        if (!cancelled) {
-          setVolunteerings(list);
-          setPage(1);
-          onChangeRef.current?.(list);
-        }
-      } catch (e) {
-        if (!cancelled) {
-          console.error("Error cargando voluntariados", e);
-          setVolunteerings([]);
-          setPage(1);
-          onChangeRef.current?.([]);
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
+    const load = async () => {
+      if (cancelled) return;
+      await fetchVolunteerings();
     };
-
-    fetchData();
+    load();
     return () => {
       cancelled = true;
     };
-  }, [filters]);
+  }, [fetchVolunteerings]);
+
+  useEffect(() => {
+    const handler = () => {
+      fetchVolunteerings();
+    };
+    window.addEventListener("inscripcion.changed", handler);
+    return () => window.removeEventListener("inscripcion.changed", handler);
+  }, [fetchVolunteerings]);
 
   const totalItems = volunteerings.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
@@ -62,7 +70,9 @@ export default function VolunteeringCardLayout({ filters = {}, mapApiRef = null,
   return (
     <section className="volunteering-card-layout">
       {loading && <p className="volunteering-card-layout-loading">Cargando...</p>}
-      {!loading && currentSlice.length === 0 && <p className="volunteering-card-layout-empty">No se encontraron eventos.</p>}
+      {!loading && currentSlice.length === 0 && (
+        <p className="volunteering-card-layout-empty">No se encontraron eventos.</p>
+      )}
       {!loading &&
         currentSlice.map((v) => (
           <VolunteeringCard
@@ -74,9 +84,9 @@ export default function VolunteeringCardLayout({ filters = {}, mapApiRef = null,
 
       {totalPages > 1 && (
         <nav className="volunteering-card-layout-pagination" aria-label="Paginación de voluntariados">
-          <button 
-            className="volunteering-card-layout-pagination-btn volunteering-card-layout-pagination-prev" 
-            onClick={() => goTo(page - 1)} 
+          <button
+            className="volunteering-card-layout-pagination-btn volunteering-card-layout-pagination-prev"
+            onClick={() => goTo(page - 1)}
             disabled={page <= 1}
             aria-label="Página anterior"
           >
@@ -91,7 +101,9 @@ export default function VolunteeringCardLayout({ filters = {}, mapApiRef = null,
               return (
                 <button
                   key={p}
-                  className={`volunteering-card-layout-pagination-number ${p === page ? "volunteering-card-layout-pagination-number-active" : ""}`}
+                  className={`volunteering-card-layout-pagination-number ${
+                    p === page ? "volunteering-card-layout-pagination-number-active" : ""
+                  }`}
                   onClick={() => goTo(p)}
                   aria-label={`Ir a página ${p}`}
                   aria-current={p === page ? "page" : undefined}
@@ -102,9 +114,9 @@ export default function VolunteeringCardLayout({ filters = {}, mapApiRef = null,
             })}
           </div>
 
-          <button 
-            className="volunteering-card-layout-pagination-btn volunteering-card-layout-pagination-next" 
-            onClick={() => goTo(page + 1)} 
+          <button
+            className="volunteering-card-layout-pagination-btn volunteering-card-layout-pagination-next"
+            onClick={() => goTo(page + 1)}
             disabled={page >= totalPages}
             aria-label="Página siguiente"
           >
