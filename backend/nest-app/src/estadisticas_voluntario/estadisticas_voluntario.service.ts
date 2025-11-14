@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EstadisticasVoluntario } from './entity/estadisticas_voluntario.entity';
@@ -17,9 +17,9 @@ export class EstadisticasVoluntarioService {
 
     @InjectRepository(Inscripcion)
     private readonly inscripcionRepo: Repository<Inscripcion>,
-  ) { }
+  ) {}
 
-
+  // Crear estadísticas si no existen
   async crearEstadisticasSiNoExisten(voluntario_id: number) {
     const voluntario = await this.voluntarioRepo.findOne({
       where: { id_usuario: voluntario_id },
@@ -42,7 +42,7 @@ export class EstadisticasVoluntarioService {
     return this.estadisticasRepo.save(estadisticas);
   }
 
-
+  // Actualizar estadísticas cuando hay asistencia
   async actualizarEstadisticasPorAsistencia(voluntario_id: number, voluntariado_id: number) {
     try {
       const inscripcion = await this.inscripcionRepo.findOne({
@@ -57,36 +57,53 @@ export class EstadisticasVoluntarioService {
         throw new NotFoundException('Inscripción no encontrada.');
       }
 
-      if (inscripcion.asistencia === null) return null;
+      if (inscripcion.asistencia === null) {
+        console.log('Inscripción sin asistencia registrada, no se actualiza.');
+        return null;
+      }
 
+      // Asegurar que existan estadísticas
       const estadisticas = await this.crearEstadisticasSiNoExisten(voluntario_id);
 
+      // Resumen de inscripciones completadas
       const resumen = await this.inscripcionRepo
         .createQueryBuilder('i')
         .leftJoin('i.voluntariado', 'v')
-        .where('i.voluntario_id = :voluntario_id', { voluntario_id }) // <-- corregido
-        .andWhere('i.estado_inscripcion = :estado', { estado: EstadoInscripcion.ACEPTADA })
+        .where('i.voluntario_id = :voluntario_id', { voluntario_id })
+        .andWhere('i.estado_inscripcion = :estado', { estado: EstadoInscripcion.TERMINADA })
         .select('COUNT(i.id_inscripcion)', 'totalInscripciones')
         .addSelect('SUM(CASE WHEN i.asistencia = true THEN 1 ELSE 0 END)', 'totalAsistencias')
         .addSelect('SUM(CASE WHEN i.asistencia = true AND i.calificado = true THEN v.horas ELSE 0 END)', 'horasTrabajadas')
         .addSelect('SUM(CASE WHEN i.asistencia = true AND i.calificado = true THEN 1 ELSE 0 END)', 'participaciones')
         .getRawOne();
 
-      const totalInscripciones = parseInt(resumen.totalInscripciones, 10);
-      const totalAsistencias = parseInt(resumen.totalAsistencias, 10);
+      // Parsear números
+      const totalInscripciones = parseInt(resumen.totalInscripciones, 10) || 0;
+      const totalAsistencias = parseInt(resumen.totalAsistencias, 10) || 0;
       const horasTrabajadas = parseInt(resumen.horasTrabajadas, 10) || 0;
       const participaciones = parseInt(resumen.participaciones, 10) || 0;
 
-      const actualizarHorasYParticipaciones = inscripcion.asistencia === true && inscripcion.calificado;
-      if (actualizarHorasYParticipaciones) {
+      // Debug logs
+      console.log('Resumen estadisticas:', {
+        totalInscripciones,
+        totalAsistencias,
+        horasTrabajadas,
+        participaciones,
+        inscripcionAsistencia: inscripcion.asistencia,
+        inscripcionCalificado: inscripcion.calificado,
+      });
+
+      // Actualizar horas y participaciones solo si asistió y está calificado
+      if (inscripcion.asistencia && inscripcion.calificado) {
         estadisticas.horas_trabajadas = horasTrabajadas;
         estadisticas.participaciones = participaciones;
       }
 
-      if (inscripcion.asistencia === false || actualizarHorasYParticipaciones) {
-        estadisticas.porcentaje_asistencia = totalInscripciones
-          ? Math.round((totalAsistencias / totalInscripciones) * 100)
-          : 0;
+      // Actualizar porcentaje de asistencia
+      if (totalInscripciones > 0) {
+        estadisticas.porcentaje_asistencia = Math.round((totalAsistencias / totalInscripciones) * 100);
+      } else {
+        estadisticas.porcentaje_asistencia = 0;
       }
 
       return await this.estadisticasRepo.save(estadisticas);
@@ -97,7 +114,7 @@ export class EstadisticasVoluntarioService {
     }
   }
 
-
+  // Obtener estadísticas de un voluntario
   async obtenerEstadisticas(voluntario_id: number) {
     const estadisticas = await this.estadisticasRepo.findOne({
       where: { voluntario: { id_usuario: voluntario_id } },

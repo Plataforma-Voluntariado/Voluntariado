@@ -2,7 +2,13 @@
 import InscripcionCard from "../../../../components/Creador/InscripcionCard/InscripcionCard";
 import "./CreatorInscriptionLayout.css";
 
-const CreatorInscriptionLayout = ({ inscripciones, setInscripciones, loading, estadoVoluntariado }) => {
+const CreatorInscriptionLayout = ({
+  inscripciones,
+  setInscripciones,
+  loading,
+  estadoVoluntariado,
+  highlightAsistencia = false,
+}) => {
   if (loading) return <p>Cargando inscripciones...</p>;
 
   if (!inscripciones || inscripciones.length === 0) {
@@ -26,6 +32,7 @@ const CreatorInscriptionLayout = ({ inscripciones, setInscripciones, loading, es
           inscripcion={i}
           setInscripciones={setInscripciones}
           estadoVoluntariado={estadoVoluntariado}
+          highlightAsistencia={highlightAsistencia}
         />
       ))}
     </div>

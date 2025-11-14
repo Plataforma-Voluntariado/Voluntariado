@@ -17,7 +17,7 @@ import { InscripcionService } from 'src/inscripcion/inscripcion.service';
 @Injectable()
 export class VoluntariadoService {
   private readonly logger = new Logger(VoluntariadoService.name);
-  private readonly commonRelations = ['categoria', 'creador', 'fotos', 'ubicacion', 'ubicacion.ciudad', 'creador.creador', 'inscripciones'] as const;
+  private readonly commonRelations = ['categoria', 'creador', 'fotos', 'ubicacion', 'ubicacion.ciudad', 'creador.creador', 'inscripciones','inscripciones.voluntario'] as const;
   constructor(
     @InjectRepository(Voluntariado) private readonly voluntariadoRepo: Repository<Voluntariado>,
     @InjectRepository(Categoria) private readonly categoriaRepo: Repository<Categoria>,
@@ -82,6 +82,7 @@ export class VoluntariadoService {
   // ====================== LIST ======================
   async findAll() {
     return this.voluntariadoRepo.find({
+      where: { estado: EstadoVoluntariado.PENDIENTE},
       relations: this.commonRelations as any,
       order: { id_voluntariado: 'DESC' },
     });
@@ -218,7 +219,9 @@ export class VoluntariadoService {
     voluntariado.estado = EstadoVoluntariado.CANCELADO;
     await this.voluntariadoRepo.save(voluntariado);
 
-    // No borrar fotos de Cloudinary
+    // Cancelar todas las inscripciones asociadas
+    await this.inscripcionService.cancelarTodasPorVoluntariado(voluntariado.id_voluntariado);
+
     return { message: `Voluntariado "${voluntariado.titulo}" cancelado correctamente.` };
   }
 
@@ -273,6 +276,10 @@ export class VoluntariadoService {
 
     if (estado === EstadoVoluntariado.EN_PROCESO) {
       await this.inscripcionService.rechazarPendientesPorVoluntariado(id);
+    }
+
+    if (estado === EstadoVoluntariado.TERMINADO) {
+      await this.inscripcionService.marcarTerminadasPorVoluntariado(id);
     }
 
     return this.voluntariadoRepo.save(voluntariado);

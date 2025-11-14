@@ -17,6 +17,7 @@ import { MailModule } from './mail/mail.module';
 import { VerificacionModule } from './verificacion/verificacion.module';
 import { VerificacionArchivoModule } from './verificacion/verificacion_archivo/verificacion_archivo.module';
 import { GatewaysModule } from './gateways/gateways.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { CategoriaModule } from './categoria/categoria.module';
 import { VoluntariadoModule } from './voluntariado/voluntariado.module';
 import { NotificacionesModule } from './notificaciones/notificaciones.module';
@@ -47,10 +48,10 @@ import { ResenaVoluntariadoModule } from './resena_voluntariado/resena_voluntari
         synchronize: false,
         logging: false,
         migrations: [__dirname + '/database/migrations/*{.ts,.js}'],
-        migrationsRun: false,
-      }),
+        migrationsRun: false }),
       inject: [ConfigService],
     }),
+  EventEmitterModule.forRoot(),
     UsuarioModule,
     CiudadModule,
     DepartamentoModule,

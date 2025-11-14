@@ -11,13 +11,11 @@ function Sidebar({ isOpen, onClose }) {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Manejar navegación y cerrar sidebar
   const handleNavigate = (path) => {
     navigate(path);
     onClose();
   };
 
-  // Manejar tecla Escape para cerrar
   useEffect(() => {
     const handleEscape = (event) => {
       if (event.key === "Escape" && isOpen) {
@@ -44,8 +42,8 @@ function Sidebar({ isOpen, onClose }) {
       case "CREADOR":
         return (
           <>
-            <li 
-              className="sidebar-item" 
+            <li
+              className="sidebar-item"
               onClick={() => handleNavigate("/profile-creator")}
               role="menuitem"
               tabIndex="0"
@@ -53,8 +51,8 @@ function Sidebar({ isOpen, onClose }) {
               <FaUser className="sidebar-icon" />
               <span>PERFIL EMPRESARIAL</span>
             </li>
-            <li 
-              className="sidebar-item" 
+            <li
+              className="sidebar-item"
               onClick={() => handleNavigate("/manage-events")}
               role="menuitem"
               tabIndex="0"
@@ -62,8 +60,8 @@ function Sidebar({ isOpen, onClose }) {
               <FaCog className="sidebar-icon" />
               <span>GESTIONAR EVENTOS</span>
             </li>
-            <li 
-              className="sidebar-item sidebar-create-button" 
+            <li
+              className="sidebar-item sidebar-create-button"
               onClick={() => handleNavigate("/create-event")}
               role="menuitem"
               tabIndex="0"
@@ -75,21 +73,33 @@ function Sidebar({ isOpen, onClose }) {
         );
       case "VOLUNTARIO":
         return (
-          <li 
-            className="sidebar-item" 
-            onClick={() => handleNavigate("/home")}
-            role="menuitem"
-            tabIndex="0"
-          >
-            <FaHome className="sidebar-icon" />
-            <span>INICIO</span>
-          </li>
+          <>
+            <li
+              className="sidebar-item"
+              onClick={() => handleNavigate("/home")}
+              role="menuitem"
+              tabIndex="0"
+            >
+              <FaHome className="sidebar-icon" />
+              <span>INICIO</span>
+            </li>
+            <li
+              className="sidebar-item"
+              onClick={() => handleNavigate("/manage-inscripciones")}
+              role="menuitem"
+              tabIndex="0"
+            >
+              <FaCog className="sidebar-icon" />
+              <span>GESTIONAR INSCRIPCIONES</span>
+            </li>
+
+          </>
         );
       case "ADMIN":
         return (
           <>
-            <li 
-              className="sidebar-item" 
+            <li
+              className="sidebar-item"
               onClick={() => handleNavigate("/user-management/VOLUNTARIO")}
               role="menuitem"
               tabIndex="0"
@@ -97,8 +107,8 @@ function Sidebar({ isOpen, onClose }) {
               <FaUsers className="sidebar-icon" />
               <span>GESTIONAR USUARIOS</span>
             </li>
-            <li 
-              className="sidebar-item" 
+            <li
+              className="sidebar-item"
               onClick={() => handleNavigate("/user-management/CREADOR")}
               role="menuitem"
               tabIndex="0"
@@ -115,14 +125,9 @@ function Sidebar({ isOpen, onClose }) {
 
   return (
     <>
-      {/* Overlay */}
-      <div 
-        className={`sidebar-overlay ${isOpen ? 'sidebar-overlay-open' : ''}`}
-        onClick={onClose}
-      />
-      
-      {/* Sidebar */}
-      <aside 
+      <div className={`sidebar-overlay ${isOpen ? 'sidebar-overlay-open' : ''}`} onClick={onClose} />
+
+      <aside
         className={`sidebar ${isOpen ? 'sidebar-open' : ''}`}
         role="menu"
         aria-hidden={!isOpen}
@@ -130,7 +135,7 @@ function Sidebar({ isOpen, onClose }) {
       >
         <div className="sidebar-header">
           <h3 className="sidebar-title">Menú</h3>
-          <button 
+          <button
             className="sidebar-close-button"
             onClick={onClose}
             aria-label="Cerrar menú"
@@ -138,12 +143,12 @@ function Sidebar({ isOpen, onClose }) {
             <FaTimes />
           </button>
         </div>
-        
+
         <nav className="sidebar-nav">
           <ul className="sidebar-list" role="none">
             {/* Perfil de usuario */}
             {user && (
-              <li 
+              <li
                 className="sidebar-item sidebar-profile"
                 onClick={() => handleNavigate("/profile")}
                 role="menuitem"
@@ -159,10 +164,9 @@ function Sidebar({ isOpen, onClose }) {
                 </span>
               </li>
             )}
-            
+
             {renderRoleSpecificItems()}
-            
-            {/* Notificaciones en el sidebar */}
+
             <li className="sidebar-item sidebar-notifications" role="menuitem" tabIndex="0">
               <SidebarNotificationWrapper />
             </li>

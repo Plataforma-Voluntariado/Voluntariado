@@ -5,7 +5,7 @@
     align-items: center;
     padding: 2rem 2rem 0 2rem;
     box-sizing: border-box;
-    overflow: hidden; 
+    overflow: hidden;
 }
 
 .header-inscripcion-page {
@@ -37,22 +37,23 @@
 }
 
 .back-text {
-  display: inline;
+    display: inline;
 }
 
-@media (max-width: 600px) {
-  .back-text {
-    display: none; /* oculta el texto */
-  }
+@media (max-width: 900px) {
+    .back-text {
+        display: none;
+        /* oculta el texto */
+    }
 
-  .btn-back {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    justify-content: center;
-    font-size: 1.3rem;
-    padding: 0;
-  }
+    .btn-back {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        justify-content: center;
+        font-size: 1.3rem;
+        padding: 0;
+    }
 }
 
 
@@ -68,16 +69,21 @@
     opacity: 0;
     transform: translateY(-5px);
     animation: fadeInDown 0.6s ease forwards;
-    flex-shrink: 1; /* permite que el título se reduzca si hace falta */
-    word-break: break-word; /* evita overflow */
-    overflow-wrap: anywhere; /* fuerza el corte de palabras largas */
+    flex-shrink: 1;
+    /* permite que el título se reduzca si hace falta */
+    word-break: break-word;
+    /* evita overflow */
+    overflow-wrap: anywhere;
+    /* fuerza el corte de palabras largas */
 }
 
 .creator-inscription-page-title::after {
     content: "";
     display: block;
-    width: 25%; /* proporcional al título */
-    max-width: 40px; /* límite máximo */
+    width: 25%;
+    /* proporcional al título */
+    max-width: 40px;
+    /* límite máximo */
     height: 2px;
     background-color: #000;
     margin: 0.3rem auto 0;
@@ -112,5 +118,91 @@
     .creator-inscription-page-title::after {
         width: 25px;
         height: 2px;
+    }
+}
+
+.subtabs-container {
+    width: 100%;
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    padding-bottom: 0.5rem;
+}
+
+.subtabs-desktop {
+    display: block;
+}
+
+.subtabs-mobile {
+    display: none;
+}
+
+@media screen and (max-width: 460px) {
+    .subtabs-desktop {
+        display: none;
+    }
+
+    .subtabs-mobile {
+        display: block;
+        width: 100%;
+        padding: 0 1rem;
+    }
+
+    .subtabs-select {
+        width: 100%;
+        padding: 0.6rem 1rem;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        background: #fff;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #334155;
+        appearance: none;
+        /* igual que Volunteer */
+    }
+
+    .subtabs-select.alert {
+        border-color: #f59e0b;
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.35);
+        animation: selectPulseAmber 1.8s ease-in-out infinite;
+    }
+
+    .subtabs-select.alert-asistencia {
+        border-color: #ef4444;
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.35);
+        animation-name: selectPulseRed;
+    }
+
+}
+
+@keyframes selectPulseAmber {
+    0% {
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.45);
+    }
+
+    60% {
+        box-shadow: 0 0 0 12px rgba(245, 158, 11, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+    }
+}
+
+@keyframes selectPulseRed {
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.45);
+    }
+
+    60% {
+        box-shadow: 0 0 0 12px rgba(239, 68, 68, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
     }
 }

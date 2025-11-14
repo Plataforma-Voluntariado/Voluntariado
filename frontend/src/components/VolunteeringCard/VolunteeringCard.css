@@ -367,6 +367,40 @@
   color: var(--color-success);
 }
 
+/* Estado: ya inscrito */
+.volunteering-card-inscribe-btn.inscribed {
+  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%); /* gris azulado */
+  border-color: #64748b;
+  color: #ffffff;
+}
+.volunteering-card-inscribe-btn.inscribed:hover {
+  transform: none;
+  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+  cursor: default;
+}
+
+.volunteering-card-inscribe-btn.rejected {
+  background: linear-gradient(135deg, #db270b 0%, #ef4444 100%); /* naranja-rojo */
+  border-color: #ef4444;
+  color: #fff;
+}
+.volunteering-card-inscribe-btn.rejected:hover {
+  transform: none;
+  cursor: default;
+}
+
+/* Disabled state general: reduce opacity, remove pointer and animation */
+.volunteering-card-inscribe-btn:disabled {
+  opacity: 0.92;
+  pointer-events: none;
+  box-shadow: none;
+}
+
+/* Make disabled buttons visually distinct and non-animated */
+.volunteering-card-inscribe-btn:disabled, .volunteering-card-inscribe-btn:disabled:hover {
+  transition: none;
+}
+
 [data-theme="dark"] .volunteering-card-location-btn {
   border-color: #007aff;
   color: #5ac8fa;

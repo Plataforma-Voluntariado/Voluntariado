@@ -1,10 +1,13 @@
 import { Injectable, BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { Inscripcion, EstadoInscripcion } from './entity/inscripcion.entity';
 import { EstadoVoluntariado, Voluntariado } from 'src/voluntariado/entity/voluntariado.entity';
 import { RolUsuario, Usuario } from 'src/usuario/entity/usuario.entity';
 import { EstadisticasVoluntarioService } from 'src/estadisticas_voluntario/estadisticas_voluntario.service';
+import { NotificacionesService } from 'src/notificaciones/notificaciones.service';
+import { TipoNotificacion } from 'src/notificaciones/entity/notificacion.entity';
 
 @Injectable()
 export class InscripcionService {
@@ -16,6 +19,8 @@ export class InscripcionService {
         @InjectRepository(Usuario)
         private usuarioRepo: Repository<Usuario>,
         private readonly estadisticasService: EstadisticasVoluntarioService,
+        private eventEmitter: EventEmitter2,
+        private readonly notificacionesService: NotificacionesService,
     ) { }
 
     private async validarCupos(voluntariadoId: number, max: number) {
@@ -69,13 +74,42 @@ export class InscripcionService {
             estado_inscripcion: EstadoInscripcion.PENDIENTE,
         });
 
-        return this.inscripcionRepo.save(inscripcion);
+        const saved = await this.inscripcionRepo.save(inscripcion);
+        try {
+            this.eventEmitter.emit('inscripcion.created', {
+                type: 'created',
+                inscripcion: saved,
+                voluntariadoId: saved.voluntariado?.id_voluntariado,
+                userId: saved.voluntario?.id_usuario,
+            });
+        } catch (e) {
+            console.error('Event emit error inscripcion.created', e);
+        }
+
+        // Crear y enviar notificación al creador del voluntariado
+        try {
+            const creadorId = saved.voluntariado?.creador?.id_usuario;
+            const nombreVoluntario = `${saved.voluntario?.nombre || ''} ${saved.voluntario?.apellido || ''}`.trim();
+            if (creadorId) {
+                await this.notificacionesService.crearYEnviarNotificacion([creadorId], {
+                    tipo: TipoNotificacion.INFO,
+                    titulo: 'Nueva inscripción',
+                    mensaje: `${nombreVoluntario || 'Un usuario'} se ha inscrito a ${saved.voluntariado?.titulo || 'tu voluntariado'}`,
+                    referencia_id: saved.id_inscripcion,
+                    url_redireccion: `/manage-events/${saved.voluntariado?.id_voluntariado}`,
+                });
+            }
+        } catch (e) {
+            console.error('Error creando notificación inscripcion.created', e);
+        }
+
+        return saved;
     }
 
     async aceptarInscripcion(creador: Usuario, idInscripcion: number) {
         const inscripcion = await this.inscripcionRepo.findOne({
             where: { id_inscripcion: idInscripcion },
-            relations: ['voluntariado', 'voluntariado.creador'],
+            relations: ['voluntariado', 'voluntariado.creador', 'voluntario'],
         });
 
         if (!inscripcion) throw new NotFoundException('Inscripción no encontrada');
@@ -86,13 +120,39 @@ export class InscripcionService {
         await this.validarCupos(inscripcion.voluntariado.id_voluntariado, inscripcion.voluntariado.maxParticipantes);
 
         inscripcion.estado_inscripcion = EstadoInscripcion.ACEPTADA;
-        return this.inscripcionRepo.save(inscripcion);
+        const saved = await this.inscripcionRepo.save(inscripcion);
+        try {
+            this.eventEmitter.emit('inscripcion.updated', {
+                type: 'aceptada',
+                inscripcion: saved,
+                voluntariadoId: saved.voluntariado?.id_voluntariado,
+                userId: saved.voluntario?.id_usuario,
+            });
+        } catch (e) {
+            console.error('Event emit error inscripcion.updated', e);
+        }
+        // Notificar al voluntario sobre la aceptación
+        try {
+            const voluntarioId = saved.voluntario?.id_usuario;
+            if (voluntarioId) {
+                await this.notificacionesService.crearYEnviarNotificacion([voluntarioId], {
+                    tipo: TipoNotificacion.INFO,
+                    titulo: 'Inscripción aceptada',
+                    mensaje: `Tu inscripción al voluntariado ${saved.voluntariado?.titulo || ''} ha sido aceptada.`,
+                    referencia_id: saved.id_inscripcion,
+                    url_redireccion: `/manage-inscripciones`,
+                });
+            }
+        } catch (e) {
+            console.error('Error creando notificación inscripcion.aceptada', e);
+        }
+        return saved;
     }
 
     async rechazarInscripcion(creador: Usuario, idInscripcion: number) {
         const inscripcion = await this.inscripcionRepo.findOne({
             where: { id_inscripcion: idInscripcion },
-            relations: ['voluntariado', 'voluntariado.creador'],
+            relations: ['voluntariado', 'voluntariado.creador', 'voluntario'],
         });
 
         if (!inscripcion) throw new NotFoundException('Inscripción no encontrada');
@@ -101,7 +161,33 @@ export class InscripcionService {
         if (inscripcion?.voluntariado.estado != EstadoVoluntariado.PENDIENTE) throw new NotFoundException('Solo se puede rechazar inscripciones a voluntariados en estado pendiente');
 
         inscripcion.estado_inscripcion = EstadoInscripcion.RECHAZADA;
-        return this.inscripcionRepo.save(inscripcion);
+        const saved = await this.inscripcionRepo.save(inscripcion);
+        try {
+            this.eventEmitter.emit('inscripcion.updated', {
+                type: 'rechazada',
+                inscripcion: saved,
+                voluntariadoId: saved.voluntariado?.id_voluntariado,
+                userId: saved.voluntario?.id_usuario,
+            });
+        } catch (e) {
+            console.error('Event emit error inscripcion.updated', e);
+        }
+        // Notificar al voluntario sobre la rechaz
+        try {
+            const voluntarioId = saved.voluntario?.id_usuario;
+            if (voluntarioId) {
+                await this.notificacionesService.crearYEnviarNotificacion([voluntarioId], {
+                    tipo: TipoNotificacion.ALERTA,
+                    titulo: 'Inscripción rechazada',
+                    mensaje: `Tu inscripción al voluntariado ${saved.voluntariado?.titulo || ''} ha sido rechazada.`,
+                    referencia_id: saved.id_inscripcion,
+                    url_redireccion: `/manage-inscripciones`,
+                });
+            }
+        } catch (e) {
+            console.error('Error creando notificación inscripcion.rechazada', e);
+        }
+        return saved;
     }
 
     async cancelar(voluntario: Usuario, idInscripcion: number) {
@@ -114,21 +200,59 @@ export class InscripcionService {
         if (inscripcion.estado_inscripcion === EstadoInscripcion.CANCELADA) throw new NotFoundException('Inscripción ya cancelada');
         if (inscripcion.voluntario.id_usuario !== voluntario.id_usuario) throw new ForbiddenException('No puedes cancelar esta inscripción');
         if (inscripcion.voluntariado.estado === EstadoVoluntariado.TERMINADO) throw new BadRequestException('No puedes cancelar un voluntariado que ya terminó');
-        if (inscripcion.voluntariado.estado === EstadoVoluntariado.EN_PROCESO)throw new BadRequestException('No puedes cancelar un voluntariado que ya esta en proceso');
+        if (inscripcion.voluntariado.estado === EstadoVoluntariado.EN_PROCESO) throw new BadRequestException('No puedes cancelar un voluntariado que ya esta en proceso');
         const ahora = new Date();
         if (inscripcion.voluntariado.fechaHoraInicio <= ahora) throw new BadRequestException('No puedes cancelar después de que el voluntariado empezó');
 
         inscripcion.estado_inscripcion = EstadoInscripcion.CANCELADA;
-        return this.inscripcionRepo.save(inscripcion);
+        const saved = await this.inscripcionRepo.save(inscripcion);
+        try {
+            this.eventEmitter.emit('inscripcion.updated', {
+                type: 'cancelada',
+                inscripcion: saved,
+                voluntariadoId: saved.voluntariado?.id_voluntariado,
+                userId: saved.voluntario?.id_usuario,
+            });
+        } catch (e) {
+            console.error('Event emit error inscripcion.updated', e);
+        }
+        // Notificar al creador que un voluntario canceló
+        try {
+            const creadorId = saved.voluntariado?.creador?.id_usuario;
+            const nombreVoluntario = `${saved.voluntario?.nombre || ''} ${saved.voluntario?.apellido || ''}`.trim();
+            if (creadorId) {
+                await this.notificacionesService.crearYEnviarNotificacion([creadorId], {
+                    tipo: TipoNotificacion.INFO,
+                    titulo: 'Inscripción cancelada',
+                    mensaje: `${nombreVoluntario || 'Un usuario'} ha cancelado su inscripción en ${saved.voluntariado?.titulo || ''}.`,
+                    referencia_id: saved.id_inscripcion,
+                    url_redireccion: `/manage-events/${saved.voluntariado?.id_voluntariado}`,
+                });
+            }
+        } catch (e) {
+            console.error('Error creando notificación inscripcion.cancelada', e);
+        }
+        return saved;
     }
 
     async misInscripciones(voluntarioId: number) {
-        return this.inscripcionRepo.find({
+        const inscripciones = await this.inscripcionRepo.find({
             where: { voluntario: { id_usuario: voluntarioId } },
-            relations: ['voluntariado'],
+            relations: ['voluntariado', 'voluntariado.creador', 'voluntariado.categoria', 'voluntariado.fotos'],
             order: { fecha_inscripcion: 'DESC' },
         });
+
+        const agrupadas = {
+            pendientes: inscripciones.filter(i => i.estado_inscripcion === EstadoInscripcion.PENDIENTE),
+            aceptadas: inscripciones.filter(i => i.estado_inscripcion === EstadoInscripcion.ACEPTADA),
+            rechazadas: inscripciones.filter(i => i.estado_inscripcion === EstadoInscripcion.RECHAZADA),
+            canceladas: inscripciones.filter(i => i.estado_inscripcion === EstadoInscripcion.CANCELADA),
+            terminadas: inscripciones.filter(i => i.estado_inscripcion === EstadoInscripcion.TERMINADA),
+        };
+
+        return agrupadas;
     }
+
 
     async inscripcionesDeVoluntariado(creador: Usuario, voluntariadoId: number) {
         const voluntariado = await this.voluntariadoRepo.findOne({
@@ -142,7 +266,6 @@ export class InscripcionService {
         const inscripciones = await this.inscripcionRepo.find({
             where: {
                 voluntariado: { id_voluntariado: voluntariadoId },
-                estado_inscripcion: Not(EstadoInscripcion.CANCELADA),
             },
             relations: ['voluntario'],
             order: { fecha_inscripcion: 'ASC' },
@@ -152,6 +275,8 @@ export class InscripcionService {
             pendientes: inscripciones.filter(i => i.estado_inscripcion === EstadoInscripcion.PENDIENTE),
             aceptadas: inscripciones.filter(i => i.estado_inscripcion === EstadoInscripcion.ACEPTADA),
             rechazadas: inscripciones.filter(i => i.estado_inscripcion === EstadoInscripcion.RECHAZADA),
+            terminadas: inscripciones.filter(i => i.estado_inscripcion === EstadoInscripcion.TERMINADA),
+            canceladas: inscripciones.filter(i => i.estado_inscripcion === EstadoInscripcion.CANCELADA),
         };
 
         return agrupadas;
@@ -178,16 +303,15 @@ export class InscripcionService {
             throw new ForbiddenException('Solo el creador puede marcar la asistencia');
         if (inscripcion.voluntariado.estado !== EstadoVoluntariado.TERMINADO)
             throw new BadRequestException('Solo se puede marcar asistencia a voluntariados terminados');
-        if (inscripcion.estado_inscripcion !== EstadoInscripcion.ACEPTADA)
+        if (inscripcion.estado_inscripcion !== EstadoInscripcion.TERMINADA)
             throw new BadRequestException('Solo se puede marcar asistencia a inscripciones aceptadas');
 
         if (inscripcion.asistencia !== null) {
             throw new BadRequestException('La asistencia ya fue marcada y no se puede modificar');
         }
 
-        // Marcar asistencia
         inscripcion.asistencia = asistencia;
-        await this.inscripcionRepo.save(inscripcion);
+        const saved = await this.inscripcionRepo.save(inscripcion);
 
         try {
             await this.estadisticasService.actualizarEstadisticasPorAsistencia(
@@ -198,10 +322,56 @@ export class InscripcionService {
             console.error('Error actualizando estadísticas por asistencia:', error);
         }
 
-        return inscripcion;
+        try {
+            this.eventEmitter.emit('inscripcion.asistencia_marked', {
+                type: 'asistencia_marked',
+                inscripcion: saved,
+                voluntariadoId: saved.voluntariado?.id_voluntariado,
+                userId: saved.voluntario?.id_usuario,
+                asistencia,
+            });
+        } catch (e) {
+            console.error('Event emit error inscripcion.asistencia_marked', e);
+        }
+
+        // Notificar al voluntario que su asistencia fue marcada
+        try {
+            const voluntarioId = saved.voluntario?.id_usuario;
+            if (voluntarioId) {
+                await this.notificacionesService.crearYEnviarNotificacion([voluntarioId], {
+                    tipo: TipoNotificacion.INFO,
+                    titulo: 'Asistencia registrada',
+                    mensaje: `Se registró tu asistencia en el voluntariado ${saved.voluntariado?.titulo || ''}.`,
+                    referencia_id: saved.id_inscripcion,
+                    url_redireccion: `/manage-inscripciones`,
+                });
+            }
+        } catch (e) {
+            console.error('Error creando notificación inscripcion.asistencia_marked', e);
+        }
+
+        return saved;
     }
 
+    async marcarTerminadasPorVoluntariado(voluntariadoId: number) {
+        await this.inscripcionRepo
+            .createQueryBuilder()
+            .update('inscripcion')
+            .set({ estado_inscripcion: EstadoInscripcion.TERMINADA })
+            .where('voluntariado_id = :id AND estado_inscripcion = :estado', {
+                id: voluntariadoId,
+                estado: EstadoInscripcion.ACEPTADA,
+            })
+            .execute();
+    }
 
-
+    async cancelarTodasPorVoluntariado(idVoluntariado: number) {
+        await this.inscripcionRepo
+            .createQueryBuilder()
+            .update(Inscripcion)
+            .set({ estado_inscripcion: EstadoInscripcion.CANCELADA })
+            .where('voluntariado_id = :id', { id: idVoluntariado })
+            .execute();
+    }
 
 }

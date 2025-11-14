@@ -1,0 +1,43 @@
+.volunteer-inscription-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, max-content));
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.volunteer-inscription-layout::-webkit-scrollbar {
+  display: none;
+}
+
+/* Estado vacío */
+.no-inscripciones-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  text-align: center;
+  width: 100%;
+}
+
+.no-inscripciones-content {
+  max-width: 400px;
+}
+
+.no-inscripciones-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 12px;
+}
+
+.no-inscripciones-description {
+  font-size: 16px;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0;
+}

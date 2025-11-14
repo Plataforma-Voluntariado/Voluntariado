@@ -13,15 +13,12 @@ function HomeCreatorLayout() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  useEffect(() => {
-    loadMisVoluntariados();
-  }, []);
-
   const loadMisVoluntariados = async () => {
     try {
       setLoading(true);
       const data = await getMyVoluntariados();
       setVoluntariados(data || {});
+      setError(null);
     } catch (err) {
       console.error("Error cargando voluntariados:", err);
       setError("Error al cargar los voluntariados");
@@ -29,6 +26,19 @@ function HomeCreatorLayout() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadMisVoluntariados();
+  }, []);
+
+  useEffect(() => {
+    const handler = () => {
+      loadMisVoluntariados();
+    };
+
+    window.addEventListener("inscripcion.changed", handler);
+    return () => window.removeEventListener("inscripcion.changed", handler);
+  }, []);
 
   const handleCreateNew = () => {
     navigate("/crear-voluntariado");
@@ -42,8 +52,7 @@ function HomeCreatorLayout() {
     const terminados = voluntariados.terminados?.length || 0;
     const cancelados = voluntariados.cancelados?.length || 0;
 
-    const total =
-      pendientes + enProceso + terminados + cancelados;
+    const total = pendientes + enProceso + terminados + cancelados;
 
     const totalInscripciones = Object.values(voluntariados)
       .flat()
@@ -65,7 +74,6 @@ function HomeCreatorLayout() {
 
   const stats = getStatistics();
 
-  // Aplana los voluntariados para mostrarlos
   const allVoluntariados = [
     ...(voluntariados.pendientes || []),
     ...(voluntariados.en_proceso || []),

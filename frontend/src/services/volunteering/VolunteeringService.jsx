@@ -1,16 +1,10 @@
 import api from "../../config/AxiosConfig";
 
-const handleError = (error) => {
-  console.error("Error obteniendo voluntariados:", error);
-  return [];
-};
-
 export const GetVolunteerings = async (filters = {}) => {
   try {
     const resp = await api.get("/voluntariados");
     let list = Array.isArray(resp.data) ? resp.data : [];
 
-    // Si no hay filtros, devolver todo
     if (!filters || Object.keys(filters).length === 0) return list;
 
     const { search, categoria_id } = filters;
@@ -37,7 +31,7 @@ export const GetVolunteerings = async (filters = {}) => {
 
     return result;
   } catch (error) {
-    return handleError(error);
+    return error;
   }
 };
 
@@ -48,7 +42,6 @@ export const GetAllVolunteerings = async () => {
 export const InscribeIntoVolunteering = async (id_voluntariado) =>{
   try{
     const response = await api.post("/inscripciones/"+id_voluntariado);
-    console.log(response)
     return response.data;
   }catch(error){
     return error;

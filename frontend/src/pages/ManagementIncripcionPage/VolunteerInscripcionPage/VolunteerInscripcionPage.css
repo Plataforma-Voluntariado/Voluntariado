@@ -1,0 +1,168 @@
+.volunteer-inscription-page {
+    height: calc(100vh - 6vh);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 2rem 0 2rem;
+    box-sizing: border-box;
+    overflow: hidden; 
+}
+
+.header-inscripcion-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 600px) {
+  .back-text {
+    display: none;
+  }
+
+  .btn-back {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    justify-content: center;
+    font-size: 1.3rem;
+    padding: 0;
+  }
+}
+
+.volunteer-inscription-page-title {
+    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    font-size: clamp(1.5rem, 8vw, 2.5rem);
+    font-weight: 700;
+    color: #000;
+    text-align: center;
+    margin: 2rem;
+    letter-spacing: 1px;
+    position: relative;
+    opacity: 0;
+    transform: translateY(-5px);
+    animation: fadeInDown 0.6s ease forwards;
+    flex-shrink: 1;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.volunteer-inscription-page-title::after {
+    content: "";
+    display: block;
+    width: 25%;
+    max-width: 40px;
+    height: 2px;
+    background-color: #000;
+    margin: 0.3rem auto 0;
+    border-radius: 2px;
+}
+
+@keyframes fadeInDown {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .volunteer-inscription-page-title {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+    }
+
+    .volunteer-inscription-page-title::after {
+        width: 30px;
+        height: 2px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .volunteer-inscription-page-title {
+        font-size: 1.5rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .volunteer-inscription-page-title::after {
+        width: 25px;
+        height: 2px;
+    }
+}
+
+.subtabs-container {
+  width: 100%;
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding-bottom: 0.5rem;
+}
+
+.subtabs-desktop {
+  display: block;
+}
+
+.subtabs-mobile {
+  display: none;
+}
+
+@media screen and (max-width: 460px) {
+  .subtabs-desktop {
+    display: none;
+  }
+
+  .subtabs-mobile {
+    display: block;
+    width: 100%;
+    padding: 0 1rem;
+  }
+
+  .subtabs-select {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #fff;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #334155;
+  }
+
+  .subtabs-select.alert {
+    border-color: #f59e0b;
+    animation: selectPulse 1.8s ease-in-out infinite;
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.35);
+  }
+}
+
+.inscriptions-scroll-area {
+  flex: 1;
+  width: 100%;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding-bottom: 1rem;
+}
+
+.inscriptions-scroll-area::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes selectPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.45);
+  }
+
+  60% {
+    box-shadow: 0 0 0 12px rgba(245, 158, 11, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+  }
+}
+

@@ -5,7 +5,6 @@ export const useVerificacionArchivoAdminSocket = (adminId, onAdminEvent) => {
   const socketRef = useRef(null);
   const eventRef = useRef(onAdminEvent);
 
-  // Mantener la función actualizada
   useEffect(() => {
     eventRef.current = onAdminEvent;
   }, [onAdminEvent]);
