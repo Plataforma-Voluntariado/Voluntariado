@@ -25,6 +25,7 @@ import CreatorInscripcionPage from "./pages/ManagementEventosPage/CreatorInscrip
 import CreatorVolunteerPage from "./pages/ManagementEventosPage/CreatorVolunteerPage/CreatorVolunteerPage";
 import VolunteerRoute from "./routes/VolunteerRoute";
 import VolunteerInscripcionPage from "./pages/ManagementIncripcionPage/VolunteerInscripcionPage/VolunteerInscripcionPage";
+import VoluntariadoDetailPage from "./pages/VoluntariadoDetailPage/VoluntariadoDetailPage";
 
 
 
@@ -55,6 +56,7 @@ root.render(
           <Route path="/home" element={<HomePage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/crear-voluntariado" element={<CreateVoluntariadoPage />} />
+          <Route path="/voluntariado/:id" element={<VoluntariadoDetailPage />} />
           <Route element={<UnverifiedEmailRoute />}><Route path="/verificar-correo" element={<EmailVerificationPage />} /></Route>
         </Route>
       </Route>

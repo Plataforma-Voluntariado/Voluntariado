@@ -5,6 +5,7 @@ import { InscribeIntoVolunteering } from "../../services/volunteering/Volunteeri
 import Swal from "sweetalert2";
 import { SuccessAlert, WrongAlert } from "../../utils/ToastAlerts";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function VolunteeringCard({ volunteering, onFocusMap }) {
   const { titulo, descripcion, fechaHoraInicio, horas, maxParticipantes, estado, creador, categoria, fotos = [], ubicacion, inscripciones, participantesAceptados, } = volunteering;
@@ -12,6 +13,7 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
   const [localInscribed, setLocalInscribed] = useState(false);
   const nombreEntidad = creador?.creador?.nombre_entidad;
   const { user } = useAuth();
+  const navigate = useNavigate();
   const isLogged = !!user;
 
   const { myInscripcion, isInscrito, isRechazado, isCreatorOwner } = useMemo(() => {
@@ -49,7 +51,8 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
     return result;
   }, [inscripciones, user, creador]);
 
-  const handleInscribe = async () => {
+  const handleInscribe = async (e) => {
+    e?.stopPropagation(); // Prevenir navegación al hacer clic en inscribirse
     if (!volunteering?.id_voluntariado || inscribing) return;
     if (isInscrito || isCreatorOwner) return;
     const confirmed = await ConfirmAlert({
@@ -169,8 +172,14 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
   };
   const goTo = (i) => setIndex(i);
 
+  const handleCardClick = () => {
+    if (volunteering?.id_voluntariado) {
+      navigate(`/voluntariado/${volunteering.id_voluntariado}`);
+    }
+  };
+
   return (
-    <div className="volunteering-card">
+    <div className="volunteering-card" onClick={handleCardClick}>
       <div
         className="volunteering-card-image"
         onMouseEnter={() => setIsPaused(true)}
@@ -352,7 +361,10 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
 
           <button
             className="volunteering-card-location-btn"
-            onClick={() => onFocusMap?.()}
+            onClick={(e) => {
+              e.stopPropagation();
+              onFocusMap?.();
+            }}
           >
             <svg
               width="16"

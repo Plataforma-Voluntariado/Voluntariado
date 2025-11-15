@@ -75,6 +75,40 @@ export const getEventsByCreatorId = async () => {
 };
 
 
+// Actualizar voluntariado
+export const updateVoluntariado = async (id, voluntariadoData, fotos = [], fotosMantener = null) => {
+  try {
+    const formData = new FormData();
+
+    // Agregar campos básicos
+    if (voluntariadoData.titulo) formData.append("titulo", voluntariadoData.titulo);
+    if (voluntariadoData.descripcion) formData.append("descripcion", voluntariadoData.descripcion);
+    if (voluntariadoData.horas) formData.append("horas", voluntariadoData.horas.toString());
+    if (voluntariadoData.maxParticipantes) formData.append("maxParticipantes", voluntariadoData.maxParticipantes.toString());
+    if (voluntariadoData.categoria_id) formData.append("categoria_id", voluntariadoData.categoria_id.toString());
+    if (voluntariadoData.fechaHoraInicio) formData.append("fechaHoraInicio", new Date(voluntariadoData.fechaHoraInicio).toISOString());
+    if (voluntariadoData.ubicacion) formData.append("ubicacion", JSON.stringify(voluntariadoData.ubicacion));
+
+    // Solo agregar fotosMantener si se proporciona explícitamente
+    if (fotosMantener !== null) {
+      formData.append("fotosMantener", JSON.stringify(fotosMantener));
+    }
+
+    // Agregar fotos nuevas
+    fotos.forEach(foto => formData.append("nuevasFotos", foto));
+
+    const { data } = await api.put(`/voluntariados/${id}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    return data;
+  } catch (error) {
+    if (error.response?.status === 403)
+      throw new Error("No tienes permisos para editar este voluntariado.");
+    throw new Error(handleError(error, "Error al actualizar voluntariado"));
+  }
+};
+
 // Cancelar voluntariado (soft delete)
 export const cancelarVoluntariado = async (id) => {
   try {

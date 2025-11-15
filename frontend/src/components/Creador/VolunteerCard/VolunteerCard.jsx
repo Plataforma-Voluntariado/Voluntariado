@@ -1,6 +1,6 @@
 // src/components/VolunteerCard.jsx
 import { useNavigate } from "react-router-dom";
-import { FaClock, FaUsers, FaMapMarkerAlt, FaCalendarAlt, FaTimesCircle, } from "react-icons/fa";
+import { FaClock, FaUsers, FaMapMarkerAlt, FaCalendarAlt, FaTimesCircle, FaEye, } from "react-icons/fa";
 import { cancelarVoluntariado } from "../../../services/voluntariado/voluntariadoService";
 import ConfirmAlert from "../../../components/alerts/ConfirmAlert";
 import { SuccessAlert, WrongAlert } from "../../../utils/ToastAlerts";
@@ -9,7 +9,14 @@ import "./VolunteerCard.css";
 const VolunteerCard = ({ voluntariado, onCancelar, highlightAsistencia = false }) => {
   const navigate = useNavigate();
 
+  // Click en la tarjeta → Ver detalles del voluntariado
   const handleClick = () => {
+    navigate(`/voluntariado/${voluntariado.id_voluntariado}`);
+  };
+
+  // Botón específico → Gestionar inscripciones
+  const handleManageInscriptions = (e) => {
+    e.stopPropagation();
     navigate(`/manage-events/${voluntariado.id_voluntariado}`, {
       state: { estadoVoluntariado: voluntariado.estado },
     });
@@ -94,6 +101,16 @@ const VolunteerCard = ({ voluntariado, onCancelar, highlightAsistencia = false }
             <FaMapMarkerAlt /> {voluntariado.ubicacion?.nombre_sector},{" "}
             {voluntariado.ubicacion?.ciudad?.ciudad}
           </p>
+        </div>
+
+        <div className="volunteer-card-actions">
+          <button
+            className="volunteer-card-manage-btn"
+            onClick={handleManageInscriptions}
+            title="Gestionar inscripciones"
+          >
+            <FaUsers /> Gestionar Inscripciones
+          </button>
         </div>
       </div>
 
