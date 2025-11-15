@@ -195,17 +195,47 @@ textarea:focus {
 
 
 
-/* ---- Responsive ---- */
-@media (max-width: 768px) {
-  .create-voluntariado-form {
-    padding: 1.2rem;
-  }
+/* ---- Mapa Interactivo ---- */
+.map-container {
+  width: 100%;
+  height: 400px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #cbd5e1;
+  transition: border-color 0.2s;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+.map-container:hover {
+  border-color: #2563eb;
+}
+
+.map-container.error {
+  border-color: #dc2626;
+}
+
+.map-instruction {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+  font-style: italic;
+}
+
+.direccion-readonly {
+  background-color: #f1f5f9 !important;
+  cursor: not-allowed;
+  color: #475569;
 }
 
 /* ---- Responsive ---- */
 @media (max-width: 768px) {
   .create-voluntariado-form {
     padding: 1.2rem;
+  }
+
+  .map-container {
+    height: 300px;
   }
 
   .form-group .fecha-picker-wrapper {

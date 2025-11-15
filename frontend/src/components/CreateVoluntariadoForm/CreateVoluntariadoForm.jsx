@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./CreateVoluntariadoForm.css";
 import { getCategorias } from "../../services/categoria/categoriaService";
 import { getDepartamentos, getCiudadesByDepartamento } from "../../services/ubicacion/ubicacionService";
@@ -12,14 +12,19 @@ import { customSelectStylesVoluntariado } from "../../styles/selectStylesVolunta
 import { TextField } from "@mui/material";
 import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import Map, { Marker } from "react-map-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 
 const MAX_PHOTOS = 5;
 const MAX_SIZE = 5 * 1024 * 1024;
 const DEFAULT_COORDS = { latitud: -2.9001285, longitud: -76.6124805 };
+const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
 
 function CreateVoluntariadoForm({ onSuccess, onCancel }) {
   const { user } = useAuth();
+  const mapRef = useRef(null);
   const [categorias, setCategorias] = useState([]);
   const [departamentos, setDepartamentos] = useState([]);
   const [ciudades, setCiudades] = useState([]);
@@ -30,6 +35,12 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
   const [loading, setLoading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedImageModal, setSelectedImageModal] = useState(null);
+  const [markerPosition, setMarkerPosition] = useState(null);
+  const [viewState, setViewState] = useState({
+    longitude: DEFAULT_COORDS.longitud,
+    latitude: DEFAULT_COORDS.latitud,
+    zoom: 13
+  });
   const [formData, setFormData] = useState({
     titulo: "",
     descripcion: "",
@@ -39,6 +50,55 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
     categoria_id: "",
     ubicacion: { ...DEFAULT_COORDS, direccion: "", ciudad_id: "", nombre_sector: "" }
   });
+
+  // Geocodificación inversa para obtener dirección desde coordenadas
+  const getAddressFromCoords = async (lng, lat) => {
+    try {
+      const response = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_TOKEN}&language=es`
+      );
+      const data = await response.json();
+      
+      if (data.features && data.features.length > 0) {
+        const feature = data.features[0];
+        return feature.place_name;
+      }
+      return "Dirección no disponible";
+    } catch (error) {
+      console.error("Error en geocodificación inversa:", error);
+      return "Error al obtener dirección";
+    }
+  };
+
+  // Manejar clic en el mapa
+  const handleMapClick = async (event) => {
+    const { lngLat } = event;
+    // Redondear a 8 decimales como máximo (según el DTO del backend)
+    const lng = parseFloat(lngLat.lng.toFixed(8));
+    const lat = parseFloat(lngLat.lat.toFixed(8));
+    
+    // Actualizar marcador
+    setMarkerPosition({ longitude: lng, latitude: lat });
+    
+    // Obtener dirección
+    const address = await getAddressFromCoords(lng, lat);
+    
+    // Actualizar formulario
+    setFormData(prev => ({
+      ...prev,
+      ubicacion: {
+        ...prev.ubicacion,
+        latitud: lat,
+        longitud: lng,
+        direccion: address
+      }
+    }));
+    
+    // Limpiar error de dirección si existe
+    if (errors["ubicacion.direccion"]) {
+      setErrors(prev => ({ ...prev, "ubicacion.direccion": "" }));
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -187,8 +247,17 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
       titulo: "", descripcion: "", fechaHoraInicio: "", horas: 1, maxParticipantes: 10, categoria_id: "",
       ubicacion: { ...DEFAULT_COORDS, direccion: "", ciudad_id: "", nombre_sector: "" }
     });
-    setFotos([]); setPreviewImages([]); setSelectedDepartamento("");
-    const fileInput = document.getElementById("fotos"); if (fileInput) fileInput.value = "";
+    setFotos([]); 
+    setPreviewImages([]); 
+    setSelectedDepartamento("");
+    setMarkerPosition(null);
+    setViewState({
+      longitude: DEFAULT_COORDS.longitud,
+      latitude: DEFAULT_COORDS.latitud,
+      zoom: 13
+    });
+    const fileInput = document.getElementById("fotos"); 
+    if (fileInput) fileInput.value = "";
   };
 
   const handleSubmit = async (e) => {
@@ -215,8 +284,19 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
     setLoading(true);
 
     try {
+      // Asegurar que ciudad_id sea un número
+      const dataToSend = {
+        ...formData,
+        ubicacion: {
+          ...formData.ubicacion,
+          ciudad_id: parseInt(formData.ubicacion.ciudad_id)
+        }
+      };
+
+      console.log("Datos a enviar:", dataToSend);
+      
       // Crear voluntariado usando directamente los datos del formulario y fotos
-      const result = await createVoluntariado(formData, fotos);
+      const result = await createVoluntariado(dataToSend, fotos);
       await SuccessAlert({
         title: "¡Voluntariado creado!",
         timer: 1500
@@ -438,17 +518,46 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
                 {errors["ubicacion.ciudad_id"] && <span className="error-text">{errors["ubicacion.ciudad_id"]}</span>}
               </div>
             </div>
+
+            {/* Mapa Interactivo */}
             <div className="form-group">
-              <label className="register-form-label">Dirección *</label>
-              <input
-                className={`register-form-input ${errors["ubicacion.direccion"] ? "error" : ""}`}
-                value={formData.ubicacion.direccion}
-                onChange={handleInputChange}
-                placeholder="Dirección completa"
-                name="ubicacion.direccion"
-              />
+              <label className="register-form-label">Selecciona la ubicación en el mapa *</label>
+              <p className="map-instruction">Haz clic en el mapa para seleccionar la ubicación exacta del voluntariado</p>
+              <div className={`map-container ${errors["ubicacion.direccion"] ? "error" : ""}`}>
+                <Map
+                  ref={mapRef}
+                  {...viewState}
+                  onMove={(evt) => setViewState(evt.viewState)}
+                  onClick={handleMapClick}
+                  mapStyle="mapbox://styles/mapbox/streets-v12"
+                  mapboxAccessToken={MAPBOX_TOKEN}
+                  style={{ width: "100%", height: "400px", borderRadius: "12px" }}
+                >
+                  {markerPosition && (
+                    <Marker
+                      longitude={markerPosition.longitude}
+                      latitude={markerPosition.latitude}
+                      anchor="bottom"
+                    >
+                      <FaMapMarkerAlt size={40} color="#dc2626" />
+                    </Marker>
+                  )}
+                </Map>
+              </div>
               {errors["ubicacion.direccion"] && <span className="error-text">{errors["ubicacion.direccion"]}</span>}
             </div>
+
+            {/* Dirección (solo lectura) */}
+            <div className="form-group">
+              <label className="register-form-label">Dirección seleccionada</label>
+              <input
+                className="register-form-input direccion-readonly"
+                value={formData.ubicacion.direccion || "Haz clic en el mapa para seleccionar la ubicación"}
+                readOnly
+                placeholder="La dirección se mostrará aquí"
+              />
+            </div>
+
             <div className="form-row">
               <div className="form-group">
                 <label className="register-form-label">Barrio/Sector *</label>
