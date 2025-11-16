@@ -82,17 +82,7 @@ export class EstadisticasVoluntarioService {
       const totalAsistencias = parseInt(resumen.totalAsistencias, 10) || 0;
       const horasTrabajadas = parseInt(resumen.horasTrabajadas, 10) || 0;
       const participaciones = parseInt(resumen.participaciones, 10) || 0;
-
-      // Debug logs
-      console.log('Resumen estadisticas:', {
-        totalInscripciones,
-        totalAsistencias,
-        horasTrabajadas,
-        participaciones,
-        inscripcionAsistencia: inscripcion.asistencia,
-        inscripcionCalificado: inscripcion.calificado,
-      });
-
+      
       // Actualizar horas y participaciones solo si asistió y está calificado
       if (inscripcion.asistencia && inscripcion.calificado) {
         estadisticas.horas_trabajadas = horasTrabajadas;

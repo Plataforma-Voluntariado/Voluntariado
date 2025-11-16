@@ -81,7 +81,7 @@ export class VoluntariadoController {
     } catch (errors) {
       throw new BadRequestException(errors);
     }
-    
+
     return this.voluntariadoService.update(+id, dto, req.user.id_usuario, nuevasFotos);
   }
 
@@ -101,6 +101,12 @@ export class VoluntariadoController {
   findMine(@Req() req: any) {
     return this.voluntariadoService.findAllByCreator(req.user.id_usuario);
   }
+
+  @Get('voluntariado-creator/:id')
+  findVoluntariadosForCreator(@Param('id') id: number) {
+    return this.voluntariadoService.findAllByCreator(id);
+  }
+
 
   @Get(':id')
   findOne(@Param('id') id: string, @Req() req: any) {
