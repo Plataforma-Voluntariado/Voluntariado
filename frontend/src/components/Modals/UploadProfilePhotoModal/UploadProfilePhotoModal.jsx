@@ -25,28 +25,25 @@ function UploadProfilePhotoModal({ currentPhotoUrl, onClose }) {
     }
 
     setSelectedFile(file);
-    setPreviewUrl(URL.createObjectURL(file)); // Previsualización rápida
+    setPreviewUrl(URL.createObjectURL(file));
   };
 
   // Función helper para manejo de acciones async con alerts
-  const handleAsyncAction = async (action, successMsg) => {
+  const handleAsyncAction = async (action) => {
     try {
       setLoading(true);
       const response = await action();
       if (response && !response.error) {
-        await SuccessAlert(successMsg);
-        onClose();
-      } else throw new Error(response.error || "Ocurrió un error");
+        return { ok: true };
+      }
+      throw new Error(response.error || "Ocurrió un error");
     } catch (error) {
-      console.error(error);
-      WrongAlert({
-        title: "Error",
-        message: error.message || "Ocurrió un error. Intenta nuevamente.",
-      });
+      return { ok: false, error };
     } finally {
       setLoading(false);
     }
   };
+
 
   // Subir nueva foto
   const handleUpload = () =>

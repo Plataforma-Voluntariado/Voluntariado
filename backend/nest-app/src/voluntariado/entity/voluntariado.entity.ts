@@ -84,4 +84,11 @@ export class Voluntariado {
       (i) => i.estado_inscripcion === EstadoInscripcion.ACEPTADA
     ).length;
   }
+
+  @Expose()
+  get promedioCalificacion(): number {
+    if (!this.resenas || this.resenas.length === 0) return 0;
+    const suma = this.resenas.reduce((acc, resena) => acc + resena.calificacion, 0);
+    return Number((suma / this.resenas.length).toFixed(1));
+  }
 }

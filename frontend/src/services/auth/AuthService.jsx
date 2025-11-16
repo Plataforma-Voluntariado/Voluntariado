@@ -17,8 +17,6 @@ export const getUserData = async () => {
         const response = await api.get("/auth/perfil");
         return response.data;
     } catch (error) {
-        // No redirigir automáticamente desde aquí para evitar bucles
-        // La redirección se manejará en el componente que usa este servicio
         if (error.response?.status === 401) {
             console.log("Usuario no autenticado");
         }
@@ -60,3 +58,13 @@ export const login = async (correo, contrasena) => {
     }
 }
 
+export const getUserProfileById = async (id) => {
+    try {
+        const response = await api.get(`/auth/perfil/${id}`);
+        return response.data;
+    } catch (error) {
+        if (error.response?.status === 401) {
+        }
+        return null;
+    }
+};

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import "./VolunteeringCard.css";
 import ConfirmAlert from "../alerts/ConfirmAlert";
 import { InscribeIntoVolunteering } from "../../services/volunteering/VolunteeringService";
-import Swal from "sweetalert2";
 import { SuccessAlert, WrongAlert } from "../../utils/ToastAlerts";
 import { useAuth } from "../../context/AuthContext";
 
@@ -12,17 +12,15 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
   const [localInscribed, setLocalInscribed] = useState(false);
   const nombreEntidad = creador?.creador?.nombre_entidad;
   const { user } = useAuth();
-  const isLogged = !!user;
 
-  const { myInscripcion, isInscrito, isRechazado, isCreatorOwner } = useMemo(() => {
+  const { isInscrito, isRechazado, isCreatorOwner } = useMemo(() => {
     const result = {
-      myInscripcion: null,
       isInscrito: false,
       isRechazado: false,
       isCreatorOwner: false,
     };
 
-    if (!isLogged) return result;
+    if (!user) return result;
 
     const userId = Number(user.userId);
 
@@ -40,8 +38,6 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
     }) || null;
 
     if (!ins) return result;
-
-    result.myInscripcion = ins;
     const status = (ins?.estado_inscripcion || "").toString().toLowerCase();
     result.isInscrito = status && !["cancelada", "rechazada"].includes(status);
     result.isRechazado = status === "rechazada";
@@ -49,9 +45,13 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
     return result;
   }, [inscripciones, user, creador]);
 
+  const navigate = useNavigate();
+
+  const effectiveIsInscrito = isInscrito || localInscribed;
+
   const handleInscribe = async () => {
     if (!volunteering?.id_voluntariado || inscribing) return;
-    if (isInscrito || isCreatorOwner) return;
+    if (effectiveIsInscrito || isCreatorOwner) return;
     const confirmed = await ConfirmAlert({
       title: "Inscribirte",
       message: "¿Deseas inscribirte a este voluntariado?",
@@ -76,10 +76,9 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
         position: "top-right",
       });
     } catch (e) {
-      Swal.fire({
+      await WrongAlert({
         title: "Error",
-        text: "No fue posible realizar la inscripción.",
-        icon: "error",
+        message: "No fue posible realizar la inscripción.",
       });
     } finally {
       setInscribing(false);
@@ -245,6 +244,11 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
             src={creador?.url_imagen || "/placeholder.svg"}
             alt={creador?.nombre || creador?.correo}
             className="volunteering-card-creator-avatar"
+            style={{ cursor: creador?.id_usuario ? "pointer" : "default" }}
+            onClick={() => {
+              const id = creador?.id_usuario || creador?.id || creador?.id_usuario;
+              if (id) navigate(`/creador/${id}`);
+            }}
           />
           <div className="volunteering-card-creator-info">
             <span className="volunteering-card-creator-label">Creador</span>
@@ -335,14 +339,13 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
         <div className="volunteering-card-footer">
           {!isCreatorOwner && (
             <button
-              className={`volunteering-card-inscribe-btn ${isInscrito ? "inscribed" : isRechazado ? "rejected" : ""
-                }`}
+              className={`volunteering-card-inscribe-btn ${effectiveIsInscrito ? "inscribed" : isRechazado ? "rejected" : ""}`}
               onClick={handleInscribe}
-              disabled={inscribing || isInscrito || isRechazado}
+              disabled={inscribing || effectiveIsInscrito || isRechazado}
             >
               {inscribing
                 ? "Inscribiendo..."
-                : isInscrito
+                : effectiveIsInscrito
                   ? "Inscrito"
                   : isRechazado
                     ? "Inscripción Rechazada"

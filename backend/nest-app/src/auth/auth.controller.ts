@@ -21,7 +21,6 @@ export class AuthController {
     const usuario = await this.authService.validateUser(inicioSesionDto);
     const { access_token, user } = await this.authService.login(usuario);
 
-    // Guardar JWT en cookie segura
     res.cookie('jwt', access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -39,17 +38,23 @@ export class AuthController {
   @Get('perfil')
   @UseGuards(JwtAuthGuard)
   async getPerfil(@Req() req) {
-    const userId = req.user.id_usuario; 
+    const userId = req.user.id_usuario;
     const user = await this.authService.getUserById(userId);
     return user;
   }
 
+  @Get('perfil/:id')
+  @UseGuards(JwtAuthGuard)
+  async getPerfilById(@Req() req) {
+    const userId = req.params.id;
+    const user = await this.authService.getUserById(userId);
+    return user;
+  }
 
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   async logout(@Res({ passthrough: true }) res: Response) {
-    // Limpiar la cookie
     res.clearCookie('jwt', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
