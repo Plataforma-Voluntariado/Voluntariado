@@ -1,0 +1,67 @@
+.location-picker-map-container {
+  position: relative;
+  width: 100%;
+}
+
+.location-picker-map {
+  width: 100%;
+  height: 100%;
+  transition: filter 160ms ease, opacity 160ms ease;
+}
+
+.location-picker-map.inactive {
+  filter: blur(1.5px) saturate(0.85);
+  opacity: 0.9;
+}
+
+.location-picker-map.active {
+  filter: none;
+  opacity: 1;
+}
+
+/* Overlay idéntico para activar el mapa */
+.map-overlay {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 2;
+}
+
+.map-overlay-hint {
+  margin: 12px;
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 12px;
+  user-select: none;
+}
+
+.location-picker-loading {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  z-index: 3;
+}
+
+.marker-container {
+  transform: translateY(-2px);
+}
+
+.marker-icon {
+  width: 28px;
+  height: 28px;
+  background: #e11d48;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}

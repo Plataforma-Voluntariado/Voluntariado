@@ -18,6 +18,7 @@ export const getCategorias = async () => {
 // Crear un nuevo voluntariado
 export const createVoluntariado = async (voluntariadoData, fotos = []) => {
   try {
+    console.log(voluntariadoData);
     const formData = new FormData();
 
     ["titulo", "descripcion", "horas", "maxParticipantes", "categoria_id"].forEach(key => {
@@ -28,7 +29,6 @@ export const createVoluntariado = async (voluntariadoData, fotos = []) => {
     formData.append("ubicacion", JSON.stringify(voluntariadoData.ubicacion));
 
     fotos.forEach(foto => formData.append("fotos", foto));
-
     const { data } = await api.post("/voluntariados", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
