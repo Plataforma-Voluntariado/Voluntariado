@@ -12,15 +12,20 @@ import { customSelectStylesVoluntariado } from "../../styles/selectStylesVolunta
 import { TextField } from "@mui/material";
 import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import Map, { Marker } from "react-map-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
-import { FaMapMarkerAlt } from "react-icons/fa";
+
+import LocationPickerMap from "../Map/LocationPickerMap/LocationPickerMap";
 
 
 const MAX_PHOTOS = 5;
 const MAX_SIZE = 5 * 1024 * 1024;
-const DEFAULT_COORDS = { latitud: -2.9001285, longitud: -76.6124805 };
-const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
+
+const DEFAULT_COORDS = { latitud: 1.1491254, longitud: -76.6465421 };
+
+// Helper para redondear coordenadas a N decimales (7 por defecto)
+const roundCoord = (n, digits = 7) => {
+  const num = Number(n);
+  return Number.isFinite(num) ? Number(num.toFixed(digits)) : n;
+};
 
 function CreateVoluntariadoForm({ onSuccess, onCancel }) {
   const { user } = useAuth();
@@ -317,7 +322,6 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
     }
   };
 
-
   // Preparar opciones para los selects
   const departamentoOptions = departamentos.map(dept => ({
     value: dept.id_departamento,
@@ -361,6 +365,23 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
       </div>
     );
   }
+
+  // Map selection handler: updates lat, lng and address
+  const handleMapSelect = ({ latitud, longitud, direccion }) => {
+    setFormData(prev => ({
+      ...prev,
+      ubicacion: {
+        ...prev.ubicacion,
+        latitud: roundCoord(latitud),
+        longitud: roundCoord(longitud),
+        // Only overwrite if we got an address; keeps manual edits if reverse geocode failed
+        direccion: direccion ?? prev.ubicacion.direccion
+      }
+    }));
+    if (direccion && errors["ubicacion.direccion"]) {
+      setErrors(prev => ({ ...prev, "ubicacion.direccion": "" }));
+    }
+  };
 
   return (
     <>
@@ -488,6 +509,21 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
           {/* Ubicación */}
           <div className="ubicacion-section">
             <h3>Ubicación del Voluntariado</h3>
+
+            {/* Mapa para seleccionar ubicación */}
+            <div className="form-group" style={{ marginBottom: "1rem" }}>
+              <label className="register-form-label">Selecciona en el mapa</label>
+              <LocationPickerMap
+                initialLat={formData.ubicacion.latitud}
+                initialLng={formData.ubicacion.longitud}
+                onSelect={handleMapSelect}
+                height={360}
+              />
+              <p className="secondary-text" style={{ marginTop: "0.5rem" }}>
+                Haz clic en el mapa para elegir la ubicación. Se autocompleta la dirección y se guardan las coordenadas.
+              </p>
+            </div>
+
             <div className="form-row">
               <div className="form-group">
                 <label className="register-form-label">Departamento *</label>
@@ -519,31 +555,16 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
               </div>
             </div>
 
-            {/* Mapa Interactivo */}
+
             <div className="form-group">
-              <label className="register-form-label">Selecciona la ubicación en el mapa *</label>
-              <p className="map-instruction">Haz clic en el mapa para seleccionar la ubicación exacta del voluntariado</p>
-              <div className={`map-container ${errors["ubicacion.direccion"] ? "error" : ""}`}>
-                <Map
-                  ref={mapRef}
-                  {...viewState}
-                  onMove={(evt) => setViewState(evt.viewState)}
-                  onClick={handleMapClick}
-                  mapStyle="mapbox://styles/mapbox/streets-v12"
-                  mapboxAccessToken={MAPBOX_TOKEN}
-                  style={{ width: "100%", height: "400px", borderRadius: "12px" }}
-                >
-                  {markerPosition && (
-                    <Marker
-                      longitude={markerPosition.longitude}
-                      latitude={markerPosition.latitude}
-                      anchor="bottom"
-                    >
-                      <FaMapMarkerAlt size={40} color="#dc2626" />
-                    </Marker>
-                  )}
-                </Map>
-              </div>
+              <label className="register-form-label">Dirección *</label>
+              <input
+                className={`register-form-input ${errors["ubicacion.direccion"] ? "error" : ""}`}
+                value={formData.ubicacion.direccion}
+                onChange={handleInputChange}
+                placeholder="Dirección completa (se autocompleta al seleccionar en el mapa)"
+                name="ubicacion.direccion"
+              />
               {errors["ubicacion.direccion"] && <span className="error-text">{errors["ubicacion.direccion"]}</span>}
             </div>
 

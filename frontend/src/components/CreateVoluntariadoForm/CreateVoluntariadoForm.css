@@ -2,17 +2,15 @@
 .create-voluntariado-form-container {
   display: flex;
   justify-content: center;
-  padding: 2rem;
-  background: #f8fafc;
   min-height: 100vh;
 }
 
 .create-voluntariado-form {
   background: #fff;
-  padding: 2rem;
+  padding: 3rem;
   width: 100%;
   max-width: 900px;
-  border-radius: 14px;
+  border-radius: var(--radius-large);
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
 }
 
@@ -263,4 +261,26 @@ textarea:focus {
     width: 84%;
   }
 
+}
+
+/* ======= Location Picker Map (mini) ======= */
+.location-picker-map-container {
+  width: 100%;
+  min-height: 300px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+.location-picker-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+  color: #374151;
 }

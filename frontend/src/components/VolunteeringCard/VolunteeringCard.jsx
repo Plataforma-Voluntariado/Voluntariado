@@ -14,7 +14,7 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
   const nombreEntidad = creador?.creador?.nombre_entidad;
   const { user } = useAuth();
 
-  const { isInscrito, isRechazado, isCreatorOwner } = useMemo(() => {
+  const { myInscripcion, isInscrito, isRechazado, isCreatorOwner } = useMemo(() => {
     const result = {
       isInscrito: false,
       isRechazado: false,
