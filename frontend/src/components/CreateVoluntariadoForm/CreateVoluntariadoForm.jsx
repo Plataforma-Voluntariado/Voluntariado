@@ -12,7 +12,7 @@ import { customSelectStylesVoluntariado } from "../../styles/selectStylesVolunta
 import { TextField } from "@mui/material";
 import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import LocationPickerMap from "./LocationPickerMap";
+import LocationPickerMap from "../Map/LocationPickerMap/LocationPickerMap";
 
 
 const MAX_PHOTOS = 5;

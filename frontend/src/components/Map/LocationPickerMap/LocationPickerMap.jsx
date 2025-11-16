@@ -1,7 +1,9 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import Map, { Marker, NavigationControl } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { reverseGeocode } from "../../services/map/geocodingService";
+import "./LocationPickerMap.css";
+import { reverseGeocode } from "../../../services/map/geocodingService";
+import { handleStyleLoad, attachClickOutside } from "../../../services/map/MapService";
 
 const token = process.env.REACT_APP_MAPBOX_TOKEN;
 
@@ -18,6 +20,22 @@ function LocationPickerMap({
   });
   const [marker, setMarker] = useState({ lat: initialLat, lng: initialLng });
   const [loading, setLoading] = useState(false);
+
+  // Activo/Inactivo como VolunteeringMap.jsx
+  const [isInteractive, setIsInteractive] = useState(false);
+  const containerRef = useRef(null);
+  const cleanupRef = useRef(null);
+
+  useEffect(() => {
+    cleanupRef.current = attachClickOutside(containerRef, () => setIsInteractive(false));
+    return () => {
+      if (cleanupRef.current) cleanupRef.current();
+    };
+  }, []);
+
+  const onStyleLoad = useCallback((map) => {
+    handleStyleLoad(map);
+  }, []);
 
   const handleClick = useCallback(async (e) => {
     try {
@@ -36,34 +54,51 @@ function LocationPickerMap({
         });
       }
     } catch (err) {
-      if (onSelect) {
-        onSelect({ latitud: marker.lat, longitud: marker.lng });
-      }
+      if (onSelect) onSelect({ latitud: marker.lat, longitud: marker.lng });
     } finally {
       setLoading(false);
     }
   }, [onSelect, marker.lat, marker.lng]);
 
   return (
-    <div className="location-picker-map-container" style={{ height }}>
+    <div
+      ref={containerRef}
+      className="location-picker-map-container"
+      style={{ height }}
+    >
       <Map
         {...viewState}
         onMove={(evt) => setViewState(evt.viewState)}
         mapStyle="mapbox://styles/mapbox/streets-v12"
         mapboxAccessToken={token}
+        onStyleLoad={onStyleLoad}
         onClick={handleClick}
-        style={{ width: "100%", height: "100%" }}
+        className={`location-picker-map ${isInteractive ? "active" : "inactive"}`}
+        dragPan={isInteractive}
+        scrollZoom={isInteractive}
+        boxZoom={isInteractive}
+        keyboard={isInteractive}
+        doubleClickZoom={isInteractive}
       >
         <NavigationControl position="top-left" />
         {marker && (
           <Marker latitude={Number(marker.lat)} longitude={Number(marker.lng)} anchor="bottom">
             <div className="marker-container">
-              <div className="marker-icon" style={{ width: 28, height: 28, background: "#e11d48", borderRadius: "50%" }} />
+              <div className="marker-icon" />
             </div>
           </Marker>
         )}
       </Map>
-      {loading && <div className="location-picker-overlay">Obteniendo dirección…</div>}
+
+      {!isInteractive && (
+        <div className="map-overlay" onClick={() => setIsInteractive(true)}>
+          <div className="map-overlay-hint">Haz clic para activar el mapa</div>
+        </div>
+      )}
+
+      {loading && (
+        <div className="location-picker-loading">Obteniendo dirección…</div>
+      )}
     </div>
   );
 }

@@ -9,16 +9,16 @@ import { useAuth } from "../../context/AuthContext";
 function VolunteeringCard({ volunteering, onFocusMap }) {
   const { titulo, descripcion, fechaHoraInicio, horas, maxParticipantes, estado, creador, categoria, fotos = [], ubicacion, inscripciones, participantesAceptados, } = volunteering;
   const [inscribing, setInscribing] = useState(false);
-  const [localInscribed, setLocalInscribed] = useState(false);
   const nombreEntidad = creador?.creador?.nombre_entidad;
   const { user } = useAuth();
   const isLogged = !!user;
 
-  const { myInscripcion, isInscrito, isRechazado, isCreatorOwner } = useMemo(() => {
+  const { isInscrito, isRechazado, isCreatorOwner } = useMemo(() => {
     const result = {
       myInscripcion: null,
       isInscrito: false,
       isRechazado: false,
+      
       isCreatorOwner: false,
     };
 
@@ -47,7 +47,7 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
     result.isRechazado = status === "rechazada";
 
     return result;
-  }, [inscripciones, user, creador]);
+  }, [inscripciones, user, creador, isLogged]);
 
   const handleInscribe = async () => {
     if (!volunteering?.id_voluntariado || inscribing) return;
@@ -68,7 +68,6 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
           message: resp.response.data.message,
         });
       }
-      setLocalInscribed(true);
       return await SuccessAlert({
         title: "¡Inscripción exitosa!",
         message: "Esperarás ser aceptado pronto.",
