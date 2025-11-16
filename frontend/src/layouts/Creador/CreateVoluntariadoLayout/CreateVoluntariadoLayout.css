@@ -1,7 +1,7 @@
 /* Layout general */
 .create-voluntariado-layout {
     min-height: 100vh;
-    background: linear-gradient(135deg, #eef2f7 0%, #dce6f5 100%);
+    background: var(--color-bg);
     padding: 5rem 0 2.5rem;
 }
 
@@ -23,11 +23,11 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: #ffffff;
-    color: #4a5cff;
+    background: var(--color-primary);
+    color: var(--color-bg);
     border: 1px solid rgba(74, 92, 255, 0.4);
-    padding: 0.65rem 1rem;
-    border-radius: 10px;
+    padding: 0.8rem 1.4rem;
+    border-radius: var(--radius-small);
     cursor: pointer;
     font-weight: 500;
     transition: all 0.25s ease-in-out;
@@ -36,7 +36,7 @@
 }
 
 .back-button:hover {
-    background: #4a5cff;
+    background: var(--color-title);
     color: white;
     transform: translateY(-2px);
     box-shadow: 0 6px 22px rgba(74, 92, 255, 0.35);
@@ -49,8 +49,7 @@
 
 .header-center h1 {
     margin-bottom: 0.4rem;
-    color: #1e293b;
-    font-weight: 800;
+    color: var(--color-primary);
     font-size: 2.3rem;
     letter-spacing: -0.5px;
 }
