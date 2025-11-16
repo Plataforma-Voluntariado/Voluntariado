@@ -1,11 +1,48 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import "./VolunteeringMapModal.css";
 import ConfirmAlert from "../../alerts/ConfirmAlert";
 import { InscribeIntoVolunteering } from "../../../services/volunteering/VolunteeringService";
-import Swal from "sweetalert2";
+import { SuccessAlert, WrongAlert } from "../../../utils/ToastAlerts";
+import { useAuth } from "../../../context/AuthContext";
 
 function VolunteeringMapModal({ volunteering, onClose }) {
   const [inscribing, setInscribing] = useState(false);
+  const [localInscribed, setLocalInscribed] = useState(false);
+  const { user } = useAuth();
+
+  const { isInscrito, isRechazado, isCreatorOwner } = useMemo(() => {
+    const result = {
+      isInscrito: false,
+      isRechazado: false,
+      isCreatorOwner: false,
+    };
+
+    if (!user) return result;
+
+    const userId = Number(user.userId);
+
+    result.isCreatorOwner = user.rol === "CREADOR" && Number(volunteering.creador?.id_usuario) === userId;
+
+    if (!Array.isArray(volunteering.inscripciones)) return result;
+    const sorted = [...volunteering.inscripciones].sort((a, b) => {
+      const idA = Number(a?.id_inscripcion ?? a?.id ?? 0);
+      const idB = Number(b?.id_inscripcion ?? b?.id ?? 0);
+      return idB - idA;
+    });
+    const ins = sorted.find((i) => {
+      const voluntarioId = Number(i?.voluntario?.id_usuario || i?.usuario?.id_usuario || i?.id_usuario || i?.voluntario || i?.usuario);
+      return !Number.isNaN(voluntarioId) && voluntarioId === userId;
+    }) || null;
+
+    if (!ins) return result;
+    const status = (ins?.estado_inscripcion || "").toString().toLowerCase();
+    result.isInscrito = status && !["cancelada", "rechazada"].includes(status);
+    result.isRechazado = status === "rechazada";
+
+    return result;
+  }, [volunteering.inscripciones, user, volunteering.creador]);
+
+  const effectiveIsInscrito = isInscrito || localInscribed;
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -40,6 +77,7 @@ function VolunteeringMapModal({ volunteering, onClose }) {
 
   const handleInscribe = async () => {
     if (!volunteering?.id_voluntariado || inscribing) return;
+    if (effectiveIsInscrito || isCreatorOwner) return;
     const confirmed = await ConfirmAlert({
       title: "Inscribirte",
       message: "¿Deseas inscribirte a este voluntariado?",
@@ -50,19 +88,23 @@ function VolunteeringMapModal({ volunteering, onClose }) {
     try {
       setInscribing(true);
       const resp = await InscribeIntoVolunteering(volunteering.id_voluntariado);
-      Swal.fire({
-        title: "Inscripción exitosa",
-        text: resp?.message || "Te has inscrito correctamente.",
-        icon: "success",
-        timer: 2500,
-        showConfirmButton: false
+      if (resp.status === 400) {
+        return await WrongAlert({
+          title: "Error",
+          message: resp.response.data.message,
+        });
+      }
+      setLocalInscribed(true);
+      return await SuccessAlert({
+        title: "¡Inscripción exitosa!",
+        message: "Esperarás ser aceptado pronto.",
+        timer: 1500,
+        position: "top-right",
       });
     } catch (e) {
-      console.error("Error inscribiendo:", e);
-      Swal.fire({
+      await WrongAlert({
         title: "Error",
-        text: "No fue posible realizar la inscripción.",
-        icon: "error"
+        message: "No fue posible realizar la inscripción.",
       });
     } finally {
       setInscribing(false);
@@ -187,13 +229,21 @@ function VolunteeringMapModal({ volunteering, onClose }) {
         </div>
 
         <div className="volunteering-map-modal-actions">
-          <button
-            className="volunteering-map-modal-button subscribe"
-            onClick={handleInscribe}
-            disabled={inscribing}
-          >
-            {inscribing ? "Inscribiendo..." : "Inscribirse"}
-          </button>
+          {!isCreatorOwner && (
+            <button
+              className={`volunteering-map-modal-button subscribe ${effectiveIsInscrito ? "inscribed" : isRechazado ? "rejected" : ""}`}
+              onClick={handleInscribe}
+              disabled={inscribing || effectiveIsInscrito || isRechazado}
+            >
+              {inscribing
+                ? "Inscribiendo..."
+                : effectiveIsInscrito
+                  ? "Inscrito"
+                  : isRechazado
+                    ? "Inscripción Rechazada"
+                    : "Inscribirse"}
+            </button>
+          )}
           <button className="volunteering-map-modal-button fullscreen">
             Ver información completa
           </button>

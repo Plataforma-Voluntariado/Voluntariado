@@ -121,3 +121,12 @@ export const cancelarVoluntariado = async (id) => {
     throw new Error(handleError(error, "Error al cancelar voluntariado"));
   }
 };
+
+export const getVoluntariadosByCreatorId = async (creatorId) => {
+  try {
+    const { data } = await api.get(`/voluntariados/voluntariado-creator/${creatorId}`);
+    return data;
+  } catch (error) {
+    throw new Error(handleError(error, "Error al obtener los voluntariados del creador"));
+  }
+};
