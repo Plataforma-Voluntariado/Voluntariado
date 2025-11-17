@@ -97,12 +97,22 @@ function VolunteeringMapModal({ volunteering, onClose }) {
         });
       }
       setLocalInscribed(true);
-      return await SuccessAlert({
+      await SuccessAlert({
         title: "¡Inscripción exitosa!",
         message: "Esperarás ser aceptado pronto.",
         timer: 1500,
         position: "top-right",
       });
+      // Navegar al detalle del voluntariado tras la inscripción exitosa
+      try {
+        navigate(`/voluntariado/${volunteering.id_voluntariado}`);
+        // Cerrar el modal después de un pequeño delay para evitar el solapamiento visual
+        setTimeout(() => {
+          onClose && onClose();
+        }, 300);
+      } catch (_) {
+        // si falla la navegación no bloqueamos el flujo
+      }
     } catch (e) {
       await WrongAlert({
         title: "Error",
@@ -166,19 +176,19 @@ function VolunteeringMapModal({ volunteering, onClose }) {
               </span>
             </div>
             <div className="volunteering-map-modal-info-item">
-              <span className="volunteering-map-modal-info-label">Horas</span>
+              <span className="volunteering-map-modal-info-label">Duración</span>
               <span className="volunteering-map-modal-info-value">
                 {volunteering.horas}h
               </span>
             </div>
             <div className="volunteering-map-modal-info-item">
-              <span className="volunteering-map-modal-info-label">Fecha</span>
+              <span className="volunteering-map-modal-info-label">Fecha inicio</span>
               <span className="volunteering-map-modal-info-value">
                 {formatDate(volunteering.fechaHoraInicio)}
               </span>
             </div>
             <div className="volunteering-map-modal-info-item">
-              <span className="volunteering-map-modal-info-label">Hora</span>
+              <span className="volunteering-map-modal-info-label">Hora entrada</span>
               <span className="volunteering-map-modal-info-value">
                 {formatTime(volunteering.fechaHoraInicio)}
               </span>
@@ -211,8 +221,35 @@ function VolunteeringMapModal({ volunteering, onClose }) {
           </div>
 
           <div className="volunteering-map-modal-creator-section">
-            <span className="volunteering-map-modal-creator-label">Creador</span>
-            <div className="volunteering-map-modal-creator">
+            <span className="volunteering-map-modal-creator-label">Perfil del Creador</span>
+            <div
+              className="volunteering-map-modal-creator"
+              role="button"
+              tabIndex={0}
+              aria-label="Ver perfil del creador"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (volunteering?.creador?.id_usuario) {
+                  navigate(`/creador/${volunteering.creador.id_usuario}`);
+                  // opcional: cerrar modal después de navegar
+                  setTimeout(() => {
+                    onClose && onClose();
+                  }, 250);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (volunteering?.creador?.id_usuario) {
+                    navigate(`/creador/${volunteering.creador.id_usuario}`);
+                    setTimeout(() => {
+                      onClose && onClose();
+                    }, 250);
+                  }
+                }
+              }}
+            >
               <img
                 src={volunteering.creador?.url_imagen || "/placeholder.svg"}
                 alt={volunteering.creador?.correo}
@@ -234,8 +271,18 @@ function VolunteeringMapModal({ volunteering, onClose }) {
           {!isCreatorOwner && (
             <button
               className={`volunteering-map-modal-button subscribe ${effectiveIsInscrito ? "inscribed" : isRechazado ? "rejected" : ""}`}
-              onClick={handleInscribe}
-              disabled={inscribing || effectiveIsInscrito || isRechazado}
+              onClick={() => {
+                if (effectiveIsInscrito) {
+                  // Si ya está inscrito, redirigir a la vista completa
+                  try {
+                    navigate(`/voluntariado/${volunteering.id_voluntariado}`);
+                  } catch (_) { /* ignore */ }
+                  setTimeout(() => { onClose && onClose(); }, 300);
+                  return;
+                }
+                handleInscribe();
+              }}
+              disabled={inscribing || isRechazado}
             >
               {inscribing
                 ? "Inscribiendo..."
