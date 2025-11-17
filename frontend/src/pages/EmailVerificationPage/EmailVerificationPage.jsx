@@ -16,11 +16,9 @@ function EmailVerificationPage() {
       const { message, success } = await verifyEmail(verificationCode.trim());
 
       if (success || message) {
-        await SuccessAlert({ message });
+        SuccessAlert({ message });
         return
       }
-
-      await WrongAlert({ title: "Error en la verificación", message: message || "Error al verificar el código." });
     } catch (err) {
       const msg = err?.response?.data?.message || err.message || "Ocurrió un error inesperado";
       await WrongAlert({ title: "Error en la verificación", message: Array.isArray(msg) ? msg.join("\n") : msg });

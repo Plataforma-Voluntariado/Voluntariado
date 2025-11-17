@@ -1,30 +1,126 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import "./CreateVoluntariadoForm.css";
 import { getCategorias } from "../../services/categoria/categoriaService";
 import { getDepartamentos, getCiudadesByDepartamento } from "../../services/ubicacion/ubicacionService";
 import { createVoluntariado } from "../../services/voluntariado/voluntariadoService";
 import { useAuth } from "../../context/AuthContext";
-import { SuccessAlert } from "../../utils/ToastAlerts";
-import { WrongAlert } from "../../utils/ToastAlerts";
+import { SuccessAlert, WrongAlert } from "../../utils/ToastAlerts";
 import ImagePreviewModal from "./ImagePreviewModal/ImagePreviewModal";
+import ImageDropzone, { DROPZONE_MAX_PHOTOS, DROPZONE_MAX_FILE_SIZE_BYTES, DROPZONE_MAX_FILE_SIZE_LABEL } from "./ImageDropzone/ImageDropzone";
 import Select from "react-select";
 import { customSelectStylesVoluntariado } from "../../styles/selectStylesVoluntariado";
 import { TextField } from "@mui/material";
 import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-
 import LocationPickerMap from "../Map/LocationPickerMap/LocationPickerMap";
 
+const roundCoord = (value, digits = 7) => {
+  const num = Number(value);
+  return Number.isFinite(num) ? Number(num.toFixed(digits)) : value;
+};
 
-const MAX_PHOTOS = 5;
-const MAX_SIZE = 5 * 1024 * 1024;
+const readFileData = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve({ name: file.name, url: reader.result });
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 
-const DEFAULT_COORDS = { latitud: 1.1491254, longitud: -76.6465421 };
+const normalizeText = (value) => {
+  if (!value) return "";
+  try {
+    return value.toString().normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
+  } catch (error) {
+    return value.toString().toLowerCase().trim();
+  }
+};
 
-// Helper para redondear coordenadas a N decimales (7 por defecto)
-const roundCoord = (n, digits = 7) => {
-  const num = Number(n);
-  return Number.isFinite(num) ? Number(num.toFixed(digits)) : n;
+const parseAddressString = (address, departamentos = []) => {
+  if (!address || !address.toString) return {};
+  const parts = address
+    .toString()
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  const parsed = {
+    direccion: "",
+    codigo_postal: "",
+    ciudad: "",
+    departamento: "",
+    pais: "",
+    nombre_sector: ""
+  };
+
+  if (!parts.length) return parsed;
+  parsed.direccion = parts[0];
+
+  if (parts.length === 1) {
+    parsed.ciudad = parts[0];
+    parsed.direccion = "";
+    return parsed;
+  }
+
+  if (parts.length >= 2) {
+    const secondPart = parts[1];
+    const normalizedSecond = normalizeText(secondPart);
+    const matchingDept = departamentos.find((dept) => {
+      const normalizedDept = normalizeText(dept.departamento);
+      return (
+        normalizedDept === normalizedSecond ||
+        normalizedDept.includes(normalizedSecond) ||
+        normalizedSecond.includes(normalizedDept)
+      );
+    });
+
+    if (matchingDept) {
+      parsed.ciudad = parts[0];
+      parsed.departamento = secondPart;
+      parsed.direccion = "";
+      parsed.pais = parts[2] || parsed.pais;
+      return parsed;
+    }
+  }
+
+  for (let index = 1; index < parts.length; index += 1) {
+    const section = parts[index];
+    const zipMatch = section.match(/(\d{4,6})\s+(.+)/);
+
+    if (zipMatch) {
+      parsed.codigo_postal = zipMatch[1];
+      parsed.ciudad = zipMatch[2].trim();
+      parsed.departamento = (parts[index + 1] || parsed.departamento).trim();
+      parsed.pais = (parts[index + 2] || parsed.pais).trim();
+      break;
+    }
+
+    if (!parsed.ciudad && /^[A-Za-zÀ-ÖØ-öø-ÿ\s\-()]+$/.test(section)) {
+      if (parts[index + 1] && /^[A-Za-zÀ-ÖØ-öø-ÿ\s\-()]+$/.test(parts[index + 1])) {
+        parsed.ciudad = section;
+        parsed.departamento = parts[index + 1];
+        parsed.pais = parts[index + 2] || "";
+        break;
+      }
+      parsed.ciudad = section;
+    }
+  }
+
+  if (!parsed.ciudad && parts[1]) {
+    parsed.ciudad = parts[1];
+  }
+
+  if (parsed.ciudad && normalizeText(parsed.ciudad) === normalizeText(parsed.direccion)) {
+    parsed.direccion = "";
+  }
+
+  Object.keys(parsed).forEach((key) => {
+    if (typeof parsed[key] === "string") {
+      parsed[key] = parsed[key].trim();
+    }
+  });
+
+  return parsed;
 };
 
 function CreateVoluntariadoForm({ onSuccess, onCancel }) {
@@ -37,8 +133,8 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
   const [previewImages, setPreviewImages] = useState([]);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [isDragOver, setIsDragOver] = useState(false);
   const [selectedImageModal, setSelectedImageModal] = useState(null);
+  const [imageResetToken, setImageResetToken] = useState(0);
   const [formData, setFormData] = useState({
     titulo: "",
     descripcion: "",
@@ -46,253 +142,430 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
     horas: 1,
     maxParticipantes: 10,
     categoria_id: "",
-    ubicacion: { ...DEFAULT_COORDS, direccion: "", ciudad_id: "", nombre_sector: "" }
+    ubicacion: { latitud: undefined, longitud: undefined, direccion: "", ciudad_id: "", nombre_sector: "" }
   });
 
+  const clearError = useCallback((field) => {
+    setErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  }, []);
+
+  const incrementImageResetToken = useCallback(() => {
+    setImageResetToken((prev) => prev + 1);
+  }, []);
+
   useEffect(() => {
-    (async () => {
-      try { setCategorias(await getCategorias()); }
-      catch {
+    let isMounted = true;
+    const loadInitialData = async () => {
+      try {
+        const [categoriasData, departamentosData] = await Promise.all([
+          getCategorias(),
+          getDepartamentos()
+        ]);
+        if (isMounted) {
+          setCategorias(categoriasData || []);
+          setDepartamentos(departamentosData || []);
+        }
+      } catch (error) {
+        console.error("Error al cargar datos iniciales", error);
       }
-      try { setDepartamentos(await getDepartamentos()); }
-      catch {
-      }
-    })();
+    };
+
+    loadInitialData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   useEffect(() => {
     if (!selectedDepartamento) {
       setCiudades([]);
-      setFormData(prev => ({ ...prev, ubicacion: { ...prev.ubicacion, ciudad_id: "" } }));
       return;
     }
-    (async () => {
+
+    let isMounted = true;
+    const loadCities = async () => {
       try {
         const data = await getCiudadesByDepartamento(selectedDepartamento);
-        setCiudades(data);
-      } catch {
+        if (isMounted) {
+          setCiudades(data || []);
+        }
+      } catch (error) {
+        console.error("Error al cargar ciudades", error);
       }
-    })();
+    };
+
+    loadCities();
+    return () => {
+      isMounted = false;
+    };
   }, [selectedDepartamento]);
 
-  const readFileData = (file) =>
-    new Promise((res, rej) => {
-      const reader = new FileReader();
-      reader.onload = () => res({ name: file.name, url: reader.result });
-      reader.onerror = rej;
-      reader.readAsDataURL(file);
-    });
+  const processFiles = useCallback(
+    async (fileList) => {
+      const filesArr = Array.from(fileList || []);
+      if (!filesArr.length) return;
 
-  const processFiles = async (fileList) => {
-    const filesArr = Array.from(fileList);
-    if (fotos.length + filesArr.length > MAX_PHOTOS) {
-      const available = MAX_PHOTOS - fotos.length;
-      await WrongAlert({
-        title: "Límite excedido",
-        message: `Solo puedes agregar ${available} imagen(es) más.`
-      });
-      return;
-    }
-    for (const f of filesArr) {
-      if (f.size > MAX_SIZE) {
+      if (fotos.length + filesArr.length > DROPZONE_MAX_PHOTOS) {
+        const available = DROPZONE_MAX_PHOTOS - fotos.length;
         await WrongAlert({
-          title: "Archivo muy grande",
-          message: `${f.name} supera 5MB.`
+          title: "Límite excedido",
+          message: `Solo puedes agregar ${available} imagen(es) más.`
         });
         return;
       }
-    }
-    try {
-      const previews = await Promise.all(filesArr.map(readFileData));
-      setFotos(prev => [...prev, ...filesArr]);
-      setPreviewImages(prev => [...prev, ...previews]);
-      setErrors(prev => ({ ...prev, fotos: "" }));
-    } catch {
-      await WrongAlert({
-        title: "Error",
-        message: "No se pudieron procesar las imágenes"
+
+      for (const file of filesArr) {
+        if (file.size > DROPZONE_MAX_FILE_SIZE_BYTES) {
+          await WrongAlert({
+            title: "Archivo muy grande",
+            message: `${file.name} supera ${DROPZONE_MAX_FILE_SIZE_LABEL}.`
+          });
+          return;
+        }
+      }
+
+      try {
+        const previews = await Promise.all(filesArr.map(readFileData));
+        setFotos((prev) => [...prev, ...filesArr]);
+        setPreviewImages((prev) => [...prev, ...previews]);
+        clearError("fotos");
+      } catch (error) {
+        console.error("Error al procesar imágenes", error);
+        await WrongAlert({
+          title: "Error",
+          message: "No se pudieron procesar las imágenes"
+        });
+      }
+    },
+    [clearError, fotos.length]
+  );
+
+  const handleInputChange = useCallback(
+    (event) => {
+      const { name, value } = event.target;
+      if (name.startsWith("ubicacion.")) {
+        const key = name.split(".")[1];
+        setFormData((prev) => {
+          const nextUbicacion = { ...prev.ubicacion, [key]: value };
+          if (key === "nombre_sector" && value.trim() && !prev.ubicacion.direccion?.trim()) {
+            nextUbicacion.direccion = value;
+          }
+          return { ...prev, ubicacion: nextUbicacion };
+        });
+        if (key === "nombre_sector" && value.trim()) {
+          clearError("ubicacion.direccion");
+        }
+      } else {
+        const numericFields = ["horas", "maxParticipantes", "categoria_id"];
+        const parsedValue = numericFields.includes(name) ? parseInt(value, 10) || "" : value;
+        setFormData((prev) => ({ ...prev, [name]: parsedValue }));
+      }
+      clearError(name);
+    },
+    [clearError]
+  );
+
+  const handleSelectChange = useCallback(
+    (name, selected) => {
+      const value = selected ? selected.value : "";
+      if (name === "departamento") {
+        setSelectedDepartamento(value);
+        setCiudades([]);
+        setFormData((prev) => ({
+          ...prev,
+          ubicacion: { ...prev.ubicacion, ciudad_id: "" }
+        }));
+      } else if (name === "ubicacion.ciudad_id") {
+        setFormData((prev) => ({
+          ...prev,
+          ubicacion: { ...prev.ubicacion, ciudad_id: value }
+        }));
+      } else if (name === "categoria_id") {
+        setFormData((prev) => ({ ...prev, categoria_id: value }));
+      }
+
+      clearError(name);
+    },
+    [clearError]
+  );
+
+  const handleClearAllImages = useCallback(() => {
+    setFotos([]);
+    setPreviewImages([]);
+    incrementImageResetToken();
+    clearError("fotos");
+  }, [clearError, incrementImageResetToken]);
+
+  const removeImage = useCallback(
+    (index) => {
+      setFotos((prev) => prev.filter((_, i) => i !== index));
+      setPreviewImages((prev) => {
+        const next = prev.filter((_, i) => i !== index);
+        if (!next.length) {
+          incrementImageResetToken();
+        }
+        return next;
       });
-    }
-  };
+    },
+    [incrementImageResetToken]
+  );
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    if (name.startsWith("ubicacion.")) {
-      const key = name.split(".")[1];
-      setFormData(prev => ({ ...prev, ubicacion: { ...prev.ubicacion, [key]: value } }));
-    } else {
-      const parsed = ["horas", "maxParticipantes", "categoria_id"].includes(name) ? (parseInt(value) || "") : value;
-      setFormData(prev => ({ ...prev, [name]: parsed }));
-    }
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: "" }));
-  };
-
-  const handleSelectChange = (name, selected) => {
-    const value = selected ? selected.value : "";
-    if (name === "departamento") {
-      setSelectedDepartamento(value);
-      setCiudades([]);
-      setFormData(prev => ({ ...prev, ubicacion: { ...prev.ubicacion, ciudad_id: "" } }));
-    } else if (name === "ubicacion.ciudad_id") {
-      setFormData(prev => ({
-        ...prev,
-        ubicacion: { ...prev.ubicacion, ciudad_id: value }
-      }));
-    } else if (name === "categoria_id") {
-      setFormData(prev => ({ ...prev, categoria_id: value }));
-    }
-
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: "" }));
-  };
-
-  const handleFotosChange = (e) => {
-    const files = e.target.files;
-    if (files && files.length) processFiles(files);
-    const input = document.getElementById("fotos");
-    if (input) input.value = "";
-  };
-
-  const handleDragOver = (e) => { e.preventDefault(); setIsDragOver(true); };
-  const handleDragLeave = (e) => { e.preventDefault(); setIsDragOver(false); };
-  const handleDrop = (e) => { e.preventDefault(); setIsDragOver(false); if (e.dataTransfer.files) processFiles(e.dataTransfer.files); };
-
-  const removeImage = (index) => {
-    setFotos(prev => prev.filter((_, i) => i !== index));
-    setPreviewImages(prev => prev.filter((_, i) => i !== index));
-    const input = document.getElementById("fotos");
-    if (input && previewImages.length - 1 === 0) input.value = "";
-  };
-
-  const clearAllImages = () => { setFotos([]); setPreviewImages([]); const input = document.getElementById("fotos"); if (input) input.value = ""; };
-
-  const openImageModal = (image, index) => {
+  const openImageModal = useCallback((image, index) => {
     const scrollY = window.scrollY;
     document.body.style.position = "fixed";
     document.body.style.top = `-${scrollY}px`;
     setSelectedImageModal({ ...image, index, scrollY });
-  };
+  }, []);
 
-  const validateForm = () => {
+  const validateForm = useCallback(() => {
     const newErrors = {};
     if (!formData.titulo.trim()) newErrors.titulo = "El título es obligatorio";
     else if (formData.titulo.length > 255) newErrors.titulo = "Máx 255 caracteres";
+
     if (!formData.descripcion.trim()) newErrors.descripcion = "La descripción es obligatoria";
     if (!formData.fechaHoraInicio) newErrors.fechaHoraInicio = "La fecha y hora son obligatorias";
-    else if (new Date(formData.fechaHoraInicio) <= new Date()) newErrors.fechaHoraInicio = "La fecha debe ser futura";
+    else if (new Date(formData.fechaHoraInicio) <= new Date()) {
+      newErrors.fechaHoraInicio = "La fecha debe ser futura";
+    }
     if (!formData.horas || formData.horas < 1) newErrors.horas = "Las horas deben ser mínimo 1";
-    if (!formData.maxParticipantes || formData.maxParticipantes < 1) newErrors.maxParticipantes = "Mínimo 1 participante";
-    else if (formData.maxParticipantes > 100) newErrors.maxParticipantes = "Máximo 100 participantes";
+    if (!formData.maxParticipantes || formData.maxParticipantes < 1) {
+      newErrors.maxParticipantes = "Mínimo 1 participante";
+    } else if (formData.maxParticipantes > 100) {
+      newErrors.maxParticipantes = "Máximo 100 participantes";
+    }
     if (!formData.categoria_id) newErrors.categoria_id = "La categoría es obligatoria";
-    if (!formData.ubicacion.direccion.trim()) newErrors["ubicacion.direccion"] = "La dirección es obligatoria";
-    if (!formData.ubicacion.nombre_sector.trim()) newErrors["ubicacion.nombre_sector"] = "El barrio/sector es obligatorio";
-    if (!formData.ubicacion.ciudad_id) newErrors["ubicacion.ciudad_id"] = "La ciudad es obligatoria";
+    const hasDireccion = formData.ubicacion.direccion.trim();
+    const hasSector = formData.ubicacion.nombre_sector.trim();
+    if (!formData.ubicacion.ciudad_id) {
+      newErrors["ubicacion.ciudad_id"] = "La ciudad es obligatoria";
+    }
+    if (!hasDireccion && !hasSector) {
+      newErrors["ubicacion.direccion"] = "La dirección es obligatoria";
+      newErrors["ubicacion.nombre_sector"] = "El barrio/sector es obligatorio";
+    }
     if (!fotos || fotos.length === 0) newErrors.fotos = "Debes subir al menos una foto";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
+  }, [fotos, formData]);
 
-  const resetForm = () => {
+
+  const resetForm = useCallback(() => {
     setFormData({
-      titulo: "", descripcion: "", fechaHoraInicio: "", horas: 1, maxParticipantes: 10, categoria_id: "",
-      ubicacion: { ...DEFAULT_COORDS, direccion: "", ciudad_id: "", nombre_sector: "" }
+      titulo: "",
+      descripcion: "",
+      fechaHoraInicio: "",
+      horas: 1,
+      maxParticipantes: 10,
+      categoria_id: "",
+      ubicacion: { latitud: "", longitud: "", direccion: "", ciudad_id: "", nombre_sector: "" }
     });
-    setFotos([]); 
-    setPreviewImages([]); 
     setSelectedDepartamento("");
-    const fileInput = document.getElementById("fotos"); 
-    if (fileInput) fileInput.value = "";
-  };
+    setCiudades([]);
+    handleClearAllImages();
+    setErrors({});
+  }, [handleClearAllImages]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(
+    async (event) => {
+      event.preventDefault();
 
-    // Validar formulario
-    if (!validateForm()) {
-      await WrongAlert({
-        title: "Formulario incompleto",
-        message: "Por favor completa todos los campos obligatorios"
-      });
-      return;
-    }
+      if (!validateForm()) {
+        await WrongAlert({
+          title: "Formulario incompleto",
+          message: "Por favor completa todos los campos obligatorios"
+        });
+        return;
+      }
 
-    // Validar autenticación y rol
-    if (!user || user.rol !== "CREADOR") {
-      await WrongAlert({
-        title: "Permisos insuficientes",
-        message: "Debes estar autenticado con rol CREADOR para crear voluntariados"
-      });
-      return;
-    }
+      if (!user || user.rol !== "CREADOR") {
+        await WrongAlert({
+          title: "Permisos insuficientes",
+          message: "Debes estar autenticado con rol CREADOR para crear voluntariados"
+        });
+        return;
+      }
 
-    setLoading(true);
+      setLoading(true);
 
-    try {
-      // Asegurar que ciudad_id sea un número
-      const dataToSend = {
-        ...formData,
-        ubicacion: {
-          ...formData.ubicacion,
-          ciudad_id: parseInt(formData.ubicacion.ciudad_id)
-        }
+      try {
+        const finalDireccion = (formData.ubicacion.direccion || formData.ubicacion.nombre_sector || "").trim();
+        const payload = {
+          ...formData,
+          ubicacion: {
+            ...formData.ubicacion,
+            direccion: finalDireccion,
+            ciudad_id: parseInt(formData.ubicacion.ciudad_id, 10)
+          }
+        };
+
+        console.log("Payload de creación de voluntariado:", payload);
+        const result = await createVoluntariado(payload, fotos);
+        await SuccessAlert({
+          title: "¡Voluntariado creado!",
+          timer: 1500
+        });
+
+        resetForm();
+        if (onSuccess) onSuccess(result);
+      } catch (error) {
+        console.error("Error al crear voluntariado", error);
+        await WrongAlert({
+          title: "Error al crear voluntariado",
+          message: error?.message || "Ocurrió un error al intentar crear el voluntariado"
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fotos, formData, onSuccess, resetForm, user, validateForm]
+  );
+
+  const categoriaOptions = useMemo(
+    () =>
+      categorias.map((cat) => ({
+        value: cat.id_categoria,
+        label: cat.nombre
+      })),
+    [categorias]
+  );
+
+  const selectedCategoriaValue = useMemo(() => {
+    if (!formData.categoria_id) return null;
+    const match = categorias.find((cat) => cat.id_categoria === formData.categoria_id);
+    return match ? { value: formData.categoria_id, label: match.nombre } : null;
+  }, [categorias, formData.categoria_id]);
+
+  const ciudadDetectadaLabel = useMemo(() => {
+    if (!formData.ubicacion.ciudad_id || !ciudades.length) return "";
+    const match = ciudades.find((ciudad) => ciudad.id_ciudad === formData.ubicacion.ciudad_id);
+    return match?.ciudad || "";
+  }, [ciudades, formData.ubicacion.ciudad_id]);
+
+  const hasCreatorAccess = user?.rol === "CREADOR";
+
+  const autoSelectLocationFromParsed = useCallback(
+    async (parsed) => {
+      if (!parsed) return;
+      const parsedDept = normalizeText(parsed.departamento);
+      const parsedCity = normalizeText(parsed.ciudad);
+      if (!parsedDept && !parsedCity) return;
+
+      const findCityInDept = async (deptId) => {
+        const citiesData = await getCiudadesByDepartamento(deptId);
+        const match = citiesData.find((city) => {
+          const normalizedCity = normalizeText(city.ciudad);
+          return (
+            normalizedCity === parsedCity ||
+            normalizedCity.includes(parsedCity) ||
+            parsedCity.includes(normalizedCity)
+          );
+        });
+        return { match, citiesData };
       };
 
-      console.log("Datos a enviar:", dataToSend);
-      
-      // Crear voluntariado usando directamente los datos del formulario y fotos
-      const result = await createVoluntariado(dataToSend, fotos);
-      await SuccessAlert({
-        title: "¡Voluntariado creado!",
-        timer: 1500
+      if (parsedDept) {
+        const departmentMatch = departamentos.find((dept) => normalizeText(dept.departamento) === parsedDept);
+        if (departmentMatch) {
+          setSelectedDepartamento(departmentMatch.id_departamento);
+          try {
+            const { match, citiesData } = await findCityInDept(departmentMatch.id_departamento);
+            setCiudades(citiesData);
+            if (match) {
+              setFormData((prev) => ({
+                ...prev,
+                ubicacion: { ...prev.ubicacion, ciudad_id: match.id_ciudad }
+              }));
+              clearError("ubicacion.ciudad_id");
+            }
+            return;
+          } catch (error) {
+            console.error("Error autocompletando ciudad", error);
+          }
+        }
+      }
+
+      if (parsedCity) {
+        for (const dept of departamentos) {
+          try {
+            const { match, citiesData } = await findCityInDept(dept.id_departamento);
+            if (match) {
+              setSelectedDepartamento(dept.id_departamento);
+              setCiudades(citiesData);
+              setFormData((prev) => ({
+                ...prev,
+                ubicacion: { ...prev.ubicacion, ciudad_id: match.id_ciudad }
+              }));
+              clearError("ubicacion.ciudad_id");
+              break;
+            }
+          } catch (error) {
+            console.error("Error buscando ciudad por departamento", error);
+          }
+        }
+      }
+    },
+    [clearError, departamentos]
+  );
+
+  const handleMapSelect = useCallback(
+    async ({ latitud, longitud, direccion }) => {
+      setFormData((prev) => ({
+        ...prev,
+        ubicacion: {
+          ...prev.ubicacion,
+          latitud: roundCoord(latitud),
+          longitud: roundCoord(longitud),
+          direccion: direccion ? direccion.trim() : ""
+        }
+      }));
+
+      if (!direccion) return;
+
+      const parsed = parseAddressString(direccion, departamentos);
+
+      console.log("Dirección parseada:", parsed);
+
+      setFormData((prev) => {
+        const parsedDireccion = parsed.direccion?.trim() || "";
+        const parsedSector = parsed.nombre_sector?.trim() || "";
+
+        const direccionFinal =
+          parsedDireccion !== ""
+            ? parsedDireccion
+            : parsedSector || ""; 
+
+        return {
+          ...prev,
+          ubicacion: {
+            ...prev.ubicacion,
+            direccion: direccionFinal,
+            nombre_sector: parsedSector || prev.ubicacion.nombre_sector
+          }
+        };
       });
 
-      // Resetear formulario y pasar el resultado al callback
-      resetForm();
-      if (onSuccess) onSuccess(result);
+      if (parsed.direccion || parsed.nombre_sector) {
+        clearError("ubicacion.direccion");
+        clearError("ubicacion.nombre_sector");
+      }
 
-    } catch (err) {
-      console.log(err)
-      await WrongAlert({
-        title: "Error al crear voluntariado",
-        message: err?.message || "Ocurrió un error al intentar crear el voluntariado"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        await autoSelectLocationFromParsed(parsed);
+      } catch (error) {
+        console.error("Error auto-seleccionando ubicación", error);
+      }
+    },
+    [autoSelectLocationFromParsed, clearError, departamentos]
+  );
 
-  // Preparar opciones para los selects
-  const departamentoOptions = departamentos.map(dept => ({
-    value: dept.id_departamento,
-    label: dept.departamento
-  }));
 
-  const ciudadOptions = ciudades.map(ciudad => ({
-    value: ciudad.id_ciudad,
-    label: ciudad.ciudad
-  }));
 
-  const categoriaOptions = categorias.map(cat => ({
-    value: cat.id_categoria,
-    label: cat.nombre
-  }));
-
-  // Valores seleccionados para los selects
-  const selectedDeptValue = selectedDepartamento ? {
-    value: selectedDepartamento,
-    label: departamentos.find(dept => dept.id_departamento === selectedDepartamento)?.departamento
-  } : null;
-
-  const selectedCiudadValue = formData.ubicacion.ciudad_id ? {
-    value: formData.ubicacion.ciudad_id,
-    label: ciudades.find(ciudad => ciudad.id_ciudad === formData.ubicacion.ciudad_id)?.ciudad
-  } : null;
-
-  const selectedCategoriaValue = formData.categoria_id ? {
-    value: formData.categoria_id,
-    label: categorias.find(cat => cat.id_categoria === formData.categoria_id)?.nombre
-  } : null;
-
-  if (!user || user.rol !== "CREADOR") {
+  if (!hasCreatorAccess) {
     return (
       <div className="create-voluntariado-form-container">
         <div style={{ textAlign: "center", padding: "2rem" }}>
@@ -304,28 +577,10 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
     );
   }
 
-  // Map selection handler: updates lat, lng and address
-  const handleMapSelect = ({ latitud, longitud, direccion }) => {
-    setFormData(prev => ({
-      ...prev,
-      ubicacion: {
-        ...prev.ubicacion,
-        latitud: roundCoord(latitud),
-        longitud: roundCoord(longitud),
-        // Only overwrite if we got an address; keeps manual edits if reverse geocode failed
-        direccion: direccion ?? prev.ubicacion.direccion
-      }
-    }));
-    if (direccion && errors["ubicacion.direccion"]) {
-      setErrors(prev => ({ ...prev, "ubicacion.direccion": "" }));
-    }
-  };
-
   return (
     <>
       <div className="create-voluntariado-form-container">
         <form onSubmit={handleSubmit} className="create-voluntariado-form">
-          {/* Título y categoría */}
           <div className="form-row">
             <div className="form-group">
               <label className="register-form-label">Título *</label>
@@ -354,8 +609,6 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
               {errors.categoria_id && <span className="error-text">{errors.categoria_id}</span>}
             </div>
           </div>
-
-          {/* Descripción */}
           <div className="form-group form-group-text-area">
             <label className="register-form-label">Descripción *</label>
             <textarea
@@ -368,8 +621,6 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
             />
             {errors.descripcion && <span className="error-text">{errors.descripcion}</span>}
           </div>
-
-          {/* Fecha / horas / participantes */}
           <div className="form-row">
             <div className="form-group">
               <div className="fecha-picker-wrapper" style={{ width: "100%" }}>
@@ -382,13 +633,13 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
                         ...prev,
                         fechaHoraInicio: newValue ? newValue.toISOString() : ""
                       }));
-                      if (errors.fechaHoraInicio) setErrors(prev => ({ ...prev, fechaHoraInicio: "" }));
+                      clearError("fechaHoraInicio");
                     }}
                     minDate={new Date()}
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        fullWidth 
+                        fullWidth
                         className={`register-form-input ${errors.fechaHoraInicio ? "error" : ""}`}
                         sx={{
                           "& .MuiInputBase-root": {
@@ -443,12 +694,8 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
               {errors.maxParticipantes && <span className="error-text">{errors.maxParticipantes}</span>}
             </div>
           </div>
-
-          {/* Ubicación */}
           <div className="ubicacion-section">
             <h3>Ubicación del Voluntariado</h3>
-
-            {/* Mapa para seleccionar ubicación */}
             <div className="form-group" style={{ marginBottom: "1rem" }}>
               <label className="register-form-label">Selecciona en el mapa</label>
               <LocationPickerMap
@@ -461,61 +708,11 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
                 Haz clic en el mapa para elegir la ubicación. Se autocompleta la dirección y se guardan las coordenadas.
               </p>
             </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label className="register-form-label">Departamento *</label>
-                <Select
-                  className="register-form-react-select"
-                  options={departamentoOptions}
-                  value={selectedDeptValue}
-                  onChange={(selected) => handleSelectChange("departamento", selected)}
-                  placeholder="Selecciona un departamento"
-                  isClearable
-                  styles={customSelectStylesVoluntariado}
-                  isSearchable={false}
-                />
-              </div>
-              <div className="form-group">
-                <label className="register-form-label">Ciudad *</label>
-                <Select
-                  className="register-form-react-select"
-                  options={ciudadOptions}
-                  value={selectedCiudadValue}
-                  onChange={(selected) => handleSelectChange("ubicacion.ciudad_id", selected)}
-                  placeholder={selectedDepartamento ? "Selecciona una ciudad" : "Seleccione un departamento"}
-                  isDisabled={!selectedDepartamento}
-                  isClearable
-                  styles={customSelectStylesVoluntariado}
-                  isSearchable={false}
-                />
-                {errors["ubicacion.ciudad_id"] && <span className="error-text">{errors["ubicacion.ciudad_id"]}</span>}
-              </div>
-            </div>
-
-
-            <div className="form-group">
-              <label className="register-form-label">Dirección *</label>
-              <input
-                className={`register-form-input ${errors["ubicacion.direccion"] ? "error" : ""}`}
-                value={formData.ubicacion.direccion}
-                onChange={handleInputChange}
-                placeholder="Dirección completa (se autocompleta al seleccionar en el mapa)"
-                name="ubicacion.direccion"
-              />
-              {errors["ubicacion.direccion"] && <span className="error-text">{errors["ubicacion.direccion"]}</span>}
-            </div>
-
-            {/* Dirección (solo lectura) */}
-            <div className="form-group">
-              <label className="register-form-label">Dirección seleccionada</label>
-              <input
-                className="register-form-input direccion-readonly"
-                value={formData.ubicacion.direccion || "Haz clic en el mapa para seleccionar la ubicación"}
-                readOnly
-                placeholder="La dirección se mostrará aquí"
-              />
-            </div>
+            {ciudadDetectadaLabel && (
+              <p className="secondary-text" style={{ marginBottom: "1rem" }}>
+                Ciudad detectada automáticamente: {ciudadDetectadaLabel}
+              </p>
+            )}
 
             <div className="form-row">
               <div className="form-group">
@@ -526,6 +723,7 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
                   onChange={handleInputChange}
                   placeholder="Barrio o sector"
                   name="ubicacion.nombre_sector"
+
                 />
                 {errors["ubicacion.nombre_sector"] && (
                   <span className="error-text">{errors["ubicacion.nombre_sector"]}</span>
@@ -534,57 +732,16 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
             </div>
           </div>
 
-          {/* Fotos */}
-          <div className="form-group">
-            <label className="register-form-label">Fotos del Voluntariado *</label>
-            <div
-              className={`drag-drop-zone ${isDragOver ? "drag-over" : ""} ${errors.fotos ? "error" : ""}`}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              onClick={() => document.getElementById("fotos").click()}
-            >
-              <div className="drag-drop-content">
-                <div className="upload-icon">
-                  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M16 13L12 9L8 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M12 9V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-                <p className="primary-text">{previewImages.length ? `Arrastra más imágenes o haz clic para agregar` : `Arrastra tus imágenes o haz clic para seleccionar`}</p>
-                <p className="secondary-text">Máximo 5 fotos • Hasta 5MB cada una • JPG, PNG, GIF</p>
-              </div>
-              <input id="fotos" type="file" accept="image/*" multiple onChange={handleFotosChange} style={{ display: "none" }} />
-            </div>
-            {errors.fotos && <span className="error-text">{errors.fotos}</span>}
-
-            {previewImages.length > 0 && (
-              <div className="image-preview-container">
-                <div className="preview-header">
-                  <p className="preview-title">Imágenes seleccionadas ({previewImages.length}/{MAX_PHOTOS})</p>
-                  <button type="button" className="clear-all-btn" onClick={clearAllImages}>Limpiar todo</button>
-                </div>
-                <div className="image-preview-grid">
-                  {previewImages.map((image, i) => (
-                    <div key={i} className="image-preview-item">
-                      <div className="image-container" onClick={() => openImageModal(image, i)}>
-                        <img src={image.url} alt={image.name} className="preview-image" />
-                        <div className="image-overlay">
-                          <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
-                          </svg>
-                        </div>
-                      </div>
-                      <button type="button" className="remove-image-btn" onClick={(e) => { e.stopPropagation(); removeImage(i); }}>✕</button>
-                      <p className="image-name">{image.name}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          <ImageDropzone
+            label="Fotos del Voluntariado *"
+            previewImages={previewImages}
+            error={errors.fotos}
+            onFilesSelected={processFiles}
+            onRemoveImage={removeImage}
+            onClearAll={handleClearAllImages}
+            onOpenPreview={openImageModal}
+            resetTrigger={imageResetToken}
+          />
 
           <div className="form-actions">
             {onCancel && <button type="button" onClick={onCancel} className="btn-cancel">Cancelar</button>}

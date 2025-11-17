@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./VoluntariadoDetailPage.css";
 import { getVoluntariadoById } from "../../services/voluntariado/voluntariadoService";
@@ -23,23 +23,7 @@ function VoluntariadoDetailPage() {
   const [inscribing, setInscribing] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  useEffect(() => {
-    loadVoluntariado();
-  }, [id]);
-
-  useEffect(() => {
-    if (!voluntariado?.fotos || voluntariado.fotos.length <= 1) return;
-
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) =>
-        (prevIndex + 1) % voluntariado.fotos.length
-      );
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [voluntariado?.fotos]);
-
-  const loadVoluntariado = async () => {
+  const loadVoluntariado = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getVoluntariadoById(id);
@@ -54,7 +38,23 @@ function VoluntariadoDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, navigate]);
+
+  useEffect(() => {
+    loadVoluntariado();
+  }, [loadVoluntariado]);
+
+  useEffect(() => {
+    if (!voluntariado?.fotos || voluntariado.fotos.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) =>
+        (prevIndex + 1) % voluntariado.fotos.length
+      );
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [voluntariado?.fotos]);
 
   const isCreator = user?.rol === "CREADOR" && user?.userId === voluntariado?.creador?.id_usuario;
 

@@ -226,7 +226,7 @@ export class UsuarioService {
       url_redireccion: '/profile',
     });
 
-    return { message: 'Correo verificado correctamente.' };
+    return ;
   }
 
   async actualizarImagenPerfil(userId: number, file: Express.Multer.File) {

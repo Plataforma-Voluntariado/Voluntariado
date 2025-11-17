@@ -15,10 +15,9 @@ export const getCategorias = async () => {
   }
 };
 
-// Crear un nuevo voluntariado
+
 export const createVoluntariado = async (voluntariadoData, fotos = []) => {
   try {
-    console.log(voluntariadoData);
     const formData = new FormData();
 
     ["titulo", "descripcion", "horas", "maxParticipantes", "categoria_id"].forEach(key => {
@@ -33,7 +32,6 @@ export const createVoluntariado = async (voluntariadoData, fotos = []) => {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
-    console.log(data);
     return data;
   } catch (error) {
     if (error.response?.status === 401)
@@ -89,13 +87,16 @@ export const updateVoluntariado = async (id, voluntariadoData, fotos = [], fotos
     if (voluntariadoData.fechaHoraInicio) formData.append("fechaHoraInicio", new Date(voluntariadoData.fechaHoraInicio).toISOString());
     if (voluntariadoData.ubicacion) formData.append("ubicacion", JSON.stringify(voluntariadoData.ubicacion));
 
-    // Solo agregar fotosMantener si se proporciona explícitamente
-    if (fotosMantener !== null) {
+    // Agregar fotosMantener SOLO si tiene elementos
+    if (Array.isArray(fotosMantener) && fotosMantener.length > 0) {
       formData.append("fotosMantener", JSON.stringify(fotosMantener));
     }
-
     // Agregar fotos nuevas
     fotos.forEach(foto => formData.append("nuevasFotos", foto));
+
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ':', pair[1]);
+    }
 
     const { data } = await api.put(`/voluntariados/${id}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
@@ -113,7 +114,7 @@ export const updateVoluntariado = async (id, voluntariadoData, fotos = [], fotos
 export const cancelarVoluntariado = async (id) => {
   try {
     const { data } = await api.delete(`/voluntariados/${id}`);
-    return data; 
+    return data;
   } catch (error) {
     if (error.response?.status === 403) {
       throw new Error("No tienes permisos para cancelar este voluntariado.");
@@ -170,11 +171,11 @@ export const GetAllVolunteerings = async () => {
   return await GetVolunteerings();
 };
 
-export const InscribeIntoVolunteering = async (id_voluntariado) =>{
-  try{
-    const response = await api.post("/inscripciones/"+id_voluntariado);
+export const InscribeIntoVolunteering = async (id_voluntariado) => {
+  try {
+    const response = await api.post("/inscripciones/" + id_voluntariado);
     return response.data;
-  }catch(error){
+  } catch (error) {
     return error;
   }
 }

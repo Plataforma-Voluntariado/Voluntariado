@@ -210,7 +210,7 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
                     <button
                       key={f.id_foto ?? i}
                       className={`indicator ${i === index ? "active" : ""}`}
-                      onClick={() => goTo(i)}
+                      onClick={(e) => { e.stopPropagation(); goTo(i); }}
                       aria-label={`Ir a imagen ${i + 1}`}
                     />
                   ))}
@@ -349,7 +349,7 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
           {!isCreatorOwner && (
             <button
               className={`volunteering-card-inscribe-btn ${effectiveIsInscrito ? "inscribed" : isRechazado ? "rejected" : ""}`}
-              onClick={handleInscribe}
+              onClick={(e) => { e.stopPropagation(); e.preventDefault(); handleInscribe(); }}
               disabled={inscribing || effectiveIsInscrito || isRechazado}
             >
               {inscribing
