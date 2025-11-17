@@ -60,7 +60,7 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
   const getAddressFromCoords = async (lng, lat) => {
     try {
       const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_TOKEN}&language=es`
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${process.env.REACT_APP_MAPBOX_TOKEN}&language=es`
       );
       const data = await response.json();
       
