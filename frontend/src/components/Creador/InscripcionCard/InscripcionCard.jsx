@@ -1,9 +1,6 @@
 import React, { useState } from "react";
-import {
-  aceptarInscripcion,
-  rechazarInscripcion,
-  marcarAsistencia,
-} from "../../../services/inscripcion/inscripcionService";
+import { useNavigate } from "react-router-dom";
+import {aceptarInscripcion,rechazarInscripcion,marcarAsistencia,} from "../../../services/inscripcion/inscripcionService";
 import { SuccessAlert, WrongAlert } from "../../../utils/ToastAlerts";
 import { FaCheckCircle, FaStar } from "react-icons/fa";
 import { MdEmail, MdDateRange } from "react-icons/md";
@@ -17,6 +14,8 @@ const InscripcionCard = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const usuario = inscripcion.voluntario;
+
+  const navigate = useNavigate();
 
   const ESTADO_VOLUNTARIADO = estadoVoluntariado?.toUpperCase();
   const ESTADO_INSCRIPCION = inscripcion.estado_inscripcion?.toUpperCase();
@@ -93,7 +92,16 @@ const InscripcionCard = ({
         {ESTADO_INSCRIPCION.replace("_", " ")}
       </span>
 
-      <img src={usuario.url_imagen} alt={usuario.nombre} className="inscripcion-avatar" />
+      <img
+        src={usuario.url_imagen}
+        alt={usuario.nombre}
+        className="inscripcion-avatar"
+        style={{ cursor: usuario?.id_usuario || usuario?.id ? "pointer" : "default" }}
+        onClick={() => {
+          const id = usuario?.id_usuario || usuario?.id || usuario;
+          if (id) navigate(`/voluntario/${id}`);
+        }}
+      />
       <h3>{usuario.nombre} {usuario.apellido}</h3>
       <p><MdEmail style={{ marginRight: "6px" }} /> {usuario.correo}</p>
       <p><MdDateRange style={{ marginRight: "6px" }} /> {new Date(inscripcion.fecha_inscripcion).toLocaleDateString()}</p>

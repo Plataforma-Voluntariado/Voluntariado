@@ -27,8 +27,7 @@ import VolunteerRoute from "./routes/VolunteerRoute";
 import VolunteerInscripcionPage from "./pages/ManagementIncripcionPage/VolunteerInscripcionPage/VolunteerInscripcionPage";
 import VoluntariadoDetailPage from "./pages/VoluntariadoDetailPage/VoluntariadoDetailPage";
 import CreatorProfilePage from "./pages/CreatorProfile/CreatorProfilePage";
-
-
+import VolunteerProfile from "./pages/VolunteerProfile/VolunteerProfile";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -59,6 +58,7 @@ root.render(
           <Route path="/crear-voluntariado" element={<CreateVoluntariadoPage />} />
           <Route path="/voluntariado/:id" element={<VoluntariadoDetailPage />} />
           <Route path="/creador/:id" element={<CreatorProfilePage />} />
+          <Route path="/voluntario/:id" element={<VolunteerProfile />} />
           <Route element={<UnverifiedEmailRoute />}><Route path="/verificar-correo" element={<EmailVerificationPage />} /></Route>
         </Route>
       </Route>
@@ -101,12 +101,12 @@ root.render(
       <Route
         element={
           <AuthProvider>
-            <VolunteerRoute/>
+            <VolunteerRoute />
           </AuthProvider>
         }
       >
         <Route element={<NavbarLayout />}>
-          <Route path="/manage-inscripciones" element={<VolunteerInscripcionPage/>} />
+          <Route path="/manage-inscripciones" element={<VolunteerInscripcionPage />} />
         </Route>
       </Route>
 

@@ -47,3 +47,12 @@ export const InscribeIntoVolunteering = async (id_voluntariado) =>{
     return error;
   }
 }
+
+export const GetVoluntarioById = async (id) => {
+  try {
+    const response = await api.get(`/voluntario/${id}`);
+    return response.data;
+  } catch (error) {
+    return error;
+  }
+};
