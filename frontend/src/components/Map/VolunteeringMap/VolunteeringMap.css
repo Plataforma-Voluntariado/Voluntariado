@@ -80,28 +80,32 @@
   }
 }
 
-.map-overlay {
+.volunteering-map-container .map-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(81, 159, 255, 0.4);
+  background: linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.18));
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 500;
   cursor: pointer;
-  border-radius: var(--radius-medium);
-  backdrop-filter: blur(3px);
-  transition: background-color 0.3s ease;
+  border-radius: 12px;
+  backdrop-filter: blur(2px);
+  transition: background 0.3s ease;
+  z-index: 2;
+  pointer-events: auto;
 }
 
-.map-overlay:hover {
-  background-color: rgba(220, 239, 255, 0.55);
+.volunteering-map-container .map-overlay:hover {
+  background: linear-gradient(180deg, rgba(0,0,0,0.03), rgba(0,0,0,0.12));
 }
 
-.map-overlay p {
-  background: var(--color-primary);
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 14px;
-  color: var(--color-bg);
+.volunteering-map-container .map-overlay-card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(245,247,250,0.97));
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+  border: 1px solid rgba(226,232,240,0.9);
+  box-shadow: 0 10px 30px rgba(15,23,42,0.18);
 }

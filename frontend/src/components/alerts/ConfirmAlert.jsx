@@ -5,6 +5,7 @@ const ConfirmAlert = async ({
   message = "Esta acción no se puede deshacer",
   confirmText = "Sí, continuar",
   cancelText = "Cancelar",
+  zIndex = 10000,
 }) => {
   const result = await Swal.fire({
     title: title,
@@ -15,6 +16,15 @@ const ConfirmAlert = async ({
     cancelButtonColor: "#d33",
     confirmButtonText: confirmText,
     cancelButtonText: cancelText,
+    customClass: {
+      container: 'swal-high-z-index'
+    },
+    didOpen: () => {
+      const container = document.querySelector('.swal2-container');
+      if (container) {
+        container.style.zIndex = zIndex;
+      }
+    }
   });
 
   return result.isConfirmed;

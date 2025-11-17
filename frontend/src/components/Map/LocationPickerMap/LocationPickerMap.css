@@ -20,26 +20,29 @@
 }
 
 /* Overlay idéntico para activar el mapa */
-.map-overlay {
+.location-picker-map-container .map-overlay {
   position: absolute;
   inset: 0;
-  background: transparent;
+  background: linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.15));
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   pointer-events: auto;
   z-index: 2;
+  backdrop-filter: blur(2px);
 }
-
-.map-overlay-hint {
+.location-picker-map-container .map-overlay-card {
   margin: 12px;
-  padding: 6px 10px;
-  background: rgba(0, 0, 0, 0.6);
-  color: #fff;
-  border-radius: 8px;
-  font-size: 12px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(245,247,250,0.95));
+  color: #0f172a;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
   user-select: none;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+  border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .location-picker-loading {

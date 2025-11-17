@@ -148,8 +148,15 @@ const VolunteeringMap = ({ volunteerings, mapApiRef }) => {
       </Map>
 
       {!isInteractive && (
-        <div className="map-overlay" onClick={() => setIsInteractive(true)}>
-          <p>Haz clic para activar el mapa</p>
+        <div
+          className="map-overlay"
+          onClick={() => setIsInteractive(true)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setIsInteractive(true)}
+          aria-label="Activar interacciones del mapa"
+        >
+          <div className="map-overlay-card">Haz clic para activar el mapa</div>
         </div>
       )}
 

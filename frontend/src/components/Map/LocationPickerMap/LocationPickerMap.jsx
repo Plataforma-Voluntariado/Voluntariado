@@ -91,8 +91,15 @@ function LocationPickerMap({
       </Map>
 
       {!isInteractive && (
-        <div className="map-overlay" onClick={() => setIsInteractive(true)}>
-          <div className="map-overlay-hint">Haz clic para activar el mapa</div>
+        <div
+          className="map-overlay"
+          onClick={() => setIsInteractive(true)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setIsInteractive(true)}
+          aria-label="Activar interacciones del mapa"
+        >
+          <div className="map-overlay-card">Haz clic para activar el mapa</div>
         </div>
       )}
 

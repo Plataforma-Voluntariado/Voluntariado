@@ -5,7 +5,10 @@ import { useAuth } from "../../context/AuthContext";
 import SidebarNotificationWrapper from "./SidebarNotificationWrapper";
 import "./Sidebar.css";
 import "./SidebarNotificationWrapper.css";
-import { FaTimes,FaCog, FaUsers, FaCalendarPlus, FaHome } from "react-icons/fa";
+import { FaTimes, FaCog, FaUsers, FaCalendarPlus, FaHome, FaSignOutAlt } from "react-icons/fa";
+import { logout } from "../../services/auth/AuthService";
+import { SuccessAlert, WrongAlert } from "../../utils/ToastAlerts";
+import ConfirmAlert from "../alerts/ConfirmAlert";
 
 function Sidebar({ isOpen, onClose }) {
   const navigate = useNavigate();
@@ -14,6 +17,40 @@ function Sidebar({ isOpen, onClose }) {
   const handleNavigate = (path) => {
     navigate(path);
     onClose();
+  };
+
+  const handleLogout = async () => {
+    // Confirmación antes de cerrar sesión
+    const confirm = await ConfirmAlert({
+      title: "¿Estás seguro de cerrar sesión?",
+      message: "",
+      confirmText: "Sí, confirmar",
+      cancelText: "No, cancelar",
+      zIndex: 10000,
+    });
+
+    if (!confirm) return;
+
+    try {
+      const success = await logout();
+      onClose();
+      
+      await SuccessAlert({
+        title: success ? "Has cerrado sesión" : "Error al cerrar sesión",
+        message: success ? "Esperamos que vuelvas pronto" : "No se pudo finalizar tu sesión correctamente",
+        timer: 2000,
+      });
+
+      navigate("/");
+    } catch (err) {
+      console.error("Error en handleLogout:", err);
+      await WrongAlert({
+        title: "Error inesperado",
+        message: "Ocurrió un problema al cerrar sesión.",
+      });
+      onClose();
+      navigate("/");
+    }
   };
 
   useEffect(() => {
@@ -162,6 +199,17 @@ function Sidebar({ isOpen, onClose }) {
             </li>
           </ul>
         </nav>
+
+        <div className="sidebar-footer">
+          <button
+            className="sidebar-logout-button"
+            onClick={handleLogout}
+            aria-label="Cerrar sesión"
+          >
+            <FaSignOutAlt className="sidebar-icon" />
+            <span>CERRAR SESIÓN</span>
+          </button>
+        </div>
       </aside>
     </>
   );

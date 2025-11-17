@@ -105,7 +105,25 @@
 /* ✅ Responsive */
 @media (max-width: 768px) {
     .create-voluntariado-layout {
-        padding: 4.5rem 0 1rem;
+        padding: 5rem 0 1rem;
+    }
+
+    .create-voluntariado-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+        padding: 0 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .back-button {
+        position: relative;
+        left: 0;
+        width: fit-content;
+    }
+
+    .header-center {
+        width: 100%;
     }
 
     .header-center h1 {
@@ -113,13 +131,18 @@
     }
 
     .back-button span {
-        display: none;
+        display: inline;
     }
 }
 
 @media (max-width: 480px) {
     .create-voluntariado-layout {
         padding: 4rem 0 1rem;
+    }
+
+    .create-voluntariado-header {
+        gap: 1rem;
+        padding: 0 0.75rem;
     }
 
     .header-center h1 {
@@ -131,7 +154,6 @@
     }
 
     .back-button {
-        left: 1rem;
         padding: 0.55rem 0.75rem;
     }
 }
