@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import "./VolunteeringCardLayout.css";
 import { GetVolunteerings } from "../../services/voluntariado/voluntariadoService";
 import VolunteeringCard from "../../components/VolunteeringCard/VolunteeringCard";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 export default function VolunteeringCardLayout({ filters = {}, mapApiRef = null, onVolunteeringsChange = () => {} }) {
   const [volunteerings, setVolunteerings] = useState([]);
@@ -90,9 +91,7 @@ export default function VolunteeringCardLayout({ filters = {}, mapApiRef = null,
             disabled={page <= 1}
             aria-label="Página anterior"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
+            <FiChevronLeft size={20} />
           </button>
 
           <div className="volunteering-card-layout-pagination-numbers">
@@ -120,9 +119,7 @@ export default function VolunteeringCardLayout({ filters = {}, mapApiRef = null,
             disabled={page >= totalPages}
             aria-label="Página siguiente"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
+            <FiChevronRight size={20} />
           </button>
 
           <span className="volunteering-card-layout-pagination-info">

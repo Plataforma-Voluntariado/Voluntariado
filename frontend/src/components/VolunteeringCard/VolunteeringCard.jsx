@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { FiCalendar, FiClock, FiCircle, FiMapPin } from "react-icons/fi";
 import "./VolunteeringCard.css";
 import ConfirmAlert from "../alerts/ConfirmAlert";
 import { InscribeIntoVolunteering } from "../../services/voluntariado/voluntariadoService";
@@ -272,46 +273,15 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
 
         <div className="volunteering-card-meta">
           <div className="volunteering-card-meta-item">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="16" y1="2" x2="16" y2="6"></line>
-              <line x1="8" y1="2" x2="8" y2="6"></line>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
+            <FiCalendar size={16} />
             <span>{formatDate(fechaHoraInicio)}</span>
           </div>
           <div className="volunteering-card-meta-item">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
+            <FiClock size={16} />
             <span>{formatTime(fechaHoraInicio)}</span>
           </div>
           <div className="volunteering-card-meta-item">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
-            </svg>
+            <FiCircle size={16} />
             <span>{horas} horas</span>
           </div>
         </div>
@@ -369,17 +339,7 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
               onFocusMap?.();
             }}
           >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"></path>
-              <circle cx="12" cy="10" r="3"></circle>
-            </svg>
+            <FiMapPin size={16} />
             {ubicacion?.nombre_sector || ubicacion?.direccion}
           </button>
         </div>

@@ -22,6 +22,8 @@ function VoluntariadoDetailPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [inscribing, setInscribing] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [mapActive, setMapActive] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   const loadVoluntariado = useCallback(async () => {
     try {
@@ -55,6 +57,32 @@ function VoluntariadoDetailPage() {
 
     return () => clearInterval(interval);
   }, [voluntariado?.fotos]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      const mapContainer = document.querySelector('.detail-map-container');
+      if (mapActive && mapContainer && !mapContainer.contains(e.target)) {
+        setMapActive(false);
+      }
+    };
+
+    if (mapActive) {
+      document.addEventListener('click', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [mapActive]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const isCreator = user?.rol === "CREADOR" && user?.userId === voluntariado?.creador?.id_usuario;
 
@@ -151,19 +179,9 @@ function VoluntariadoDetailPage() {
   return (
     <div className="voluntariado-detail-page">
       <div className="voluntariado-detail-container">
-        <div className="top-buttons">
-          {isCreator && (
-            <button
-              className="btn-edit-top"
-              onClick={() => setShowEditModal(true)}
-              title="Editar voluntariado"
-            >
-              <FaEdit /> Editar
-            </button>
-          )}
-        </div>
         <div className="detail-layout">
-          <div className="detail-left-column">
+          <div className="detail-left-scroll-container">
+            <div className="detail-left-column">
             <div className="carousel-container">
               <div className="carousel-images">
                 {fotos.length > 0 ? (
@@ -229,9 +247,20 @@ function VoluntariadoDetailPage() {
                 </div>
               </div>
             </div>
+            </div>
           </div>
-          <div className="detail-right-column">
-            <div className="action-section">
+          <div className="detail-right-scroll-container">
+            <div className="detail-right-column">
+              {isCreator && (
+                <button
+                  className="btn-edit-detail"
+                  onClick={() => setShowEditModal(true)}
+                  title="Editar voluntariado"
+                >
+                  <FaEdit /> Editar
+                </button>
+              )}
+              <div className="action-section">
               {!isCreator && !isInscrito && user?.rol === "VOLUNTARIO" && (
                 <button
                   className="btn-inscribe-detail"
@@ -301,7 +330,20 @@ function VoluntariadoDetailPage() {
             {hasLocation && (
               <div className="detail-section">
                 <h2>Ubicación en el mapa</h2>
-                <div className="detail-map-container">
+                <div 
+                  className={`detail-map-container ${mapActive ? 'active' : ''}`}
+                  onClick={(e) => {
+                    if (!mapActive) {
+                      e.stopPropagation();
+                      setMapActive(true);
+                    }
+                  }}
+                >
+                  {!mapActive && (
+                    <div className="map-overlay">
+                      <p>{isMobile ? 'Presiona aquí para interactuar con el mapa' : 'Haz clic para interactuar con el mapa'}</p>
+                    </div>
+                  )}
                   <Map
                     mapboxAccessToken={MAPBOX_TOKEN}
                     initialViewState={{
@@ -311,6 +353,11 @@ function VoluntariadoDetailPage() {
                     }}
                     style={{ width: "100%", height: "400px" }}
                     mapStyle="mapbox://styles/mapbox/streets-v11"
+                    scrollZoom={mapActive}
+                    dragPan={mapActive}
+                    dragRotate={mapActive}
+                    doubleClickZoom={mapActive}
+                    touchZoomRotate={mapActive}
                   >
                     <Marker
                       longitude={ubicacion.longitud}
@@ -325,6 +372,7 @@ function VoluntariadoDetailPage() {
                 </div>
               </div>
             )}
+            </div>
           </div>
         </div>
       </div>
