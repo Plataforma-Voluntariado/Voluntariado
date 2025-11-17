@@ -6,7 +6,7 @@ function VolunteeringMapInfo() {
   return (
     <div className="volunteering-map-info">
       <div className="volunteering-map-info-container">
-        <h2 className="volunteering-map-info-title">Busca en el mapa</h2>
+        <h2 className="volunteering-map-info-title">BUSCA EN EL MAPA</h2>
         
         <div className="volunteering-map-info-steps">
           <div className="volunteering-map-info-step">

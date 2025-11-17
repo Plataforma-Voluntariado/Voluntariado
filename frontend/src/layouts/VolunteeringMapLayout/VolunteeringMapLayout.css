@@ -2,7 +2,7 @@
   width: 80%;
   display: flex;
   gap: 1.5rem;
-  border-radius: 24px;
+  border-radius: var(--radius-large);
   overflow: hidden;
   margin: 0 auto;
 }
