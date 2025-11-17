@@ -117,7 +117,7 @@
   background-color: #ef4444;
 }
 
-/* Etiqueta de categoría dentro de la tarjeta */
+
 .category-label {
   display: flex;
   align-items: center;
@@ -127,10 +127,9 @@
   color: #fff;
   font-size: 0.8rem;
   text-transform: capitalize;
-  white-space: nowrap; /* evita que el texto haga wrap */
+  white-space: nowrap; 
 }
 
-/* Contenedor de detalles: fechas, horas, participantes, ubicación */
 .volunteer-card-details {
   display: flex;
   flex-wrap: wrap;
@@ -146,20 +145,25 @@
   gap: 6px;
 }
 
-.cancel-icon {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
+/* Cancel button: text variant placed inside actions */
+.volunteer-card-cancel-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: transparent;
   color: #ef4444;
-  font-size: 1.6rem;
+  border: 1px solid rgba(239, 68, 68, 0.12);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-  z-index: 2;
+  transition: all 0.2s ease;
 }
 
-.cancel-icon:hover {
-  transform: scale(1.2);
-  opacity: 0.8;
+.volunteer-card-cancel-btn:hover {
+  background: rgba(239, 68, 68, 0.04);
+  transform: translateY(-2px);
 }
 
 @keyframes volunteerCardPulseRed {
@@ -176,23 +180,20 @@
   }
 }
 
-
-
-/* Contenedor de acciones/botones */
 .volunteer-card-actions {
   display: flex;
   gap: 0.75rem;
   margin-top: auto;
   padding-top: 0.75rem;
+  align-items: center;
 }
 
-/* Botón Gestionar Inscripciones */
 .volunteer-card-manage-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.625rem 1.25rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #202c5f 0%, #5d9de2 100%);
   color: white;
   border: none;
   border-radius: 8px;

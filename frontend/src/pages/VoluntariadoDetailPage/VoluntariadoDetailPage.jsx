@@ -9,7 +9,7 @@ import { Marker } from "react-map-gl";
 import EditVoluntariadoModal from "../../components/Modals/EditVoluntariadoModal/EditVoluntariadoModal";
 import { InscribeIntoVolunteering } from "../../services/volunteering/VolunteeringService";
 import ConfirmAlert from "../../components/alerts/ConfirmAlert";
-import { FaMapMarkerAlt, FaClock, FaUsers, FaCalendarAlt, FaEdit } from "react-icons/fa";
+import { FaMapMarkerAlt, FaClock, FaUsers, FaCalendarAlt, FaEdit, FaCheckCircle } from "react-icons/fa";
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
 
@@ -25,18 +25,16 @@ function VoluntariadoDetailPage() {
 
   useEffect(() => {
     loadVoluntariado();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  // Carrusel automático de imágenes
   useEffect(() => {
     if (!voluntariado?.fotos || voluntariado.fotos.length <= 1) return;
 
     const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => 
+      setCurrentImageIndex((prevIndex) =>
         (prevIndex + 1) % voluntariado.fotos.length
       );
-    }, 4000); // Cambia cada 4 segundos
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [voluntariado?.fotos]);
@@ -59,24 +57,25 @@ function VoluntariadoDetailPage() {
   };
 
   const isCreator = user?.rol === "CREADOR" && user?.userId === voluntariado?.creador?.id_usuario;
-  
-  const myInscripcion = voluntariado?.inscripciones?.find(
-    (i) => Number(i?.voluntario?.id_usuario) === Number(user?.userId)
-  );
+
+  const myInscripcion = voluntariado?.inscripciones
+    ?.filter(i => Number(i?.voluntario?.id_usuario) === Number(user?.userId))
+    ?.sort((a, b) => Number(b?.id_inscripcion) - Number(a?.id_inscripcion))?.[0];
+    
   const isInscrito = myInscripcion && !["cancelada", "rechazada"].includes(myInscripcion?.estado_inscripcion?.toLowerCase());
 
   const handleInscribe = async () => {
     if (!voluntariado?.id_voluntariado || inscribing || isInscrito || isCreator) return;
-    
+
     const confirmed = await ConfirmAlert({
       title: "Inscribirte",
       message: "¿Deseas inscribirte a este voluntariado?",
       confirmText: "Sí, inscribirme",
       cancelText: "Cancelar",
     });
-    
+
     if (!confirmed) return;
-    
+
     try {
       setInscribing(true);
       await InscribeIntoVolunteering(voluntariado.id_voluntariado);
@@ -85,7 +84,7 @@ function VoluntariadoDetailPage() {
         message: "Esperarás ser aceptado pronto.",
         timer: 1500,
       });
-      await loadVoluntariado(); // Recargar para actualizar inscripciones
+      await loadVoluntariado();
     } catch (e) {
       await WrongAlert({
         title: "Error",
@@ -152,11 +151,7 @@ function VoluntariadoDetailPage() {
   return (
     <div className="voluntariado-detail-page">
       <div className="voluntariado-detail-container">
-        {/* Botones superiores */}
         <div className="top-buttons">
-          <button className="btn-back" onClick={() => navigate(-1)}>
-            ← Volver
-          </button>
           {isCreator && (
             <button
               className="btn-edit-top"
@@ -167,12 +162,8 @@ function VoluntariadoDetailPage() {
             </button>
           )}
         </div>
-
-        {/* Layout principal: Izquierda (Carrusel) | Derecha (Información) */}
         <div className="detail-layout">
-          {/* COLUMNA IZQUIERDA: Carrusel + Info del creador */}
           <div className="detail-left-column">
-            {/* Carrusel de imágenes con título superpuesto */}
             <div className="carousel-container">
               <div className="carousel-images">
                 {fotos.length > 0 ? (
@@ -181,9 +172,8 @@ function VoluntariadoDetailPage() {
                       key={index}
                       src={foto.url}
                       alt={`${titulo} - Imagen ${index + 1}`}
-                      className={`carousel-image ${
-                        index === currentImageIndex ? "active" : ""
-                      }`}
+                      className={`carousel-image ${index === currentImageIndex ? "active" : ""
+                        }`}
                     />
                   ))
                 ) : (
@@ -194,43 +184,34 @@ function VoluntariadoDetailPage() {
                   />
                 )}
               </div>
-
-              {/* Overlay con gradiente para legibilidad */}
               <div className="carousel-overlay"></div>
-
-              {/* Título y categoría en la parte superior de las imágenes */}
               <div className="carousel-title-overlay">
-                <h1 
+                <h1
                   className="voluntariado-title-overlay"
-                  onClick={handleCreatorClick}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: 'default' }}
                 >
                   {titulo}
                 </h1>
                 <span className="badge-categoria-overlay">{categoria?.nombre}</span>
               </div>
 
-              {/* Indicadores de puntos */}
               {fotos.length > 1 && (
                 <div className="carousel-indicators">
                   {fotos.map((_, index) => (
                     <span
                       key={index}
-                      className={`indicator-dot ${
-                        index === currentImageIndex ? "active" : ""
-                      }`}
+                      className={`indicator-dot ${index === currentImageIndex ? "active" : ""
+                        }`}
                     />
                   ))}
                 </div>
               )}
             </div>
-
-            {/* Información del creador */}
             <div className="creator-info-card">
               <div className="creator-label-header">
                 <span>Organizado por</span>
               </div>
-              <div 
+              <div
                 className="creator-content"
                 onClick={handleCreatorClick}
               >
@@ -249,10 +230,7 @@ function VoluntariadoDetailPage() {
               </div>
             </div>
           </div>
-
-          {/* COLUMNA DERECHA: Información del voluntariado */}
           <div className="detail-right-column">
-            {/* Botón de inscripción */}
             <div className="action-section">
               {!isCreator && !isInscrito && user?.rol === "VOLUNTARIO" && (
                 <button
@@ -264,11 +242,12 @@ function VoluntariadoDetailPage() {
                 </button>
               )}
               {isInscrito && (
-                <div className="badge-inscrito">Ya estás inscrito</div>
+                <div className="badge-inscrito" role="status" aria-live="polite">
+                  <FaCheckCircle className="badge-inscrito-icon" aria-hidden="true" />
+                  <span>Ya estás inscrito</span>
+                </div>
               )}
             </div>
-
-            {/* Información rápida */}
             <div className="detail-quick-info">
               <div className="info-item">
                 <FaCalendarAlt className="icon" />
@@ -315,14 +294,10 @@ function VoluntariadoDetailPage() {
                 </div>
               )}
             </div>
-
-            {/* Descripción */}
             <div className="detail-section">
               <h2>Descripción</h2>
               <p className="detail-description">{descripcion}</p>
             </div>
-
-            {/* Mapa */}
             {hasLocation && (
               <div className="detail-section">
                 <h2>Ubicación en el mapa</h2>
@@ -353,8 +328,6 @@ function VoluntariadoDetailPage() {
           </div>
         </div>
       </div>
-
-      {/* Modal de edición */}
       {showEditModal && (
         <EditVoluntariadoModal
           voluntariado={voluntariado}

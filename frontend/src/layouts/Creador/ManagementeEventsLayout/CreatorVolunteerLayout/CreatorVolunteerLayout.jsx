@@ -15,8 +15,7 @@ function CreatorVolunteerLayout({
     () => new Set(pendingAsistenciaIds),
     [pendingAsistenciaIds]
   );
-
-  // Cada vez que cambien las props, actualizamos el estado
+  
   useEffect(() => {
     setVoluntariadosState(voluntariados || []);
   }, [voluntariados]);
