@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 export const SuccessAlert = ({
   title = "Éxito",
   message = "Operación realizada correctamente",
-  timer = 1500,
+  timer = 1000,
   position = "top-right",
 } = {}) => {
   return new Promise((resolve) => {

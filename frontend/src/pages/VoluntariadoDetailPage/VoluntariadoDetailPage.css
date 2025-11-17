@@ -558,15 +558,16 @@
 }
 
 .map-overlay p {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
-  padding: 1rem 2rem;
+  background: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(245,247,250,0.97));
+  color: #0f172a;
+  padding: 10px 16px;
   border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  font-size: 0.95rem;
+  font-weight: 700;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.18);
   text-align: center;
-  letter-spacing: 0.025em;
+  letter-spacing: 0.02em;
+  border: 1px solid rgba(226,232,240,0.9);
 }
 
 .custom-marker {
@@ -736,8 +737,8 @@
   }
 
   .map-overlay p {
-    padding: 0.875rem 1.5rem;
-    font-size: 0.9375rem;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
     max-width: 90%;
   }
 
@@ -788,8 +789,8 @@
   }
 
   .map-overlay p {
-    padding: 0.75rem 1.25rem;
-    font-size: 0.875rem;
+    padding: 0.65rem 1rem;
+    font-size: 0.85rem;
     border-radius: 10px;
     max-width: 85%;
   }
