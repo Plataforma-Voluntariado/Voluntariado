@@ -149,24 +149,6 @@
   z-index: 1;
 }
 
-/* Overlay con gradiente para legibilidad del texto */
-.carousel-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.6) 0%,
-    rgba(0, 0, 0, 0) 40%,
-    rgba(0, 0, 0, 0) 60%,
-    rgba(0, 0, 0, 0.3) 100%
-  );
-  z-index: 2;
-  pointer-events: none;
-}
-
 /* Título y categoría superpuestos en la parte superior */
 .carousel-title-overlay {
   position: absolute;
@@ -384,10 +366,13 @@
   box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
 }
 
-.badge-inscrito::before {
-  content: '✓';
+.badge-inscrito-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 1.25rem;
-  font-weight: bold;
+  line-height: 1;
+  margin-right: 8px;
 }
 
 .detail-quick-info {

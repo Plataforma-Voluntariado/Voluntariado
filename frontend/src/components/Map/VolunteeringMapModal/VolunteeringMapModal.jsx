@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import "./VolunteeringMapModal.css";
 import ConfirmAlert from "../../alerts/ConfirmAlert";
 import { InscribeIntoVolunteering } from "../../../services/volunteering/VolunteeringService";
@@ -6,6 +7,7 @@ import { SuccessAlert, WrongAlert } from "../../../utils/ToastAlerts";
 import { useAuth } from "../../../context/AuthContext";
 
 function VolunteeringMapModal({ volunteering, onClose }) {
+  const navigate = useNavigate();
   const [inscribing, setInscribing] = useState(false);
   const [localInscribed, setLocalInscribed] = useState(false);
   const { user } = useAuth();
@@ -244,7 +246,23 @@ function VolunteeringMapModal({ volunteering, onClose }) {
                     : "Inscribirse"}
             </button>
           )}
-          <button className="volunteering-map-modal-button fullscreen">
+          <button
+            className="volunteering-map-modal-button fullscreen"
+            type="button"
+            onClick={() => {
+              // Navegar primero y cerrar el modal un poco después para evitar solapamientos visuales
+              try {
+                navigate(`/voluntariado/${volunteering.id_voluntariado}`);
+              } catch (e) {
+                // ignore
+              }
+              // Cerrar el modal después de un corto delay
+              setTimeout(() => {
+                try { onClose && onClose(); } catch (e) { /* ignore */ }
+              }, 350);
+            }}
+            aria-label="Ver información completa"
+          >
             Ver información completa
           </button>
         </div>

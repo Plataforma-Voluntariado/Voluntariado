@@ -178,7 +178,7 @@ function CreatorProfilePage() {
             ) : (
               <div className="events-grid">
                 {terminados.map((v) => (
-                  <article key={v.id_voluntariado} className="event-card" onClick={() => navigate(`/voluntariado/${v.id_voluntariado}`)} style={{cursor: 'pointer'}}>
+                  <article key={v.id_voluntariado} className="event-card" onClick={() => navigate(`/voluntariado/resenas/${v.id_voluntariado}`)} style={{cursor: 'pointer'}}>
                     <img src={v.fotos?.[0]?.url || "/volunteering.jpg"} alt={v.titulo} />
                     <div className="event-content">
                       <h4>{v.titulo}</h4>
