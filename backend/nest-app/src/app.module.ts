@@ -27,6 +27,7 @@ import { InscripcionModule } from './inscripcion/inscripcion.module';
 import { BullMqModule } from './bull/bull.module';
 import { EstadisticasVoluntarioModule } from './estadisticas_voluntario/estadisticas_voluntario.module';
 import { ResenaVoluntariadoModule } from './resena_voluntariado/resena_voluntariado.module';
+import { CertificadosModule } from './certificados/certificados.module';
 
 
 @Module({
@@ -73,7 +74,8 @@ import { ResenaVoluntariadoModule } from './resena_voluntariado/resena_voluntari
     InscripcionModule,
     ResenaVoluntariadoModule,
     BullMqModule,
-    EstadisticasVoluntarioModule
+    EstadisticasVoluntarioModule,
+    CertificadosModule,
   ],
   controllers: [AppController],
   providers: [AppService],

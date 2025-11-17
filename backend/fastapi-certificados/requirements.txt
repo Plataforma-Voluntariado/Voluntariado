@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+requests
+Jinja2
+qrcode
+python-dotenv
