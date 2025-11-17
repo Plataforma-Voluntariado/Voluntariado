@@ -44,7 +44,6 @@ function NavigationBar() {
         </div>
 
         <div className="navigation-bar-right">
-          {/* Menú hamburguesa para móviles */}
           {isMobile && (
             <button 
               className="hamburger-button"
@@ -55,7 +54,6 @@ function NavigationBar() {
             </button>
           )}
 
-          {/* Menú normal para pantallas grandes */}
           {!isMobile && (
             <ul className="navigation-bar-list">
               {renderRoleSpecificItems()}
@@ -76,8 +74,6 @@ function NavigationBar() {
           )}
         </div>
       </nav>
-
-      {/* Sidebar para móviles */}
       <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
     </>
   );

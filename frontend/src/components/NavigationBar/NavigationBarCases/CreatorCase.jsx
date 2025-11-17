@@ -6,9 +6,6 @@ function CreatorCase() {
   const Navigate = useNavigate();
   return (
     <>
-      <li className="navigation-bar-list-item role-item" onClick={() => Navigate("/profile-creator")}>
-        PERFIL EMPRESARIAL
-      </li>
       <li className="navigation-bar-list-item role-item" onClick={() => Navigate("/manage-events")}>
         GESTIONAR EVENTOS
       </li>
