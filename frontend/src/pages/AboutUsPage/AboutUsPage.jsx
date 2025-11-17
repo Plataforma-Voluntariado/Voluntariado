@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./AboutUsPage.css";
 import "../LandingPage/LandingPage.css"; // Importar estilos del header
@@ -9,34 +9,11 @@ import valoresImage from "../../assets/photos/valores.png";
 import VoluntariadoLogo from "../../assets/photos/logo.png";
 import Footer from "../../components/Footer/Footer";
 import NavigationBar from "../../components/NavigationBar/NavigationBar";
+import { useAuth } from "../../context/AuthContext";
 
 function AboutUsPage() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-
-  // Verificar si hay un usuario logueado
-  useEffect(() => {
-    // Verificar si hay cookies de autenticación o llamar al endpoint de perfil
-    const checkAuth = async () => {
-      try {
-        // Hacer una llamada simple para verificar si hay sesión activa
-        const response = await fetch(`${process.env.REACT_APP_URL_SERVER_VOLUNTARIADO}/auth/perfil`, {
-          credentials: 'include',
-          method: 'GET'
-        });
-        
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
-        }
-      } catch (error) {
-        // Si falla, el usuario no está logueado
-        setUser(null);
-      }
-    };
-
-    checkAuth();
-  }, []);
+  const { user } = useAuth();
 
   const handleStartHelping = () => {
     if (!user) {

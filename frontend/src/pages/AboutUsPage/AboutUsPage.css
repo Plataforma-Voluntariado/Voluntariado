@@ -108,7 +108,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  max-width: 30%; /* Reducido al 30% del espacio disponible */
+  max-width: 25%;
 }
 
 .section-image img {
@@ -116,8 +116,9 @@
   height: auto;
   border-radius: var(--radius-medium);
   box-shadow: var(--shadow-sm);
-  max-height: 300px; /* Altura máxima para mantener proporción */
-  object-fit: contain; /* Mantiene la proporción de la imagen */
+  max-height: 220px;
+  max-width: 220px;
+  object-fit: contain;
 }
 
 /* Sección específica de misión y visión */
@@ -142,8 +143,11 @@
 
   .section-image {
     order: 1;
-    max-width: 50%;
+    max-width: 100%;
     margin: 1rem auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .section-content {
@@ -162,6 +166,17 @@
 
   .values-image {
     margin-left: 0;
+    order: 1;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .values-image img {
+    max-width: 200px;
+    width: 100%;
+    height: auto;
   }
 }
 
@@ -182,35 +197,41 @@
 
 .value-item {
   text-align: center;
-  padding: 1.5rem;
+  padding: 2rem 1.5rem;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-small);
-  transition: transform 0.3s ease;
+  border-radius: 12px;
+  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
+  min-height: 160px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .value-item:hover {
   transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.15);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .value-item h3 {
   color: var(--color-primary);
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
   letter-spacing: -0.3px;
-  font-size: 1.25rem;
+  font-size: 1.375rem;
+  font-weight: 700;
 }
 
 .value-item p {
-  letter-spacing: -0.3px;
-  word-spacing: -0.5px;
-  line-height: 1.4;
-  max-width: 250px;
+  letter-spacing: -0.2px;
+  line-height: 1.6;
+  max-width: 280px;
   margin: 0 auto;
   white-space: normal;
-  hyphens: none;
   text-align: center;
+  color: #4b5563;
+  font-size: 1rem;
 }
 
 .values-image {
@@ -259,12 +280,15 @@
 
 /* Header buttons consistency - Override any conflicting styles */
 .landing-header .nav-buttons .btn {
-  padding: 0.75rem 1.5rem !important;
-  font-size: 0.875rem !important;
+  padding: 0.875rem 1.75rem !important;
+  font-size: 0.9375rem !important;
   font-weight: 600 !important;
-  min-width: 120px !important;
+  min-width: 140px !important;
   text-align: center !important;
   white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 /* Responsive adjustments */
@@ -279,26 +303,122 @@
 
   .about-us-sections {
     gap: 1.5rem;
+    padding: 1rem;
   }
 
-  .values-grid,
+  .values-section {
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    align-items: center;
+  }
+
+  .values-content {
+    margin-bottom: 1.5rem;
+    order: 2;
+    width: 100%;
+  }
+
+  .values-content h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .values-image {
+    margin-left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    order: 1;
+    width: 100%;
+  }
+
+  .values-image img {
+    max-width: 200px;
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .values-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin-top: 1rem;
+  }
+
+  .value-item {
+    padding: 1.5rem 1.25rem;
+    min-height: auto;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+  }
+
+  .value-item h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .value-item p {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    max-width: 100%;
+    padding: 0;
+  }
+
   .impact-stats {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  
+
   .landing-header .nav-buttons .btn {
-    padding: 0.75rem 1.5rem !important;
-    font-size: 0.875rem !important;
-    min-width: 120px !important;
+    padding: 0.875rem 1.5rem !important;
+    font-size: 0.9rem !important;
+    min-width: 130px !important;
   }
 }
 
 @media (max-width: 480px) {
+  .about-us-sections {
+    padding: 0.75rem;
+  }
+
+  .values-section {
+    padding: 1.75rem 1rem;
+  }
+
+  .values-content h2 {
+    font-size: 1.75rem;
+  }
+
+  .values-image img {
+    max-width: 180px;
+  }
+
+  .values-grid {
+    gap: 1rem;
+  }
+
+  .value-item {
+    padding: 1.25rem 1rem;
+    min-height: auto;
+  }
+
+  .value-item h3 {
+    font-size: 1.125rem;
+    margin-bottom: 0.625rem;
+  }
+
+  .value-item p {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
   .landing-header .nav-buttons .btn {
-    padding: 0.75rem 1.2rem !important;
-    font-size: 0.8rem !important;
-    min-width: 100px !important;
+    padding: 0.75rem 1.25rem !important;
+    font-size: 0.875rem !important;
+    min-width: 110px !important;
   }
 }
 

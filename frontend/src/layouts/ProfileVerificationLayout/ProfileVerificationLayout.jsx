@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { FiChevronDown } from "react-icons/fi";
 import "./ProfileVerificationLayout.css";
 import ProfileEmail from "../../components/Profile/ProfileEmail/ProfileEmail";
 import ProfileVerificationItem from "../../components/Profile/ProfileVerificationItem/ProfileVerificationItem";
@@ -63,11 +64,7 @@ function ProfileVerificationLayout({ user }) {
               </p>
             </div>
             <div className={`profile-verification-toggle-icon ${isExpanded ? "expanded" : ""}`}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" strokeWidth="2"
-                strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
+              <FiChevronDown size={24} />
             </div>
           </div>
 
