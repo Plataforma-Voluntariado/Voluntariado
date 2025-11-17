@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import "./VolunteeringCard.css";
 import ConfirmAlert from "../alerts/ConfirmAlert";
 import { InscribeIntoVolunteering } from "../../services/volunteering/VolunteeringService";
+import Swal from "sweetalert2";
 import { SuccessAlert, WrongAlert } from "../../utils/ToastAlerts";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 
 function VolunteeringCard({ volunteering, onFocusMap }) {
   const { titulo, descripcion, fechaHoraInicio, horas, maxParticipantes, estado, creador, categoria, fotos = [], ubicacion, inscripciones, participantesAceptados, } = volunteering;
@@ -247,16 +247,18 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
           {truncateText(descripcion, 100)}
         </p>
 
-        <div className="volunteering-card-creator">
+        <div 
+          className="volunteering-card-creator"
+          onClick={(e) => {
+            e.stopPropagation();
+            const id = creador?.id_usuario || creador?.id;
+            if (id) navigate(`/creador/${id}`);
+          }}
+        >
           <img
             src={creador?.url_imagen || "/placeholder.svg"}
             alt={creador?.nombre || creador?.correo}
             className="volunteering-card-creator-avatar"
-            style={{ cursor: creador?.id_usuario ? "pointer" : "default" }}
-            onClick={() => {
-              const id = creador?.id_usuario || creador?.id || creador?.id_usuario;
-              if (id) navigate(`/creador/${id}`);
-            }}
           />
           <div className="volunteering-card-creator-info">
             <span className="volunteering-card-creator-label">Creador</span>
