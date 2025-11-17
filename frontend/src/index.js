@@ -25,6 +25,7 @@ import CreatorInscripcionPage from "./pages/ManagementEventosPage/CreatorInscrip
 import CreatorVolunteerPage from "./pages/ManagementEventosPage/CreatorVolunteerPage/CreatorVolunteerPage";
 import VolunteerRoute from "./routes/VolunteerRoute";
 import VolunteerInscripcionPage from "./pages/ManagementIncripcionPage/VolunteerInscripcionPage/VolunteerInscripcionPage";
+import CertificadosPage from "./pages/CertificadosPage/CertificadosPage";
 import VoluntariadoDetailPage from "./pages/VoluntariadoDetailPage/VoluntariadoDetailPage";
 import CreatorProfilePage from "./pages/CreatorProfile/CreatorProfilePage";
 import VolunteerProfile from "./pages/VolunteerProfile/VolunteerProfile";
@@ -109,6 +110,7 @@ root.render(
       >
         <Route element={<NavbarLayout />}>
           <Route path="/manage-inscripciones" element={<VolunteerInscripcionPage />} />
+          <Route path="/mis-certificados" element={<CertificadosPage />} />
         </Route>
       </Route>
 

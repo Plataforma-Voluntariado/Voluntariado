@@ -15,6 +15,35 @@
   background: transparent;
 }
 
+.volunteer-profile-certificates-btn {
+  width: 100%;
+  margin-top: 20px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.volunteer-profile-certificates-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+}
+
+.volunteer-profile-certificates-btn:active {
+  transform: translateY(0);
+}
+
 /* Modern card */
 .volunteer-profile-card{
   background: var(--surface);

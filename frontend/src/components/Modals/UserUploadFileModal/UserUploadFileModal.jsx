@@ -35,11 +35,16 @@ function UserUploadFileModal({ tipoDocumento, onClose }) {
     try {
       setLoading(true);
       const fileType = getFileType(tipoDocumento);
-      const response = await UploadUserFile(selectedFile, fileType);
-      if (response.status === 400) {
+      const resp = await UploadUserFile(selectedFile, fileType);
+      // Maneja el nuevo formato { ok, status, message } o el antiguo axios response
+      if (resp && typeof resp.ok === 'boolean') {
+        if (!resp.ok) {
+          return WrongAlert({ title: 'Error', message: resp.message || 'No se pudo subir el archivo.' });
+        }
+      } else if (resp?.status === 400) {
         return WrongAlert({
-          title: "Error",
-          message: response.response.data.message,
+          title: 'Error',
+          message: resp?.response?.data?.message || 'Solicitud inválida',
         });
       }
       await SuccessAlert({

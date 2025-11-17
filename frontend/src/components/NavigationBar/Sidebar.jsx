@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import SidebarNotificationWrapper from "./SidebarNotificationWrapper";
 import "./Sidebar.css";
 import "./SidebarNotificationWrapper.css";
-import { FaTimes, FaCog, FaUsers, FaCalendarPlus, FaHome, FaSignOutAlt } from "react-icons/fa";
+import { FaTimes,FaCog, FaUsers, FaCalendarPlus, FaHome, FaCertificate, FaSignOutAlt} from "react-icons/fa";
 import { logout } from "../../services/auth/AuthService";
 import { SuccessAlert, WrongAlert } from "../../utils/ToastAlerts";
 import ConfirmAlert from "../alerts/ConfirmAlert";
@@ -118,6 +118,15 @@ function Sidebar({ isOpen, onClose }) {
             >
               <FaCog className="sidebar-icon" />
               <span>GESTIONAR INSCRIPCIONES</span>
+            </li>
+            <li
+              className="sidebar-item"
+              onClick={() => handleNavigate("/mis-certificados")}
+              role="menuitem"
+              tabIndex="0"
+            >
+              <FaCertificate className="sidebar-icon" />
+              <span>MIS CERTIFICADOS</span>
             </li>
 
           </>

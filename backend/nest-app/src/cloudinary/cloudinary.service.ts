@@ -33,6 +33,33 @@ export class CloudinaryService {
     });
   }
 
+  async uploadFileFromBuffer(
+    buffer: Buffer,
+    filename: string,
+    resourceType: 'image' | 'raw' | 'video' | 'auto' = 'raw',
+  ): Promise<UploadApiResponse> {
+    if (!buffer) {
+      throw new BadRequestException('No se ha proporcionado ningún buffer.');
+    }
+
+    return new Promise<UploadApiResponse>((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          public_id: filename.replace(/\.[^/.]+$/, ''), // Remover extensión
+          resource_type: resourceType,
+        },
+        (error, result) => {
+          if (error || !result) {
+            return reject(new BadRequestException('Error al subir archivo a Cloudinary'));
+          }
+          resolve(result);
+        },
+      );
+
+      uploadStream.end(buffer);
+    });
+  }
+
   async deleteImage(publicId: string): Promise<boolean> {
     if (!publicId) {
       throw new BadRequestException('Debe proporcionar el public_id de la imagen.');

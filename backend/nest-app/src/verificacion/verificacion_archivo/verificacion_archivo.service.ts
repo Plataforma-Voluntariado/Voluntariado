@@ -188,9 +188,12 @@ export class VerificacionArchivoService {
       });
 
       const fastApiUrl = this.configService.get<string>(FASTAPI_URL);
-      if (!fastApiUrl) throw new Error('❌ No se encontró FASTAPI_URL en .env');
+      if (!fastApiUrl) throw new Error(' No se encontró FASTAPI_URL en .env');
 
-      const response = await axios.post(fastApiUrl, formData, {
+      // Construir endpoint correcto del verificador
+      const baseUrl = (fastApiUrl || '').replace(/\/$/, '');
+      const endpoint = baseUrl.includes('/analizar-pdf') ? baseUrl : `${baseUrl}/analizar-pdf`;
+      const response = await axios.post(endpoint, formData, {
         headers: formData.getHeaders(),
         maxBodyLength: Infinity,
       });
@@ -203,7 +206,7 @@ export class VerificacionArchivoService {
       );
       throw new BadRequestException(
         error?.response?.data?.detail ||
-        'Error al analizar el documento con la IA.',
+        'Error al analizar el documento con la IA (FastAPI).',
       );
     }
   }

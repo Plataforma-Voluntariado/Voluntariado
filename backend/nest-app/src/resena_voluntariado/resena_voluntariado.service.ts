@@ -34,12 +34,15 @@ export class ResenaVoluntariadoService {
   private async enviarAFastAPIComentario(comentario: string): Promise<number> {
     try {
       const fastApiUrl = this.configService.get<string>(FASTAPISENTIMIENTO_URL);
-      if (!fastApiUrl) throw new BadRequestException('La URL de FastAPI para sentimiento no está configurada.');
-      const response = await axios.post(fastApiUrl, { comentario });
+      if (!fastApiUrl) {
+        console.warn('URL de FastAPI para sentimiento no configurada. Usando calificación por defecto.');
+        return 5; // Calificación por defecto
+      }
+      const response = await axios.post(fastApiUrl, { comentario }, { timeout: 5000 });
       return response.data.estrellas;
     } catch (error) {
-      console.error('Error al analizar comentario con FastAPI:', error?.response?.data || error);
-      throw new BadRequestException('No se pudo analizar el comentario con la IA.');
+      console.error('Error al analizar comentario con FastAPI (usando calificación por defecto):', error?.message);
+      return 5; // Calificación por defecto si falla
     }
   }
 
@@ -68,7 +71,6 @@ export class ResenaVoluntariadoService {
         where: {
           voluntario: { id_usuario: voluntario_id },
           voluntariado: { id_voluntariado: voluntariado_id },
-          estado_inscripcion: EstadoInscripcion.TERMINADA,
         },
       }),
       this.resenaRepo.findOne({
@@ -80,6 +82,9 @@ export class ResenaVoluntariadoService {
     ]);
 
     if (!inscripcion) throw new ForbiddenException('No puedes reseñar este voluntariado');
+    if (inscripcion.estado_inscripcion !== EstadoInscripcion.ACEPTADA && 
+        inscripcion.estado_inscripcion !== EstadoInscripcion.TERMINADA)
+      throw new ForbiddenException('Tu inscripción no está aprobada para reseñar.');
     if (!inscripcion.asistencia)
       throw new ForbiddenException('Solo puedes reseñar si asististe al voluntariado.');
     if (resenaExistente) throw new BadRequestException('Ya has dejado una reseña para este voluntariado.');

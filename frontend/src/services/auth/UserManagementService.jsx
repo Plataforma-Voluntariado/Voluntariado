@@ -86,21 +86,28 @@ export const GetUserFilesArray = async () => {
 
 export const UploadUserFile = async (fileData, fileType) => {
   try {
+    if (!fileData) {
+      return { ok: false, status: 0, message: "No se seleccionó ningún archivo." };
+    }
+
+    // Validación rápida en frontend antes de enviar
+    if (fileData.type !== "application/pdf") {
+      return { ok: false, status: 0, message: "El archivo debe ser un PDF (application/pdf)." };
+    }
+    if (fileData.size > 1024 * 1024) { // 1MB
+      return { ok: false, status: 0, message: "El PDF excede el límite de 1MB." };
+    }
+
+    const normalizedType = (fileType || "").toLowerCase();
     const formData = new FormData();
-    formData.append("archivo", fileData);
-    const response = await api.post(
-      `/verificacion-archivo/subir/${fileType}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-    return response;
+    formData.append("archivo", fileData, fileData.name || "documento.pdf");
+
+    const response = await api.post(`/verificacion-archivo/subir/${normalizedType}`, formData);
+    return { ok: true, status: response.status, data: response.data };
   } catch (error) {
-    console.error("Error subiendo el archivo del usuario:", error);
-    return error || { error: "Error al subir archivo" };
+    const serverDetail = error?.response?.data?.message || error?.response?.data?.detail || error?.response?.data || error.message;
+    console.error("Error subiendo el archivo del usuario:", serverDetail);
+    return { ok: false, status: error?.response?.status || 500, message: serverDetail };
   }
 };
 

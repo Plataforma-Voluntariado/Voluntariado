@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Certificado de Participación</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      color: #222; 
+      margin: 30px;
+      padding: 0;
+    }
+    .container { 
+      border: 5px solid #2b6cb0; 
+      padding: 40px; 
+      min-height: 700px;
+    }
+    .header { 
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .org { 
+      font-size: 14px; 
+      color: #4a5568; 
+    }
+    .logo-container {
+      text-align: right;
+    }
+    .logo {
+      max-height: 60px;
+      max-width: 200px;
+    }
+    .title { 
+      text-align: center; 
+      margin: 40px 0 20px; 
+      color: #2b6cb0; 
+    }
+    .title h1 { 
+      margin: 0; 
+      font-size: 32px; 
+      font-weight: bold;
+    }
+    .subtitle { 
+      text-align: center; 
+      font-size: 16px; 
+      color: #4a5568; 
+      margin-bottom: 40px; 
+    }
+    .content { 
+      font-size: 16px; 
+      line-height: 1.8; 
+      margin: 30px 0; 
+      text-align: center;
+    }
+    .name { 
+      font-size: 26px; 
+      font-weight: bold; 
+      text-align: center; 
+      margin: 20px 0; 
+      color: #2b6cb0;
+      text-transform: uppercase;
+    }
+    .details { 
+      margin-top: 40px; 
+      font-size: 14px;
+    }
+    .details-row {
+      margin: 10px 0;
+    }
+    .details-label { 
+      font-weight: bold; 
+      display: inline-block;
+      width: 150px;
+    }
+    .footer { 
+      margin-top: 60px; 
+      text-align: center;
+    }
+    .qr { 
+      text-align: center;
+      margin-top: 30px; 
+    }
+    .seal { 
+      text-align: center; 
+      margin-top: 30px; 
+      color: #4a5568; 
+      font-size: 12px; 
+    }
+    .small { 
+      font-size: 12px; 
+      color: #718096; 
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="org">
+        <strong>{{ organizacion or 'Plataforma Voluntariado' }}</strong><br>
+        <span class="small">Fecha de emisión: {{ hoy }}</span>
+      </div>
+      <div class="logo-container">
+        <img src="https://res.cloudinary.com/dkkb0nx3l/image/upload/v1763397829/logo_uflivf.png" alt="Logo" class="logo">
+      </div>
+    </div>
+
+    <div class="title">
+      <h1>CERTIFICADO DE PARTICIPACIÓN</h1>
+    </div>
+    <div class="subtitle">Se otorga el presente certificado a:</div>
+
+    <div class="name">{{ nombre_voluntario }}</div>
+
+    <div class="content">
+      Por su destacada participación en el voluntariado<br>
+      <strong>"{{ voluntariado_titulo }}"</strong><br><br>
+      Realizado el día <strong>{{ fecha }}</strong><br>
+      Con una dedicación total de <strong>{{ horas }} hora{% if horas != 1 %}s{% endif %}</strong>
+    </div>
+
+    <div class="details">
+      <div class="details-row">
+        <span class="details-label">ID de Certificado:</span>
+        <span>{{ certificado_id }}</span>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="small">{{ firmado_por or 'Coordinación General' }}</div>
+    </div>
+
+    <div class="qr">
+      <img src="{{ qr_data_uri }}" alt="QR" width="120" height="120">
+    </div>
+
+    <div class="seal">
+      Este certificado puede verificarse escaneando el código QR
+    </div>
+  </div>
+</body>
+</html>
