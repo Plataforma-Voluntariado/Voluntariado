@@ -93,7 +93,7 @@ const VoluntariadoDetallePage = () => {
   });
   const avgRating = voluntariado.promedioCalificacion ?? 0;
   const filteredResenas = selectedStar >= 1 ? resenas.filter(r => Number(r.calificacion) === selectedStar) : resenas;
-
+  
   return (
     <div className="vol-detalle-container">
       <div className="vol-detalle-main">
@@ -188,18 +188,8 @@ const VoluntariadoDetallePage = () => {
                   <div className="info-content">
                     <span className="info-label">Participantes</span>
                     <span className="info-value">
-                      {voluntariado.participantesAceptados || 0} / {voluntariado.maxParticipantes}
+                      {(voluntariado.inscripciones?.filter(i => i.estado_inscripcion === "TERMINADA")?.length || 0)} / {voluntariado.maxParticipantes}
                     </span>
-                  </div>
-                  <div className="participants-progress">
-                    <div 
-                      className="participants-bar" 
-                      style={{
-                        width: `${voluntariado.maxParticipantes > 0 
-                          ? ((voluntariado.participantesAceptados || 0) / voluntariado.maxParticipantes) * 100 
-                          : 0}%`
-                      }}
-                    />
                   </div>
                 </div>
               )}

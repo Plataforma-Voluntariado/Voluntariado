@@ -17,7 +17,7 @@ import { InscripcionService } from 'src/inscripcion/inscripcion.service';
 @Injectable()
 export class VoluntariadoService {
   private readonly logger = new Logger(VoluntariadoService.name);
-  private readonly commonRelations = ['categoria', 'creador', 'fotos', 'ubicacion', 'ubicacion.ciudad', 'creador.creador', 'inscripciones','inscripciones.voluntario','resenas','resenas.voluntario'] as const;
+  private readonly commonRelations = ['categoria', 'creador', 'fotos', 'ubicacion', 'ubicacion.ciudad', 'creador.creador', 'inscripciones','inscripciones.voluntario','resenas','resenas.voluntario',"ubicacion.ciudad.departamento"] as const;
   constructor(
     @InjectRepository(Voluntariado) private readonly voluntariadoRepo: Repository<Voluntariado>,
     @InjectRepository(Categoria) private readonly categoriaRepo: Repository<Categoria>,
@@ -170,7 +170,6 @@ export class VoluntariadoService {
         );
       }
 
-      // calclo fechafin
       const nuevaFechaInicio = dto.fechaHoraInicio ?? voluntariado.fechaHoraInicio;
       const nuevasHoras = dto.horas ?? voluntariado.horas;
 

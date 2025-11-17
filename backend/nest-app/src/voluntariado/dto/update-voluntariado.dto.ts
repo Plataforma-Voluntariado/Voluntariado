@@ -82,8 +82,7 @@ export class UpdateVoluntariadoDto {
   @IsOptional()
   @IsArray({ message: 'fotosMantener debe ser un arreglo' })
   @ArrayUnique()
-  @MinLength(1, { message: 'Debe mantener mínimo una foto si se envía este arreglo.' })
   @IsInt({ each: true, message: 'Cada valor en fotosMantener debe ser un número entero' })
-  @Type(() => Number) // ✅ convierte strings a números
+  @Type(() => Number) 
   fotosMantener?: number[];
 }

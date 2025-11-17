@@ -69,13 +69,16 @@ export class VoluntariadoController {
   async update(@Param('id') id: string, @Body() body: any, @UploadedFiles() nuevasFotos: Express.Multer.File[], @Req() req: any) {
     body.ubicacion = this.parseJsonField(body.ubicacion, 'Formato inválido para ubicacion');
     body.fotosMantener = this.parseJsonField(body.fotosMantener, 'fotosMantener debe ser un arreglo válido. Ej: [1,2,3]');
-
-    if (body.fotosMantener && !Array.isArray(body.fotosMantener)) {
-      body.fotosMantener = [body.fotosMantener];
+    if (!body.fotosMantener) {
+      body.fotosMantener = undefined;
     }
-
+    else if (typeof body.fotosMantener === 'number' || typeof body.fotosMantener === 'string') {
+      body.fotosMantener = [Number(body.fotosMantener)];
+    }
+    else if (Array.isArray(body.fotosMantener)) {
+      body.fotosMantener = body.fotosMantener.map(v => Number(v));
+    }
     const dto = plainToInstance(UpdateVoluntariadoDto, body);
-
     try {
       await validateOrReject(dto);
     } catch (errors) {
