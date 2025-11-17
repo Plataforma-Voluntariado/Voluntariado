@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import "./UploadProfilePhotoModal.css";
 import { UploadProfilePhoto, DeleteProfilePhoto } from "../../../services/auth/UserManagementService";
-import { SuccessAlert } from "../../../utils/ToastAlerts";
 import { WrongAlert } from "../../../utils/ToastAlerts";
 
 function UploadProfilePhotoModal({ currentPhotoUrl, onClose }) {
