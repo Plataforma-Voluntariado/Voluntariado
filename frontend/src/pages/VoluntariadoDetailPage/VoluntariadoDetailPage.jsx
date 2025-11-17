@@ -25,6 +25,7 @@ function VoluntariadoDetailPage() {
 
   useEffect(() => {
     loadVoluntariado();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   // Carrusel automático de imágenes
@@ -133,7 +134,6 @@ function VoluntariadoDetailPage() {
     horas,
     maxParticipantes,
     participantesAceptados,
-    estado,
     categoria,
     fotos = [],
     ubicacion,

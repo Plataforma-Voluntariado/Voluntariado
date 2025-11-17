@@ -54,6 +54,7 @@ function EditVoluntariadoModal({ voluntariado, onClose, onSuccess }) {
 
   useEffect(() => {
     loadInitialData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadInitialData = async () => {

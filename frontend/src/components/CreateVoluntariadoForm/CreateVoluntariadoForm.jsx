@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import "./CreateVoluntariadoForm.css";
 import { getCategorias } from "../../services/categoria/categoriaService";
 import { getDepartamentos, getCiudadesByDepartamento } from "../../services/ubicacion/ubicacionService";
@@ -29,7 +29,6 @@ const roundCoord = (n, digits = 7) => {
 
 function CreateVoluntariadoForm({ onSuccess, onCancel }) {
   const { user } = useAuth();
-  const mapRef = useRef(null);
   const [categorias, setCategorias] = useState([]);
   const [departamentos, setDepartamentos] = useState([]);
   const [ciudades, setCiudades] = useState([]);
@@ -40,12 +39,6 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
   const [loading, setLoading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedImageModal, setSelectedImageModal] = useState(null);
-  const [markerPosition, setMarkerPosition] = useState(null);
-  const [viewState, setViewState] = useState({
-    longitude: DEFAULT_COORDS.longitud,
-    latitude: DEFAULT_COORDS.latitud,
-    zoom: 13
-  });
   const [formData, setFormData] = useState({
     titulo: "",
     descripcion: "",
@@ -55,55 +48,6 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
     categoria_id: "",
     ubicacion: { ...DEFAULT_COORDS, direccion: "", ciudad_id: "", nombre_sector: "" }
   });
-
-  // Geocodificación inversa para obtener dirección desde coordenadas
-  const getAddressFromCoords = async (lng, lat) => {
-    try {
-      const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${process.env.REACT_APP_MAPBOX_TOKEN}&language=es`
-      );
-      const data = await response.json();
-      
-      if (data.features && data.features.length > 0) {
-        const feature = data.features[0];
-        return feature.place_name;
-      }
-      return "Dirección no disponible";
-    } catch (error) {
-      console.error("Error en geocodificación inversa:", error);
-      return "Error al obtener dirección";
-    }
-  };
-
-  // Manejar clic en el mapa
-  const handleMapClick = async (event) => {
-    const { lngLat } = event;
-    // Redondear a 8 decimales como máximo (según el DTO del backend)
-    const lng = parseFloat(lngLat.lng.toFixed(8));
-    const lat = parseFloat(lngLat.lat.toFixed(8));
-    
-    // Actualizar marcador
-    setMarkerPosition({ longitude: lng, latitude: lat });
-    
-    // Obtener dirección
-    const address = await getAddressFromCoords(lng, lat);
-    
-    // Actualizar formulario
-    setFormData(prev => ({
-      ...prev,
-      ubicacion: {
-        ...prev.ubicacion,
-        latitud: lat,
-        longitud: lng,
-        direccion: address
-      }
-    }));
-    
-    // Limpiar error de dirección si existe
-    if (errors["ubicacion.direccion"]) {
-      setErrors(prev => ({ ...prev, "ubicacion.direccion": "" }));
-    }
-  };
 
   useEffect(() => {
     (async () => {
@@ -255,12 +199,6 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
     setFotos([]); 
     setPreviewImages([]); 
     setSelectedDepartamento("");
-    setMarkerPosition(null);
-    setViewState({
-      longitude: DEFAULT_COORDS.longitud,
-      latitude: DEFAULT_COORDS.latitud,
-      zoom: 13
-    });
     const fileInput = document.getElementById("fotos"); 
     if (fileInput) fileInput.value = "";
   };

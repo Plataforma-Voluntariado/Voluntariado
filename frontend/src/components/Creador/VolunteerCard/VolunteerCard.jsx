@@ -1,6 +1,6 @@
 // src/components/VolunteerCard.jsx
 import { useNavigate } from "react-router-dom";
-import { FaClock, FaUsers, FaMapMarkerAlt, FaCalendarAlt, FaTimesCircle, FaEye, } from "react-icons/fa";
+import { FaClock, FaUsers, FaMapMarkerAlt, FaCalendarAlt, FaTimesCircle } from "react-icons/fa";
 import { cancelarVoluntariado } from "../../../services/voluntariado/voluntariadoService";
 import ConfirmAlert from "../../../components/alerts/ConfirmAlert";
 import { SuccessAlert, WrongAlert } from "../../../utils/ToastAlerts";

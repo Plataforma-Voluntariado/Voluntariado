@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import "./VolunteeringCard.css";
 import ConfirmAlert from "../alerts/ConfirmAlert";
 import { InscribeIntoVolunteering } from "../../services/volunteering/VolunteeringService";
-import Swal from "sweetalert2";
 import { SuccessAlert, WrongAlert } from "../../utils/ToastAlerts";
 import { useAuth } from "../../context/AuthContext";
 
