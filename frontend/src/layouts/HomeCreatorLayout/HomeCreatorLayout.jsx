@@ -56,7 +56,11 @@ function HomeCreatorLayout() {
 
     const totalInscripciones = Object.values(voluntariados)
       .flat()
-      .reduce((sum, v) => sum + (v.inscripciones?.length || 0), 0);
+      .reduce(
+        (sum, v) => sum + (v.inscripciones?.filter(i => i.estado_inscripcion === "PENDIENTE").length || 0),
+        0
+      );
+
 
     return { total, pendientes, enProceso, terminados, cancelados, totalInscripciones };
   };
@@ -125,7 +129,7 @@ function HomeCreatorLayout() {
             </div>
             <div className="stat-info">
               <h3>{stats.totalInscripciones}</h3>
-              <p>Total Inscripciones</p>
+              <p>Total Inscripciones Pendientes</p>
             </div>
           </div>
         </div>

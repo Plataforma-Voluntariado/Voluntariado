@@ -43,7 +43,6 @@ function CreatorProfilePage() {
 
       try {
         const res = await getVoluntariadosByCreatorId(id);
-        console.log(res)
         setVolRes(res || {});
         const terminadosList = res?.terminados || [];
         setTerminados(terminadosList);
@@ -87,7 +86,7 @@ function CreatorProfilePage() {
   return (
     <div className="creator-page-container">
       <div className="creator-card">
-        <div className="creator-header">
+        <div className="creator-header-1">
           <div className="creator-header-left">
             <div className="avatar-wrap">
               <img

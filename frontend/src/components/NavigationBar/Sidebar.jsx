@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import SidebarNotificationWrapper from "./SidebarNotificationWrapper";
 import "./Sidebar.css";
 import "./SidebarNotificationWrapper.css";
-import { FaTimes, FaUser, FaCog, FaUsers, FaCalendarPlus, FaHome } from "react-icons/fa";
+import { FaTimes,FaCog, FaUsers, FaCalendarPlus, FaHome } from "react-icons/fa";
 
 function Sidebar({ isOpen, onClose }) {
   const navigate = useNavigate();
@@ -25,7 +25,6 @@ function Sidebar({ isOpen, onClose }) {
 
     if (isOpen) {
       document.addEventListener("keydown", handleEscape);
-      // Focus en el sidebar para accesibilidad
       const sidebar = document.querySelector(".sidebar");
       if (sidebar) sidebar.focus();
     }
@@ -42,15 +41,6 @@ function Sidebar({ isOpen, onClose }) {
       case "CREADOR":
         return (
           <>
-            <li
-              className="sidebar-item"
-              onClick={() => handleNavigate("/profile-creator")}
-              role="menuitem"
-              tabIndex="0"
-            >
-              <FaUser className="sidebar-icon" />
-              <span>PERFIL EMPRESARIAL</span>
-            </li>
             <li
               className="sidebar-item"
               onClick={() => handleNavigate("/manage-events")}
