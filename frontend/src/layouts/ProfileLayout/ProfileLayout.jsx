@@ -17,13 +17,11 @@ function ProfileLayout() {
 
   return (
     <div className="profile-layout">
-      <div className="profile-glass-container">
         <ProfileHeader user={user} />
         <ProfileInfo user={user} />
         <ProfileVerificationLayout user = {user}/>
         <ProfileStats user={user} />
         <ProfileLogout />
-      </div>
     </div>
   );
 }

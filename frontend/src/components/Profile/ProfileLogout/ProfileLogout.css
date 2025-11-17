@@ -5,15 +5,15 @@
 }
 
 .profile-logout-button {
-    width: 90%;
-    padding: 1rem 0;
+    width: 100%;
+    padding: 1.25rem 0;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 8px;
-    border-radius: var(--radius-medium);
+    border-radius: var(--radius-large);
     border: none;
-    background: var(--red-button);
+    background: var(--color-error);
     color: white;
     font-size: 1rem;
     font-weight: 600;

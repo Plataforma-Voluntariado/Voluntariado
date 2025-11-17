@@ -1,5 +1,15 @@
 import api from "../../config/AxiosConfig";
 
+
+export const GetUserById = async (userId) => {
+  try{
+    const response = await api.get(`/voluntario/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error obteniendo el usuario por ID.", error);
+    return error;
+  }
+}
 export const GetUsersByRole = async (rol) => {
   try {
     const response = await api.get("/verificacion/pendientes");

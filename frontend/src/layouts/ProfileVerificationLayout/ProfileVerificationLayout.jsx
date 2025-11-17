@@ -57,7 +57,7 @@ function ProfileVerificationLayout({ user }) {
         <>
           <div className="profile-verification-toggle-card" onClick={toggleVerifications}>
             <div className="profile-verification-toggle-content">
-              <h4 className="profile-verification-toggle-title">Verificación de Identidad</h4>
+              <h4 className="profile-verification-toggle-title">VERIFICACIÓN DE IDENTIDAD</h4>
               <p className="profile-verification-toggle-subtitle">
                 {isExpanded ? "Ocultar" : "Ver"} tus documentos de verificación
               </p>

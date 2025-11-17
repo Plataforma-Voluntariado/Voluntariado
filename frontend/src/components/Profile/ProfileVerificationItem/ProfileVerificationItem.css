@@ -1,13 +1,12 @@
 .profile-verification-card {
   position: relative;
   width: 100%;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--color-surface);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 20px;
-  padding: 1.5rem;
+  padding: 1.75rem;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  border: 2px solid rgba(0, 0, 0, 0.15);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
 }
@@ -18,13 +17,13 @@
 }
 
 .profile-verification-card-empty {
-  border: 2px dashed #007AFF;
-  background: rgba(0, 122, 255, 0.05);
+  border: 2px dashed var(--color-primary);
+  background: var(--color-primary-light);
 }
 
 .profile-verification-card-empty:hover {
-  background: rgba(0, 122, 255, 0.08);
-  border-color: #0051D5;
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
 }
 
 [data-theme="dark"] .profile-verification-card {
@@ -45,7 +44,7 @@
   gap: 1rem;
   margin-bottom: 1.25rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--color-border);
 }
 
 [data-theme="dark"] .profile-verification-header {
@@ -59,10 +58,11 @@
 }
 
 .profile-verification-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1a1a1a;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-primary);
   margin: 0;
+  text-transform: uppercase;
 }
 
 [data-theme="dark"] .profile-verification-title {
@@ -79,19 +79,19 @@
 }
 
 .profile-verification-status-pendiente {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  background: var(--color-warning);
   color: white;
   box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
 }
 
 .profile-verification-status-aprobado {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: var(--color-success);
   color: white;
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
 .profile-verification-status-rechazado {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  background: var(--color-error);
   color: white;
   box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 }
@@ -105,8 +105,9 @@
 }
 
 .profile-verification-empty-message {
-  font-size: 1rem;
-  color: #525252;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  font-weight: 600;
   text-align: center;
   margin: 0;
 }
@@ -131,7 +132,7 @@
 .profile-verification-label {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #525252;
+  color: var(--color-text);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -143,7 +144,7 @@
 .profile-verification-value {
   font-size: 1rem;
   font-weight: 500;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 [data-theme="dark"] .profile-verification-value {
@@ -152,7 +153,7 @@
 
 .profile-verification-filename {
   font-size: 0.95rem;
-  color: #007AFF;
+  color: var(--color-title);
   font-weight: 500;
   cursor: pointer;
   text-decoration: underline;
@@ -161,7 +162,7 @@
 }
 
 .profile-verification-filename:hover {
-  color: #0051D5;
+  color: var(--color-primary);
 }
 
 .profile-verification-comment {
@@ -191,7 +192,7 @@
   font-weight: 600;
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-small);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -214,23 +215,23 @@
 }
 
 .profile-verification-button.view {
-  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+  background: var(--color-primary);
   box-shadow: 0 4px 16px rgba(0, 122, 255, 0.35);
 }
 
 .profile-verification-button.view:hover {
-  background: linear-gradient(135deg, #0051D5 0%, #003DA5 100%);
+  filter: brightness(0.95);
   box-shadow: 0 8px 24px rgba(0, 122, 255, 0.5);
   transform: translateY(-2px) scale(1.02);
 }
 
 .profile-verification-button.upload {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: var(--color-success);
   box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
 }
 
 .profile-verification-button.upload:hover {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  filter: brightness(0.95);
   box-shadow: 0 8px 24px rgba(16, 185, 129, 0.5);
   transform: translateY(-2px) scale(1.02);
 }
@@ -238,12 +239,12 @@
 .profile-verification-button.upload-primary {
   width: 100%;
   max-width: 300px;
-  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-title) 100%);
   box-shadow: 0 4px 16px rgba(0, 122, 255, 0.35);
 }
 
 .profile-verification-button.upload-primary:hover {
-  background: linear-gradient(135deg, #0051D5 0%, #003DA5 100%);
+  background: linear-gradient(135deg, var(--color-title) 0%, var(--color-primary) 100%);
   box-shadow: 0 8px 24px rgba(0, 122, 255, 0.5);
   transform: translateY(-2px) scale(1.02);
 }

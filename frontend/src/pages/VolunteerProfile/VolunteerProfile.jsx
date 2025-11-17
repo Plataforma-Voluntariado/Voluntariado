@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { GetVoluntarioById } from '../../services/volunteering/VolunteeringService';
+import { GetVoluntarioById } from '../../services/voluntariado/voluntariadoService';
 import { MdEmail, MdDateRange } from 'react-icons/md';
 import { FaCheckCircle, FaPhone, FaChevronDown, FaChevronUp, FaClock, FaUsers, FaPercent } from 'react-icons/fa';
 import './VolunteerProfile.css';

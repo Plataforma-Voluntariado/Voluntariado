@@ -6,19 +6,18 @@
   margin-bottom: 2rem;
   justify-content: center;
   padding-bottom: 2rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--color-border);
   box-sizing: border-box;
   overflow: hidden;
 }
 
 .profile-info-item {
   flex: 1;
+    background: var(--color-primary-light);
   min-width: 0;
   max-width: 100%;
-  background: white;
   padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-medium);
   position: relative;
   box-sizing: border-box;
   word-wrap: break-word;
@@ -28,8 +27,8 @@
 .profile-info-item h4 {
   margin: 0 0 0.5rem 0;
   font-size: 0.9rem;
-  font-weight: 600;
-  color: #666;
+  font-weight: 700;
+  color: var(--color-primary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -37,7 +36,7 @@
 .profile-info-item p {
   margin: 0;
   font-size: 1rem;
-  color: #333;
+  color: var(--color-text);
   font-weight: 500;
 }
 
@@ -47,42 +46,6 @@
   gap: 0.5rem;
 }
 
-.verification-badge {
-  display: inline-block;
-  padding: 0.4rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-align: center;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  align-self: flex-start;
-}
-
-.verification-badge.verified {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-  cursor: default;
-}
-
-.verification-badge.not-verified {
-  background-color: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffeaa7;
-}
-
-.verification-badge.not-verified:hover {
-  background-color: #ffeaa7;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.verification-badge.not-verified:active {
-  transform: translateY(0);
-}
 
 /* Tarjeta centrada para fecha de nacimiento */
 .profile-info-item-centered {
@@ -100,8 +63,8 @@
   width: 24px;
   height: 24px;
   object-fit: contain;
-  opacity: 0.7;
   transition: opacity 0.3s ease;
+  color: var(--color-primary)
 }
 
 .profile-info-icon:hover {

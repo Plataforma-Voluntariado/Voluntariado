@@ -7,7 +7,7 @@ import { WrongAlert, SuccessAlert } from "../../utils/ToastAlerts";
 import Map from "react-map-gl";
 import { Marker } from "react-map-gl";
 import EditVoluntariadoModal from "../../components/Modals/EditVoluntariadoModal/EditVoluntariadoModal";
-import { InscribeIntoVolunteering } from "../../services/volunteering/VolunteeringService";
+import { InscribeIntoVolunteering } from "../../services/voluntariado/voluntariadoService";
 import ConfirmAlert from "../../components/alerts/ConfirmAlert";
 import { FaMapMarkerAlt, FaClock, FaUsers, FaCalendarAlt, FaEdit, FaCheckCircle } from "react-icons/fa";
 
