@@ -12,11 +12,13 @@ import { customSelectStylesVoluntariado } from "../../styles/selectStylesVolunta
 import { TextField } from "@mui/material";
 import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+
 import LocationPickerMap from "../Map/LocationPickerMap/LocationPickerMap";
 
 
 const MAX_PHOTOS = 5;
 const MAX_SIZE = 5 * 1024 * 1024;
+
 const DEFAULT_COORDS = { latitud: 1.1491254, longitud: -76.6465421 };
 
 // Helper para redondear coordenadas a N decimales (7 por defecto)
@@ -194,8 +196,11 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
       titulo: "", descripcion: "", fechaHoraInicio: "", horas: 1, maxParticipantes: 10, categoria_id: "",
       ubicacion: { ...DEFAULT_COORDS, direccion: "", ciudad_id: "", nombre_sector: "" }
     });
-    setFotos([]); setPreviewImages([]); setSelectedDepartamento("");
-    const fileInput = document.getElementById("fotos"); if (fileInput) fileInput.value = "";
+    setFotos([]); 
+    setPreviewImages([]); 
+    setSelectedDepartamento("");
+    const fileInput = document.getElementById("fotos"); 
+    if (fileInput) fileInput.value = "";
   };
 
   const handleSubmit = async (e) => {
@@ -222,8 +227,19 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
     setLoading(true);
 
     try {
+      // Asegurar que ciudad_id sea un número
+      const dataToSend = {
+        ...formData,
+        ubicacion: {
+          ...formData.ubicacion,
+          ciudad_id: parseInt(formData.ubicacion.ciudad_id)
+        }
+      };
+
+      console.log("Datos a enviar:", dataToSend);
+      
       // Crear voluntariado usando directamente los datos del formulario y fotos
-      const result = await createVoluntariado(formData, fotos);
+      const result = await createVoluntariado(dataToSend, fotos);
       await SuccessAlert({
         title: "¡Voluntariado creado!",
         timer: 1500
@@ -477,6 +493,7 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
               </div>
             </div>
 
+
             <div className="form-group">
               <label className="register-form-label">Dirección *</label>
               <input
@@ -488,6 +505,18 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
               />
               {errors["ubicacion.direccion"] && <span className="error-text">{errors["ubicacion.direccion"]}</span>}
             </div>
+
+            {/* Dirección (solo lectura) */}
+            <div className="form-group">
+              <label className="register-form-label">Dirección seleccionada</label>
+              <input
+                className="register-form-input direccion-readonly"
+                value={formData.ubicacion.direccion || "Haz clic en el mapa para seleccionar la ubicación"}
+                readOnly
+                placeholder="La dirección se mostrará aquí"
+              />
+            </div>
+
             <div className="form-row">
               <div className="form-group">
                 <label className="register-form-label">Barrio/Sector *</label>

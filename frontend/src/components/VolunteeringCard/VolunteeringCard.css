@@ -10,11 +10,13 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: row;
+  cursor: pointer;
 }
 
 .volunteering-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  border-color: rgba(102, 126, 234, 0.3);
 }
 
 [data-theme="dark"] .volunteering-card {
@@ -151,11 +153,24 @@
   background: rgba(0, 122, 255, 0.05);
   border-radius: 12px;
   border: 1px solid rgba(0, 122, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.volunteering-card-creator:hover {
+  background: rgba(0, 122, 255, 0.12);
+  border-color: rgba(0, 122, 255, 0.3);
+  transform: translateX(4px);
 }
 
 [data-theme="dark"] .volunteering-card-creator {
   background: rgba(0, 122, 255, 0.08);
   border: 1px solid rgba(0, 122, 255, 0.2);
+}
+
+[data-theme="dark"] .volunteering-card-creator:hover {
+  background: rgba(0, 122, 255, 0.15);
+  border-color: rgba(0, 122, 255, 0.4);
 }
 
 .volunteering-card-creator-avatar {
@@ -165,6 +180,12 @@
   object-fit: cover;
   border: 2px solid rgba(0, 122, 255, 0.3);
   flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.volunteering-card-creator:hover .volunteering-card-creator-avatar {
+  transform: scale(1.1);
+  border-color: rgba(0, 122, 255, 0.5);
 }
 
 .volunteering-card-creator-info {

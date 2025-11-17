@@ -25,10 +25,13 @@ import CreatorInscripcionPage from "./pages/ManagementEventosPage/CreatorInscrip
 import CreatorVolunteerPage from "./pages/ManagementEventosPage/CreatorVolunteerPage/CreatorVolunteerPage";
 import VolunteerRoute from "./routes/VolunteerRoute";
 import VolunteerInscripcionPage from "./pages/ManagementIncripcionPage/VolunteerInscripcionPage/VolunteerInscripcionPage";
+import VoluntariadoDetailPage from "./pages/VoluntariadoDetailPage/VoluntariadoDetailPage";
 import CreatorProfilePage from "./pages/CreatorProfile/CreatorProfilePage";
-import VoluntariadoDetallePage from "./pages/VoluntariadoDetallePage/VoluntariadoDetallePage";
+
+
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
+
 root.render(
   <BrowserRouter>
     <ScrollToTop />
@@ -53,8 +56,9 @@ root.render(
         <Route element={<NavbarLayout />}>
           <Route path="/home" element={<HomePage />} />
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/creador/:id" element={<CreatorProfilePage/>} />
-          <Route path="/voluntariado/:id" element={<VoluntariadoDetallePage />} />
+          <Route path="/crear-voluntariado" element={<CreateVoluntariadoPage />} />
+          <Route path="/voluntariado/:id" element={<VoluntariadoDetailPage />} />
+          <Route path="/creador/:id" element={<CreatorProfilePage />} />
           <Route element={<UnverifiedEmailRoute />}><Route path="/verificar-correo" element={<EmailVerificationPage />} /></Route>
         </Route>
       </Route>
@@ -90,7 +94,6 @@ root.render(
         <Route element={<NavbarLayout />}>
           <Route path="/manage-events" element={<CreatorVolunteerPage />} />
           <Route path="/manage-events/:eventId" element={<CreatorInscripcionPage />} />
-          <Route path="/crear-voluntariado" element={<CreateVoluntariadoPage />} />
         </Route>
       </Route>
 

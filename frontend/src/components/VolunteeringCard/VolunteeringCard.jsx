@@ -45,6 +45,7 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
     return result;
   }, [inscripciones, user, creador]);
 
+
   const navigate = useNavigate();
 
   const effectiveIsInscrito = isInscrito || localInscribed;
@@ -168,8 +169,14 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
   };
   const goTo = (i) => setIndex(i);
 
+  const handleCardClick = () => {
+    if (volunteering?.id_voluntariado) {
+      navigate(`/voluntariado/${volunteering.id_voluntariado}`);
+    }
+  };
+
   return (
-    <div className="volunteering-card">
+    <div className="volunteering-card" onClick={handleCardClick}>
       <div
         className="volunteering-card-image"
         onMouseEnter={() => setIsPaused(true)}
@@ -239,16 +246,18 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
           {truncateText(descripcion, 100)}
         </p>
 
-        <div className="volunteering-card-creator">
+        <div 
+          className="volunteering-card-creator"
+          onClick={(e) => {
+            e.stopPropagation();
+            const id = creador?.id_usuario || creador?.id;
+            if (id) navigate(`/creador/${id}`);
+          }}
+        >
           <img
             src={creador?.url_imagen || "/placeholder.svg"}
             alt={creador?.nombre || creador?.correo}
             className="volunteering-card-creator-avatar"
-            style={{ cursor: creador?.id_usuario ? "pointer" : "default" }}
-            onClick={() => {
-              const id = creador?.id_usuario || creador?.id || creador?.id_usuario;
-              if (id) navigate(`/creador/${id}`);
-            }}
           />
           <div className="volunteering-card-creator-info">
             <span className="volunteering-card-creator-label">Creador</span>
@@ -355,7 +364,10 @@ function VolunteeringCard({ volunteering, onFocusMap }) {
 
           <button
             className="volunteering-card-location-btn"
-            onClick={() => onFocusMap?.()}
+            onClick={(e) => {
+              e.stopPropagation();
+              onFocusMap?.();
+            }}
           >
             <svg
               width="16"

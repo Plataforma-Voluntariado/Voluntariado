@@ -91,11 +91,6 @@ export class VoluntariadoController {
     return this.voluntariadoService.remove(+id, req.user);
   }
 
-  @Get()
-  findAll() {
-    return this.voluntariadoService.findAll();
-  }
-
   @Roles(RolUsuario.CREADOR)
   @Get('owns')
   findMine(@Req() req: any) {
@@ -111,5 +106,10 @@ export class VoluntariadoController {
   @Get(':id')
   findOne(@Param('id') id: string, @Req() req: any) {
     return this.voluntariadoService.findOne(+id, req.user);
+  }
+
+  @Get()
+  findAll() {
+    return this.voluntariadoService.findAll();
   }
 }
