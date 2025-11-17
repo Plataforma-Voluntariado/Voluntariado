@@ -6,7 +6,7 @@
   text-align: center;
   justify-content: center;
   padding-bottom: 2rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--color-border);
   margin-bottom: 2rem;
 }
 
@@ -73,7 +73,7 @@
   font-size: 1.75rem;
   font-weight: 600;
   width: 100%;
-  color: #1a1a1a;
+  color: var(--color-title);
   margin: 0 0 0.5rem 0;
   letter-spacing: -0.02em;
 }
@@ -84,10 +84,10 @@
 
 .profile-role {
   font-size: 1rem;
-  color: #007aff;
+  color: var(--color-bg);
   font-weight: 500;
   padding: 0.4rem 1rem;
-  background: rgba(0, 122, 255, 0.1);
+  background: var(--color-primary);;
   border-radius: 12px;
   display: inline-block;
 }
@@ -107,13 +107,13 @@
 }
 
 .profile-status.verified {
-  color: #10b981;
-  background: rgba(16, 185, 129, 0.1);
+  color: var(--color-bg);
+  background: var(--color-success);
 }
 
 .profile-status.unverified {
-  color: #f59e0b;
-  background: rgba(245, 158, 11, 0.1);
+  color: var(--color-bg);
+  background: var(--color-warning);
 }
 
 [data-theme="dark"] .profile-status.verified {

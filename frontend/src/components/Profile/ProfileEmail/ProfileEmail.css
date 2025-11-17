@@ -2,21 +2,16 @@
   position: relative;
   width: 100%;
   max-width: 100%;
-  background: rgba(255, 255, 255, 0.9);
+  min-height: 80px;
+  background: var(--color-primary-light);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 20px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 1.75rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
   margin: 0 auto;
-}
-
-.profile-email-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  align-content: start;
 }
 
 [data-theme="dark"] .profile-email-card {
@@ -28,24 +23,25 @@
 .profile-email-icon {
   position: absolute;
   top: 1rem;
-  right: 1rem;
+  right: 1.75rem;
   width: 32px;
   height: 32px;
   object-fit: contain;
-  opacity: 0.6;
+  color: var(--color-primary);
 }
 
 .profile-email-header {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
+
 }
 
 .profile-email-label {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1a1a1a;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-primary);
 }
 
 [data-theme="dark"] .profile-email-label {
@@ -55,20 +51,20 @@
 .profile-email-status {
   display: inline-block;
   padding: 0.35rem 0.875rem;
-  border-radius: 12px;
+  border-radius: var(--radius-small);
   font-weight: 500;
   font-size: 0.85rem;
   text-transform: capitalize;
 }
 
 .profile-email-status.verified {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: var(--color-success);
   color: white;
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
 .profile-email-status.not-verified {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  background: var(--color-warning);
   color: white;
   box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
 }
@@ -78,13 +74,14 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+
 }
 
 .profile-email-address {
   flex: 1;
-  font-size: 1.125rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-text);
   margin: 0;
   word-break: break-word;
 }
@@ -94,16 +91,16 @@
 }
 
 .profile-email-verify-button {
-  padding: 0.75rem 1.5rem;
+  padding: 0.35rem 0.875rem;
   font-size: 0.95rem;
   font-weight: 600;
   color: white;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: var(--color-primary);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-small);
   cursor: pointer;
   white-space: nowrap;
-  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+  box-shadow: 0 4px 16px rgba(16, 109, 185, 0.35);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
@@ -125,14 +122,14 @@
 }
 
 .profile-email-verify-button:hover {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.5);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-title) 100%);
+  box-shadow: 0 8px 24px rgba(16, 83, 185, 0.5);
   transform: translateY(-2px) scale(1.02);
 }
 
 .profile-email-verify-button:active {
   transform: translateY(0) scale(0.98);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 4px 12px rgba(16, 103, 185, 0.4);
 }
 
 @media (max-width: 768px) {

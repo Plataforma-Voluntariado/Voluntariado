@@ -1,11 +1,10 @@
 import React from "react";
 import "./ProfileEmail.css";
-import iconoCorreo from "../../../assets/photos/icono-correo.jpg";
 import { sendVerificationEmail } from "../../../services/auth/authEmailVerificationService";
 import { SuccessAlert } from "../../../utils/ToastAlerts";
 import { WrongAlert } from "../../../utils/ToastAlerts";
 import { useNavigate } from "react-router-dom";
-
+import { FaMailBulk } from "react-icons/fa";
 function ProfileEmail({ user }) {
   const navigate = useNavigate();
 
@@ -42,14 +41,12 @@ function ProfileEmail({ user }) {
 
   return (
     <div className="profile-email-card">
-      <img
-        src={iconoCorreo || "/placeholder.svg"}
-        alt="Correo"
+      <FaMailBulk
         className="profile-email-icon"
       />
 
       <div className="profile-email-header">
-        <span className="profile-email-label">Correo:</span>
+        <span className="profile-email-label">CORREO:</span>
         <span
           className={`profile-email-status ${
             isVerified ? "verified" : "not-verified"

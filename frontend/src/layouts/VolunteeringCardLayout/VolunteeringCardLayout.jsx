@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import "./VolunteeringCardLayout.css";
-import { GetVolunteerings } from "../../services/volunteering/VolunteeringService";
+import { GetVolunteerings } from "../../services/voluntariado/voluntariadoService";
 import VolunteeringCard from "../../components/VolunteeringCard/VolunteeringCard";
 
 export default function VolunteeringCardLayout({ filters = {}, mapApiRef = null, onVolunteeringsChange = () => {} }) {
