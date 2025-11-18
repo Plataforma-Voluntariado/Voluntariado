@@ -215,7 +215,7 @@ function Sidebar({ isOpen, onClose }) {
             onClick={handleLogout}
             aria-label="Cerrar sesión"
           >
-            <FaSignOutAlt className="sidebar-icon" />
+            <FaSignOutAlt className="sidebar-icon-close" />
             <span>CERRAR SESIÓN</span>
           </button>
         </div>

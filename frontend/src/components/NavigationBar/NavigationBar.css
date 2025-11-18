@@ -8,7 +8,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 2rem;
-  border-bottom: 2px solid #007bff71;
+  border-bottom: 1.5px solid #007bff71;
   background-color: white;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   z-index: 1000;
@@ -58,10 +58,10 @@
 }
 
 .navigation-bar-list-item {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  color: var(--color-primary-dark, #1a1a1a);
+  color: var(--color-text);
   transition: color 0.3s ease, transform 0.2s ease;
 }
 
@@ -90,7 +90,7 @@
   color: var(--color-primary);
 }
 
-.create-event-button:hover {
+.navigation-bar-create-event-button:hover {
   color: rgb(215, 215, 215);
 }
 

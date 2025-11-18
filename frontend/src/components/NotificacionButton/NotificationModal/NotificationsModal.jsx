@@ -8,10 +8,10 @@ function NotificationsModal({ vistas, noVistas }) {
   const [activeTab, setActiveTab] = useState("noVistas");
 
   const iconMap = {
-    INFO: <MdInfo color="#007bff" />,
-    ALERTA: <MdWarning color="#ff4d4f" />,
-    MENSAJE: <MdMessage color="#52c41a" />,
-    RECORDATORIO: <MdEventNote color="#faad14" />,
+    INFO: <MdInfo />,
+    ALERTA: <MdWarning />,
+    MENSAJE: <MdMessage />,
+    RECORDATORIO: <MdEventNote />,
   };
 
   const formatDateTime = (fecha) => {
@@ -60,7 +60,7 @@ function NotificationsModal({ vistas, noVistas }) {
         {list.map((n) => (
           <li
             key={n.id_notificacion}
-            className="notification-item"
+            className={`notification-item tipo-${(n.tipo || "").toLowerCase()} ${n.visto ? "visto" : "nuevo"}`}
             onClick={() => handleClickNotification(n)}
             style={{ cursor: n.visto ? "default" : "pointer" }}
           >
