@@ -742,6 +742,10 @@
 
 /* Móviles pequeños */
 @media (max-width: 480px) {
+  .btn-back{
+    width: auto;
+    padding: auto;
+  }
   .vol-hero-section {
     height: 240px;
   }

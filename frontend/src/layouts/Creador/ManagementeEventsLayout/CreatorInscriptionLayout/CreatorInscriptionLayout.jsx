@@ -1,5 +1,5 @@
 // src/layouts/Creador/ManagementeEventsLayout/CreatorInscriptionLayout/CreatorInscriptionLayout.jsx
-import InscripcionCard from "../../../../components/Creador/InscripcionCard/InscripcionCard";
+import InscripcionCard from "../../../../components/Inscription/InscriptionCard/InscripcionCard";
 import "./CreatorInscriptionLayout.css";
 
 const CreatorInscriptionLayout = ({

@@ -1,0 +1,245 @@
+.inscripcion-card {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-content: start;
+  gap: 0.6rem;
+  background: var(--color-primary-light);
+  border-radius: var(--radius-medium);
+  width: 100%;
+  max-width: 260px;
+  padding: 2rem;
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inscripcion-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.inscripcion-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid var(--color-primary);
+  object-fit: cover;
+}
+.inscripcion-card-info{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+.inscripcion-icon{
+  margin-right: 6px;
+  color: var(--color-title);
+}
+.inscripcion-card h3 {
+  font-size: 0.9rem;
+  height: 1.8rem;
+  font-weight: 600;
+  width:100%;
+  color: var(--color-primary);
+  word-break: break-word;
+  margin: 0.08rem 0 0.05rem 0;
+}
+
+.inscripcion-card p {
+  font-size: 0.8rem;
+  width: 100%;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  margin: 0.03rem 0 0.03rem 0;
+}
+
+.status {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 6px 12px;
+  border-radius: var(--radius-small);
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-bg);
+  z-index: 2;
+}
+
+.status.pendiente {
+  background-color: var(--color-warning);
+}
+
+.status.aceptada {
+  background-color: var(--color-success);
+}
+
+.status.cancelada {
+  background-color: var(--color-error);
+}
+
+.status.terminada{
+  background-color: var(--color-success);
+}
+
+.status.rechazada {
+  background-color: var(--color-error);
+}
+
+/* Botones de acción */
+.inscripcion-card-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.inscripcion-card-actions button:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.inscripcion-card-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.cancelar-btn{
+  width: 100%;
+  font-size: 0.9rem;
+  padding: 7px 0;
+  background: var(--color-error);
+  color: var(--color-bg);
+  border: none;
+  border-radius: var(--radius-small);
+}
+
+/* Botón de asistencia */
+.inscripcion-card-actions button.assistencia {
+  background-color: #10b981;
+  color: #ffffff;
+}
+
+.inscripcion-card-indicators {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.indicator {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-bg);
+  padding: 6px 12px;
+  border-radius: var(--radius-small);
+  text-transform: uppercase;
+}
+
+.indicator.asistencia {
+  background-color: var(--color-success);
+  /* verde */
+}
+
+.indicator.calificado {
+  background-color: var(--color-warning);
+  /* amarillo/dorado */
+}
+
+.comentar-btn{
+  width: 100%;
+  font-size: 0.9rem;
+  padding: 7px 0;
+  background: var(--color-primary);
+  color: var(--color-bg);
+  border: none;
+  box-sizing: border-box;
+  border-radius: var(--radius-small);
+  cursor: pointer;
+}
+.asistencia{
+  flex: 1;
+  background: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-small);
+  color: var(--color-bg);
+  padding: 6px 12px;
+}
+.ausencia{
+  flex: 1;
+  background: var(--color-error);
+  border: none;
+  border-radius: var(--radius-small);
+  color: var(--color-bg);
+  padding: 6px 12px;
+}
+.comentar-btn:hover{
+  box-shadow: 0 4px 14px rgba(7,26,60,0.1);
+}
+.inscripcion-card.highlight-asistencia {
+  border: 2px solid var(--color-error);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 0 0 0 rgba(239, 68, 68, 0.35);
+  animation: cardPulseRed 2s ease-in-out infinite;
+}
+
+.inscripcion-card-actions .asistencia.pulse {
+  animation: asistenciaButtonPulse 1.6s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45);
+}
+
+@keyframes cardPulseRed {
+  0% {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 0 0 0 rgba(239, 68, 68, 0.45);
+  }
+
+  60% {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 0 0 14px rgba(239, 68, 68, 0);
+  }
+
+  100% {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+@keyframes asistenciaButtonPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45);
+  }
+
+  60% {
+    box-shadow: 0 0 0 12px rgba(16, 185, 129, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+  .inscripcion-card {
+    padding: 0.7rem 0.6rem;
+
+  }
+  .inscripcion-avatar {
+    width: 40px;
+    height: 40px;
+  }
+  .inscripcion-card h3 {
+    font-size: 0.98rem;
+  }
+  .inscripcion-card p {
+    font-size: 0.85rem;
+  }
+  .inscripcion-card-actions button {
+    font-size: 0.8rem;
+  }
+}

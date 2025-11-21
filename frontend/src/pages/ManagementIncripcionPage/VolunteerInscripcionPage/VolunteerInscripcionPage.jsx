@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useInscripcionSocket from "../../../hooks/useInscripcionSocket";
-import { Tabs } from "../../../components/Creador/Tabs/Tabs";
+import { Tabs } from "../../../components/Inscription/Tabs/Tabs";
 import VolunteerInscriptionLayout from "../../../layouts/Voluntario/VolunteerInscriptionLayout/VolunteerInscriptionLayout";
 import { getMisInscripciones } from "../../../services/inscripcion/inscripcionService";
 import { WrongAlert } from "../../../utils/ToastAlerts";

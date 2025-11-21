@@ -1,60 +1,62 @@
 .creator-events-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  /* un poco más compacto */
-  justify-content: center;
+  width: 80%;
+  justify-content: space-between;
   padding: 0;
-  margin: 0 0 1rem;
+  margin: 0;
+  z-index: 3;
 }
 
 .creator-tab-btn {
-  flex: 1 1 22%;
-  min-width: 100px;
-  max-width: 220px;
+  flex: 1;
+
   padding: 10px 12px;
-  border: 2px solid #e2e8f0;
-  background: #ffffff;
-  color: #64748b;
+  border: 2px solid var(--color-primary);
+  background: var(--color-surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: var(--color-text);
   font-weight: 500;
   font-size: 14px;
-  border-radius: 10px;
+  border-bottom: none;
+  border-radius: var(--radius-small) var(--radius-small) 0 0;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--transition);
   position: relative;
   text-align: center;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
+  box-shadow: var(--shadow-sm);
   white-space: nowrap;
 }
 
 .creator-tab-btn:hover {
-  color: #475569;
-  border-color: #cbd5e1;
-  background: #f8fafc;
+  color: var(--color-primary);
+
+  background: var(--color-primary-light);
   transform: translateY(-1px);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
 .creator-tab-btn.active {
-  color: #3b82f6;
-  border-color: #3b82f6;
-  background: #ffffff;
+  color: var(--color-bg);
+  background: var(--color-primary);
   font-weight: 600;
-  box-shadow: 0 3px 12px rgba(59, 130, 246, 0.15);
+  box-shadow: 0 3px 12px rgba(0, 122, 255, 0.25);
   transform: translateY(-1px);
 }
 
+/* Alert styles using CSS variables */
 .creator-tab-btn.alert {
-  color: #f59e0b;
-  border-color: #f59e0b;
+  color: var(--color-warning);
+  border-color: var(--color-warning);
   animation: tabPulseAmber 1.8s ease-in-out infinite;
   box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.35);
 }
 
 .creator-tab-btn.alert:hover {
-  color: #d97706;
-  border-color: #d97706;
+  color: var(--color-warning);
+  border-color: var(--color-warning);
 }
 
 .creator-tab-btn.alert::after {
@@ -74,17 +76,17 @@
 .creator-tab-btn.alert[data-key="porComentar"],
 .creator-tab-btn.alert[data-key="por_calificar_voluntario"],
 .creator-tab-btn.alert[data-key="por_devolver"] {
-  color: #f59e0b;
-  border-color: #f59e0b;
+  color: var(--color-warning);
+  border-color: var(--color-warning);
   box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.35);
   animation-name: tabPulseAmber;
 }
 
 .creator-tab-btn.alert[data-key="por_asistencia"],
 .creator-tab-btn.alert[data-key="porAsistencia"] {
-  color: #ef4444;
-  border-color: #ef4444;
-  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.35);
+  color: var(--color-error);
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.35);
   animation-name: tabPulseRed;
 }
 
@@ -92,11 +94,9 @@
   0% {
     box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.45);
   }
-
   60% {
     box-shadow: 0 0 0 12px rgba(245, 158, 11, 0);
   }
-
   100% {
     box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
   }
@@ -104,15 +104,13 @@
 
 @keyframes tabPulseRed {
   0% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.45);
+    box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.45);
   }
-
   60% {
-    box-shadow: 0 0 0 12px rgba(239, 68, 68, 0);
+    box-shadow: 0 0 0 12px rgba(255, 59, 48, 0);
   }
-
   100% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    box-shadow: 0 0 0 0 rgba(255, 59, 48, 0);
   }
 }
 
@@ -121,31 +119,23 @@
     transform: scale(0.8);
     opacity: 0.6;
   }
-
   50% {
     transform: scale(1.2);
     opacity: 1;
   }
-
   100% {
     transform: scale(0.8);
     opacity: 0.6;
   }
 }
 
-
-
-
-/* Efecto al hacer click */
 .creator-tab-btn:active {
   transform: scale(0.97);
 }
 
-/* Responsive progresivo */
 @media (max-width: 1024px) {
   .creator-tab-btn {
-    flex: 1 1 28%;
-    /* 3 por fila aprox */
+    flex: 1 1 12%;
     font-size: 13px;
     padding: 9px 10px;
   }
@@ -154,7 +144,6 @@
 @media (max-width: 768px) {
   .creator-tab-btn {
     flex: 1 1 45%;
-    /* 2 por fila */
     font-size: 12px;
     padding: 8px 10px;
   }
@@ -163,51 +152,17 @@
 @media (max-width: 480px) {
   .creator-tab-btn {
     flex: 1 1 48%;
-    /* 2 por fila, tamaño mínimo */
     font-size: 11px;
     padding: 6px 8px;
   }
+  .creator-event-tabs{
+    width: 100%;
+  }
 }
 
-/* Foco para accesibilidad */
 .creator-tab-btn:focus-visible {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
-/* ===== 🎨 Colores personalizados para subtabs de “Terminadas” ===== */
-/* usamos !important para sobreescribir el azul base */
-
-.creator-tab-btn.active[data-key="porComentar"] {
-  color: #facc15 !important;
-  /* Amarillo */
-  border-color: #facc15 !important;
-}
-
-.creator-tab-btn.active[data-key="porAsistencia"] {
-  color: #ef4444 !important;
-  /* Rojo */
-  border-color: #ef4444 !important;
-
-}
-
-.creator-tab-btn.active[data-key="completadas"] {
-  color: #22c55e !important;
-  /* Verde */
-  border-color: #22c55e !important;
-
-}
-
-.creator-tab-btn.active[data-key="por_calificar"] {
-  color: #facc15 !important;
-  /* Amarillo */
-  border-color: #facc15 !important;
-}
-
-.creator-tab-btn.active[data-key="por_asistencia"] {
-  color: #ef4444 !important;
-  /* Rojo */
-  border-color: #ef4444 !important;
-
-}
 

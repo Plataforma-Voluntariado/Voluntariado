@@ -22,7 +22,7 @@ const InscripcionCard = ({
 
   const mostrarBotonesAceptarRechazar = ESTADO_VOLUNTARIADO === "PENDIENTE" && ESTADO_INSCRIPCION === "PENDIENTE";
   const mostrarBotonAsistencia = ESTADO_VOLUNTARIADO === "TERMINADO" && ESTADO_INSCRIPCION === "TERMINADA" && inscripcion.asistencia == null;
-
+  console.log(ESTADO_VOLUNTARIADO, ESTADO_INSCRIPCION, inscripcion.asistencia);
   const moverInscripcion = (listaDestino, nuevoEstado = {}) => {
     setInscripciones(prev => {
       const nuevoState = Object.fromEntries(
@@ -103,8 +103,8 @@ const InscripcionCard = ({
         }}
       />
       <h3>{usuario.nombre} {usuario.apellido}</h3>
-      <p><MdEmail style={{ marginRight: "6px" }} /> {usuario.correo}</p>
-      <p><MdDateRange style={{ marginRight: "6px" }} /> {new Date(inscripcion.fecha_inscripcion).toLocaleDateString()}</p>
+      <p><MdEmail className="inscripcion-icon"/> {usuario.correo}</p>
+      <p><MdDateRange className="inscripcion-icon" /> {new Date(inscripcion.fecha_inscripcion).toLocaleDateString()}</p>
 
       <div className="inscripcion-card-indicators">
         {inscripcion.asistencia && <span className="indicator asistencia"><FaCheckCircle /> Asistió</span>}
@@ -129,7 +129,7 @@ const InscripcionCard = ({
         )}
         {mostrarBotonAsistencia && (
           <button
-            className={`asistencia ${highlightAsistencia ? "pulse" : ""}`}
+            className={`ausencia ${highlightAsistencia ? "pulse" : ""}`}
             onClick={() => handleAsistencia(false)}
             disabled={loading}
           >

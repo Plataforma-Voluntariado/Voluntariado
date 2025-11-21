@@ -23,7 +23,7 @@
     background-color: #3b82f6;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius-small);
     padding: 8px 16px;
     font-size: 0.9rem;
     font-weight: 500;
@@ -59,12 +59,11 @@
 
 .creator-inscription-page-title {
     font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
-    font-size: clamp(1.5rem, 8vw, 2.5rem);
+    font-size: 1.5rem;;
     font-weight: 700;
-    color: #000;
+    color: var(--color-primary);
     text-align: center;
-    margin: 2rem;
-    letter-spacing: 1px;
+    margin: 1.5rem;
     position: relative;
     opacity: 0;
     transform: translateY(-5px);
@@ -75,19 +74,6 @@
     /* evita overflow */
     overflow-wrap: anywhere;
     /* fuerza el corte de palabras largas */
-}
-
-.creator-inscription-page-title::after {
-    content: "";
-    display: block;
-    width: 25%;
-    /* proporcional al título */
-    max-width: 40px;
-    /* límite máximo */
-    height: 2px;
-    background-color: #000;
-    margin: 0.3rem auto 0;
-    border-radius: 2px;
 }
 
 @keyframes fadeInDown {

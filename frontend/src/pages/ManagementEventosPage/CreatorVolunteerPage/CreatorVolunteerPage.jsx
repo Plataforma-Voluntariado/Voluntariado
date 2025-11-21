@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import "./CreatorVolunteerPage.css";
 import { useAuth } from "../../../context/AuthContext";
 import CreatorVolunteerLayout from "../../../layouts/Creador/ManagementeEventsLayout/CreatorVolunteerLayout/CreatorVolunteerLayout";
-import { Tabs } from "../../../components/Creador/Tabs/Tabs";
+import { Tabs } from "../../../components/Inscription/Tabs/Tabs";
 import { getEventsByCreatorId } from "../../../services/voluntariado/voluntariadoService";
 
 const tabsConfig = [

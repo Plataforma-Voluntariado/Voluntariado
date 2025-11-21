@@ -1,20 +1,21 @@
 .volunteer-inscription-page {
-    height: calc(100vh - 6vh);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem 2rem 0 2rem;
-    box-sizing: border-box;
-    overflow: hidden; 
+  height: calc(100vh - 6vh);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 1rem 0 1rem;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: var(--color-bg);
 }
 
 .header-inscripcion-page {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    width: 100%;
-    margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  margin-bottom: 1rem;
 }
 
 @media (max-width: 600px) {
@@ -33,108 +34,98 @@
 }
 
 .volunteer-inscription-page-title {
-    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
-    font-size: clamp(1.5rem, 8vw, 2.5rem);
-    font-weight: 700;
-    color: #000;
-    text-align: center;
-    margin: 2rem;
-    letter-spacing: 1px;
-    position: relative;
-    opacity: 0;
-    transform: translateY(-5px);
-    animation: fadeInDown 0.6s ease forwards;
-    flex-shrink: 1;
-    word-break: break-word;
-    overflow-wrap: anywhere;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-align: center;
+  margin: 2rem 0 0 0;
+  position: relative;
+  opacity: 0;
+  transform: translateY(-5px);
+  animation: fadeInDown 0.6s ease forwards;
+  flex-shrink: 1;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
-.volunteer-inscription-page-title::after {
-    content: "";
-    display: block;
-    width: 25%;
-    max-width: 40px;
-    height: 2px;
-    background-color: #000;
-    margin: 0.3rem auto 0;
-    border-radius: 2px;
-}
 
 @keyframes fadeInDown {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media screen and (max-width: 768px) {
-    .volunteer-inscription-page-title {
-        font-size: 1.8rem;
-        margin-bottom: 1rem;
-    }
+  .volunteer-inscription-page-title {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
 
-    .volunteer-inscription-page-title::after {
-        width: 30px;
-        height: 2px;
-    }
+  .volunteer-inscription-page-title::after {
+    width: 30px;
+    height: 2px;
+  }
 }
 
 @media screen and (max-width: 480px) {
-    .volunteer-inscription-page-title {
-        font-size: 1.5rem;
-        margin-bottom: 0.8rem;
-    }
+  .volunteer-inscription-page-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.8rem;
+  }
 
-    .volunteer-inscription-page-title::after {
-        width: 25px;
-        height: 2px;
-    }
+  .volunteer-inscription-page-title::after {
+    width: 25px;
+    height: 2px;
+  }
 }
-
 .subtabs-container {
   width: 100%;
-  margin-top: 0.5rem;
   display: flex;
+  justify-content: center;
   flex-direction: column;
-  align-items: center;
+  align-items: start;
   position: sticky;
   top: 0;
   z-index: 5;
-  padding-bottom: 0.5rem;
+  padding: 0;
 }
 
 .subtabs-desktop {
   display: block;
+  width: 80%;
+   margin: 0 auto;
 }
 
 .subtabs-mobile {
   display: none;
+  width: 80%;
+  margin: 0 auto;
 }
 
-@media screen and (max-width: 460px) {
+@media screen and (max-width: 480px) {
   .subtabs-desktop {
     display: none;
   }
 
   .subtabs-mobile {
     display: block;
-    width: 100%;
-    padding: 0 1rem;
+    width: 80%;
   }
 
   .subtabs-select {
-    width: 100%;
+    width: 90%;
     padding: 0.6rem 1rem;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    background: #fff;
+    border-radius: var(--radius-small) var(--radius-small) 0 0;
+    background: var(--color-surface);
     font-size: 1rem;
     font-weight: 500;
-    color: #334155;
+    color: var(--color-primary);
   }
 
   .subtabs-select.alert {
-    border-color: #f59e0b;
+    border-color: var(--color-warning);
     animation: selectPulse 1.8s ease-in-out infinite;
     box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.35);
   }
@@ -142,12 +133,22 @@
 
 .inscriptions-scroll-area {
   flex: 1;
-  width: 100%;
+  justify-content: start;
+  width: 80%;
   overflow-y: auto;
   scrollbar-width: none;
-  padding-bottom: 1rem;
+  background: var(--color-surface);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+  border: 2px solid var(--color-primary);
+  margin-top: -2px;
+  border-radius: 0 0 var(--radius-large) var(--radius-large);
+  padding: 2rem;
+  box-sizing: border-box;
+  
 }
 
+@media screen and (max-width: 480px) {
+}
 .inscriptions-scroll-area::-webkit-scrollbar {
   display: none;
 }
@@ -165,4 +166,3 @@
     box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
   }
 }
-
