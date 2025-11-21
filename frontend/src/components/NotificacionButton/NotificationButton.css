@@ -4,15 +4,21 @@
 }
 
 .navigation-bar-notifications-button {
-  font-size: 1.5rem;
+  font-size: 2rem;
   color: var(--color-primary, #007bff);
+    transition-duration: 0.3s;
+}
+.navigation-bar-notifications-button:hover {
+  color: var(--color-accent, #0056b3);
+  transform: translateY(-1px);
+  transition-duration: 0.3s;
 }
 
 .notification-badge {
   position: absolute;
   top: -6px;
   right: -6px;
-  background-color: red;
+  background-color: var(--color-warning);
   color: white;
   font-size: 0.75rem;
   font-weight: bold;
