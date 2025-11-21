@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import useInscripcionSocket from "../../../hooks/useInscripcionSocket";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { Tabs } from "../../../components/Creador/Tabs/Tabs";
+import { Tabs } from "../../../components/Inscription/Tabs/Tabs";
 import CreatorInscriptionLayout from "../../../layouts/Creador/ManagementeEventsLayout/CreatorInscriptionLayout/CreatorInscriptionLayout";
 import { getInscripcionesByVoluntariado } from "../../../services/inscripcion/inscripcionService";
 import "./CreatorInscripcionPage.css";

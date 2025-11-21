@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import VolunteerCard from "../../../../components/Creador/VolunteerCard/VolunteerCard";
+import VolunteerCard from "../../../../components/Inscription/VolunteerCard/VolunteerCard";
 import "./CreatorVolunteerLayout.css";
 
 function CreatorVolunteerLayout({

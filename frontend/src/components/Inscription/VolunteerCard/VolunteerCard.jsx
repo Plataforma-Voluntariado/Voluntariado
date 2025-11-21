@@ -1,12 +1,21 @@
 // src/components/VolunteerCard.jsx
 import { useNavigate } from "react-router-dom";
-import { FaClock, FaUsers, FaMapMarkerAlt, FaCalendarAlt } from "react-icons/fa";
+import {
+  FaClock,
+  FaUsers,
+  FaMapMarkerAlt,
+  FaCalendarAlt,
+} from "react-icons/fa";
 import { cancelarVoluntariado } from "../../../services/voluntariado/voluntariadoService";
-import ConfirmAlert from "../../../components/alerts/ConfirmAlert";
+import ConfirmAlert from "../../alerts/ConfirmAlert";
 import { SuccessAlert, WrongAlert } from "../../../utils/ToastAlerts";
 import "./VolunteerCard.css";
 
-const VolunteerCard = ({ voluntariado, onCancelar, highlightAsistencia = false }) => {
+const VolunteerCard = ({
+  voluntariado,
+  onCancelar,
+  highlightAsistencia = false,
+}) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -38,10 +47,13 @@ const VolunteerCard = ({ voluntariado, onCancelar, highlightAsistencia = false }
 
     try {
       await cancelarVoluntariado(voluntariado.id_voluntariado);
-      SuccessAlert({title:"Cancelacion Exitosa", message:"Has cancelado con exito el Voluntariado"})
+      SuccessAlert({
+        title: "Cancelacion Exitosa",
+        message: "Has cancelado con exito el Voluntariado",
+      });
       if (onCancelar) onCancelar(voluntariado.id_voluntariado);
     } catch (error) {
-      WrongAlert({message:error.message})
+      WrongAlert({ message: error.message });
     }
   };
   const cardClassName = [
@@ -60,15 +72,21 @@ const VolunteerCard = ({ voluntariado, onCancelar, highlightAsistencia = false }
       <span className={`status ${voluntariado.estado}`}>
         {voluntariado.estado.replace("_", " ")}
       </span>
-
-      <img
-        src={
-          voluntariado.fotos?.[0]?.url ||
-          "https://via.placeholder.com/250x180"
-        }
-        alt={voluntariado.titulo}
-        className="volunteer-card-horizontal-image"
-      />
+      <div className="volunteer-card-horizontal-image-container">
+        <img
+          src={
+            voluntariado.fotos?.[0]?.url ||
+            "https://via.placeholder.com/250x180"
+          }
+          alt={voluntariado.titulo}
+          className="volunteer-card-horizontal-image"
+        />
+        <div className="volunteer-card-meta">
+          <span className="category-label">
+            {voluntariado.categoria.nombre}
+          </span>
+        </div>
+      </div>
 
       <div className="volunteer-card-horizontal-info">
         <h3 className="volunteer-card-title">{voluntariado.titulo}</h3>
@@ -82,11 +100,7 @@ const VolunteerCard = ({ voluntariado, onCancelar, highlightAsistencia = false }
             ? voluntariado.descripcion.slice(0, 150) + "..."
             : voluntariado.descripcion}
         </p>
-        <div className="volunteer-card-meta">
-          <span className="category-label">
-            {voluntariado.categoria.nombre}
-          </span>
-        </div>
+
         <div className="volunteer-card-details">
           <p>
             <FaCalendarAlt />{" "}
@@ -127,7 +141,6 @@ const VolunteerCard = ({ voluntariado, onCancelar, highlightAsistencia = false }
           )}
         </div>
       </div>
-
     </div>
   );
 };

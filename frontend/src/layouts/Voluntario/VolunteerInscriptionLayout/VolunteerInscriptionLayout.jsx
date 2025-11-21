@@ -1,4 +1,4 @@
-import VolunteerInscripcionCard from "../../../components/Voluntario/VolunteerInscripcionCard/VolunteerInscripcionCard";
+import VolunteerInscripcionCard from "../../../components/Inscription/InscriptionCard/VolunteerInscripcionCard";
 import "./VolunteerInscriptionLayout.css";
 
 const VolunteerInscriptionLayout = ({
