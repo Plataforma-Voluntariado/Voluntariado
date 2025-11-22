@@ -10,7 +10,19 @@
   scrollbar-width: none;
   min-height: 200px;
 }
-
+.volunteer-no-inscripciones-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  align-items: center;
+  overflow-y: auto;
+  scrollbar-width: none;
+  margin-top: -2px;
+  border-radius: 0 0 var(--radius-large) var(--radius-large);
+  padding: 2rem;
+  box-sizing: border-box;
+}
 
 .volunteer-inscription-layout::-webkit-scrollbar {
   display: none;

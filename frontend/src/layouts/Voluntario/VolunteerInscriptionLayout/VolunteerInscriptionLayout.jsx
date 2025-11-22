@@ -11,7 +11,7 @@ const VolunteerInscriptionLayout = ({
 
   if (!inscripciones || inscripciones.length === 0) {
     return (
-      <div className="no-inscripciones-container">
+      <div className="volunteer-no-inscripciones-container">
         <div className="no-inscripciones-content">
           <h3 className="no-inscripciones-title">No hay inscripciones</h3>
           <p className="no-inscripciones-description">

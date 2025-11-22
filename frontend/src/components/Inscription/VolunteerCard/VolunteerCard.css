@@ -104,14 +104,17 @@
 }
 
 .status {
-  display: flex;
-  align-items: center;
+  position: absolute;
+  top: 10px;
+  right: 10px;
   padding: 6px 12px;
   border-radius: var(--radius-small);
   text-transform: uppercase;
-  color: var(--color-bg);
   font-size: 0.8rem;
-  white-space: nowrap;
+  font-weight: 500;
+  color: var(--color-bg);
+  z-index: 2;
+  pointer-events: none; 
 }
 
 .status.pendiente {

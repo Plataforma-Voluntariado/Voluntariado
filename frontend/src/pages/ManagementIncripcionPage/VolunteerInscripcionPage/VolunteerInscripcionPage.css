@@ -139,7 +139,7 @@
   scrollbar-width: none;
   background: var(--color-surface);
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
-  border: 2px solid var(--color-primary);
+  border: 2px solid var(--color-primary-light-glass);
   margin-top: -2px;
   border-radius: 0 0 var(--radius-large) var(--radius-large);
   padding: 2rem;

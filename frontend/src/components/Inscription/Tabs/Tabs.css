@@ -12,7 +12,7 @@
   flex: 1;
 
   padding: 10px 12px;
-  border: 2px solid var(--color-primary);
+  border: 2px solid var(--color-primary-light-glass);
   background: var(--color-surface);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -29,7 +29,10 @@
   box-shadow: var(--shadow-sm);
   white-space: nowrap;
 }
-
+.creator-tab-btn-subtab-active{
+  border-radius: var(--radius-small);
+  border: 2px solid var(--color-primary-light-glass);
+}
 .creator-tab-btn:hover {
   color: var(--color-primary);
 

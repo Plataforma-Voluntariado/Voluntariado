@@ -1,5 +1,5 @@
 .inscripcion-card {
-  position: relative;
+  position: relative; /* Necesario para posicionar el status dentro de la card */
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
@@ -9,10 +9,12 @@
   border-radius: var(--radius-medium);
   width: 100%;
   max-width: 260px;
+  max-height: 260px;
   padding: 2rem;
   box-sizing: border-box;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 0; /* crea stacking context estable para el status */
 }
 
 .inscripcion-card:hover {
@@ -57,7 +59,7 @@
   margin: 0.03rem 0 0.03rem 0;
 }
 
-.status {
+.inscripcion-card-status {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -68,25 +70,26 @@
   font-weight: 500;
   color: var(--color-bg);
   z-index: 2;
+  pointer-events: none; 
 }
 
-.status.pendiente {
+.inscripcion-card-status-pendiente {
   background-color: var(--color-warning);
 }
 
-.status.aceptada {
+.inscripcion-card-status-aceptada {
   background-color: var(--color-success);
 }
 
-.status.cancelada {
+.inscripcion-card-status-cancelada {
   background-color: var(--color-error);
 }
 
-.status.terminada{
+.inscripcion-card-status-terminada{
   background-color: var(--color-success);
 }
 
-.status.rechazada {
+.inscripcion-card-status-rechazada {
   background-color: var(--color-error);
 }
 
@@ -220,6 +223,26 @@
   100% {
     box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
   }
+}
+.inscripcion-card-aceptar-btn {
+  flex: 1;
+  background: var(--color-success);
+  border: none;
+  border-radius: var(--radius-small);
+  color: var(--color-bg);
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.inscripcion-card-rechazar-btn {
+  flex: 1;
+  background: var(--color-error);
+  border: none;
+  border-radius: var(--radius-small);
+  color: var(--color-bg);
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
 }
 
 

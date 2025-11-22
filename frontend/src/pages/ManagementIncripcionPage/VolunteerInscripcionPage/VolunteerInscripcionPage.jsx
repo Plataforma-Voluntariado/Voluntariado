@@ -63,7 +63,7 @@ const VolunteerInscripcionPage = () => {
   const getFilteredTerminadas = () => {
     const todas = inscripciones["terminadas"] || [];
     if (activeTab !== "terminadas") return todas;
-
+   
     if (activeSubTab === "porComentar")
       return todas.filter((i) => i.asistencia === true && !i.calificado);
     if (activeSubTab === "porAsistencia")
@@ -83,6 +83,7 @@ const VolunteerInscripcionPage = () => {
       <Tabs
         tabs={tabsConfig}
         activeTab={activeTab}
+        activePrincipalTab={{"activePrincipalTab": activeTab}}
         onTabChange={setActiveTab}
         tabAlert={hasPendingComments ? "terminadas" : undefined}
       />
