@@ -1,8 +1,8 @@
 .volunteering-map-layout {
-  width: 80%;
+  width: 70%;
   display: flex;
-  gap: 1.5rem;
-  border-radius: var(--radius-large);
+  gap: 1rem; /* compacted */
+  border-radius: calc(var(--radius-large) - 4px); /* slightly smaller */
   overflow: hidden;
   margin: 0 auto;
 }
@@ -11,13 +11,13 @@
   .volunteering-map-layout {
     width: 100%;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem; /* compacted */
   }
 }
 
 @media (max-width: 768px) {
   .volunteering-map-layout {
     width: 100%;
-    gap: 1.25rem;
+    gap: .85rem; /* further compacted */
   }
 }

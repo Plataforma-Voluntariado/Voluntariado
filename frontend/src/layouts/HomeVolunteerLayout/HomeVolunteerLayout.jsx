@@ -23,24 +23,33 @@ function HomeVolunteerLayout() {
   return (
     <div className="home-volunteer-layout">
       <div className="home-volunteer-header">
-        <h1 className="home-volunteer-layout-title">
-          Ubica los próximos eventos y elige dónde quieres aportar tu tiempo.
-        </h1>
+        <div className="home-volunteer-layout-title-container">
+          <h1 className="home-volunteer-layout-title">
+            Ubica los próximos eventos y elige dónde quieres aportar tu tiempo.
+          </h1>
+        </div>
+
         <button
           className="home-volunteer-certificates-btn"
-          onClick={() => navigate('/mis-certificados')}
+          onClick={() => navigate("/mis-certificados")}
           title="Ver mis certificados"
         >
           <FaCertificate /> Mis Certificados
         </button>
       </div>
 
-      <VolunteeringMapLayout volunteerings={volunteeringsForMap} mapApiRef={mapApiRef} />
-
-      <h1 className="home-volunteer-layout-title">Filtrar eventos</h1>
+      <VolunteeringMapLayout
+        volunteerings={volunteeringsForMap}
+        mapApiRef={mapApiRef}
+      />
+        <div className="home-volunteer-layout-title-container">
+<h1 className="home-volunteer-layout-title">Filtrar eventos</h1>
+        </div>
       <SearchVolunteerings onApplyFilters={handleApplyFilters} />
-
+        <div className="home-volunteer-layout-title-container">
       <h1 className="home-volunteer-layout-title">Eventos disponibles</h1>
+        </div>
+
 
       <VolunteeringCardLayout
         filters={filters}
