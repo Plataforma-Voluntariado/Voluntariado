@@ -225,12 +225,12 @@ function VoluntariadoDetailPage() {
                 </div>
               )}
             </div>
-            <div className="creator-info-card">
+            <div className="detail-page-creator-info-card">
               <div className="creator-label-header">
                 <span>Organizado por</span>
               </div>
               <div
-                className="creator-content"
+                className="detail-page-creator-content"
                 onClick={handleCreatorClick}
               >
                 <img
