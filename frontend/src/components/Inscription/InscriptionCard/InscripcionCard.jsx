@@ -88,7 +88,7 @@ const InscripcionCard = ({
 
   return (
     <div className={cardClassName}>
-      <span className={`status ${ESTADO_INSCRIPCION.toLowerCase()}`}>
+      <span className={`inscripcion-card-status inscripcion-card-status-${ESTADO_INSCRIPCION.toLowerCase()}`}>
         {ESTADO_INSCRIPCION.replace("_", " ")}
       </span>
 
@@ -114,8 +114,8 @@ const InscripcionCard = ({
       <div className="inscripcion-card-actions">
         {mostrarBotonesAceptarRechazar && (
           <>
-            <button onClick={handleAceptar} disabled={loading}>Aceptar</button>
-            <button onClick={handleRechazar} disabled={loading}>Rechazar</button>
+            <button className="inscripcion-card-aceptar-btn" onClick={handleAceptar} disabled={loading}>Aceptar</button>
+            <button className="inscripcion-card-rechazar-btn" onClick={handleRechazar} disabled={loading}>Rechazar</button>
           </>
         )}
         {mostrarBotonAsistencia && (

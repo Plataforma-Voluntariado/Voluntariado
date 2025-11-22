@@ -119,6 +119,7 @@ const CreatorInscripcionPage = () => {
       <Tabs
         tabs={tabsConfig}
         activeTab={activeTab}
+        activePrincipalTab={{activePrincipalTab: activeTab}}
         onTabChange={setActiveTab}
         tabAlert={
           estado === "TERMINADO" && hasPendingTerminadas
