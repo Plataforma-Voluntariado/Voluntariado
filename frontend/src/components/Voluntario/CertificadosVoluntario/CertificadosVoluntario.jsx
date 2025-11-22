@@ -108,7 +108,7 @@ const CertificadosVoluntario = () => {
                         <span className="spinner-small"></span> Generando...
                       </>
                     ) : (
-                      '🎓 Generar Certificado'
+                      'Generar Certificado'
                     )}
                   </button>
                 </div>
