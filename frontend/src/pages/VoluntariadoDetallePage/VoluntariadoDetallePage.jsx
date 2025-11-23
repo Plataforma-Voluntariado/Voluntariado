@@ -49,6 +49,7 @@ const VoluntariadoDetallePage = () => {
         if (Array.isArray(v?.resenas)) setResenas(v.resenas);
         else if (Array.isArray(v?.reviews)) setResenas(v.reviews);
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.error("Error fetching voluntariado:", err);
       } finally {
         setLoading(false);

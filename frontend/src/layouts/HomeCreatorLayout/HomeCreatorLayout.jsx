@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import "./HomeCreatorLayout.css";
 import { getMyVoluntariados } from "../../services/voluntariado/voluntariadoService";
 import { useAuth } from "../../context/AuthContext";
 import VolunteeringCard from "../../components/VolunteeringCard/VolunteeringCard";
-import { FaPlus, FaCalendarAlt, FaUsers, FaChartLine } from "react-icons/fa";
+import { FaPlus, FaCalendarAlt, FaUsers, FaChartLine, FaQuestionCircle } from "react-icons/fa";
+import introJs from 'intro.js';
+import 'intro.js/introjs.css';
 
 function HomeCreatorLayout() {
   const [voluntariados, setVoluntariados] = useState({});
@@ -20,6 +22,7 @@ function HomeCreatorLayout() {
       setVoluntariados(data || {});
       setError(null);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("Error cargando voluntariados:", err);
       setError("Error al cargar los voluntariados");
     } finally {
@@ -40,12 +43,124 @@ function HomeCreatorLayout() {
     return () => window.removeEventListener("inscripcion.changed", handler);
   }, []);
 
+  // Estado para controlar si el tour está activo
+  const [isTourActive, setIsTourActive] = useState(false);
+
+  // Función auxiliar para inicializar el tour
+  const initTour = (isMobileWithSidebar) => {
+    setIsTourActive(true);
+    const tourInstance = introJs();
+    
+    // Configurar los pasos según si es móvil o no
+    const steps = isMobileWithSidebar ? [
+      {
+        element: '.sidebar-list-item:nth-child(1)',
+        intro: 'Aquí puedes gestionar todos tus eventos y ver las inscripciones pendientes.',
+        position: 'right'
+      },
+      {
+        element: '.sidebar-user-profile',
+        intro: 'Accede a tu perfil para editar tu información y ver tus estadísticas.',
+        position: 'right'
+      }
+    ] : [];
+
+    tourInstance.setOptions({
+      prevLabel: 'Anterior',
+      nextLabel: 'Siguiente', 
+      skipLabel: 'Salir',
+      doneLabel: 'Finalizar',
+      showProgress: true,
+      showBullets: true,
+      exitOnOverlayClick: false,
+      exitOnEsc: true,
+      disableInteraction: true,
+      scrollToElement: true,
+      scrollPadding: 80,
+      overlayOpacity: 0.8,
+      tooltipClass: 'modern-gray-tooltip',
+      helperElementPadding: 10,
+      highlightClass: 'modern-gray-highlight',
+      scrollTo: 'tooltip',
+      steps: steps.length > 0 ? steps : undefined
+    });
+    
+    tourInstance.onbeforechange(() => {
+      return true;
+    });
+    
+    tourInstance.oncomplete(() => {
+      setIsTourActive(false);
+      // Cerrar sidebar si está abierto
+      const closeSidebarBtn = document.querySelector('.sidebar-close');
+      if (closeSidebarBtn) {
+        closeSidebarBtn.click();
+      }
+    });
+    
+    tourInstance.onexit(() => {
+      setIsTourActive(false);
+      // Cerrar sidebar si está abierto
+      const closeSidebarBtn = document.querySelector('.sidebar-close');
+      if (closeSidebarBtn) {
+        closeSidebarBtn.click();
+      }
+    });
+    
+    tourInstance.start();
+  };
+
+  // Función para iniciar el tour manualmente
+  const startTour = () => {
+    // Detectar si es móvil
+    const isMobile = window.innerWidth <= 768;
+    
+    // Si es móvil, abrir el sidebar primero
+    if (isMobile) {
+      const hamburgerButton = document.querySelector('.hamburger-button');
+      if (hamburgerButton) {
+        hamburgerButton.click();
+        // Esperar a que se abra el sidebar
+        setTimeout(() => {
+          initTour(true);
+        }, 300);
+        return;
+      }
+    }
+    
+    // Si no es móvil o no se encontró el botón, iniciar tour normal
+    const homeCreatorContainer = document.querySelector('.home-creator-container');
+    if (homeCreatorContainer) {
+      homeCreatorContainer.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+    
+    setTimeout(() => {
+      initTour(false);
+    }, 700);
+  };
+
   const handleCreateNew = () => {
     navigate("/crear-voluntariado");
   };
 
-  const getStatistics = () => {
-    if (!voluntariados || typeof voluntariados !== "object") return {};
+  // Memoizar los voluntariados combinados para evitar renders innecesarios
+  const allVoluntariados = useMemo(() => {
+    return [
+      ...(voluntariados.pendientes || []),
+      ...(voluntariados.en_proceso || []),
+      ...(voluntariados.terminados || []),
+      ...(voluntariados.cancelados || []),
+    ];
+  }, [voluntariados]);
+
+  // Memoizar las estadísticas para evitar cálculos innecesarios
+  const stats = useMemo(() => {
+    if (!voluntariados || typeof voluntariados !== "object") {
+      return { total: 0, pendientes: 0, enProceso: 0, terminados: 0, cancelados: 0, totalInscripciones: 0 };
+    }
 
     const pendientes = voluntariados.pendientes?.length || 0;
     const enProceso = voluntariados.en_proceso?.length || 0;
@@ -61,9 +176,54 @@ function HomeCreatorLayout() {
         0
       );
 
-
     return { total, pendientes, enProceso, terminados, cancelados, totalInscripciones };
-  };
+  }, [voluntariados]);
+
+  // Verificar si es la primera vez del usuario (después de definir allVoluntariados)
+  useEffect(() => {
+    const hasSeenTour = localStorage.getItem('creatorTourCompleted');
+    if (!hasSeenTour && !loading && user && allVoluntariados.length >= 0) {
+      // Mostrar el tour después de que todo esté cargado y estable
+      setTimeout(() => {
+        setIsTourActive(true);
+        const tourInstance = introJs();
+        tourInstance.setOptions({
+          prevLabel: 'Anterior',
+          nextLabel: 'Siguiente',
+          skipLabel: 'Salir',
+          doneLabel: 'Finalizar',
+          showProgress: true,
+          showBullets: true,
+          exitOnOverlayClick: false,
+          exitOnEsc: true,
+          disableInteraction: true,
+          scrollToElement: true,
+          scrollPadding: 80,
+          overlayOpacity: 0.8,
+          tooltipClass: 'modern-gray-tooltip',
+          helperElementPadding: 10,
+          highlightClass: 'modern-gray-highlight',
+          scrollTo: 'tooltip'
+        });
+        
+        tourInstance.onbeforechange(() => {
+          return true;
+        });
+        
+        tourInstance.oncomplete(() => {
+          localStorage.setItem('creatorTourCompleted', 'true');
+          setIsTourActive(false);
+        });
+        
+        tourInstance.onexit(() => {
+          localStorage.setItem('creatorTourCompleted', 'true');
+          setIsTourActive(false);
+        });
+        
+        tourInstance.start();
+      }, 1500);
+    }
+  }, [loading, user, allVoluntariados]);
 
   if (loading) {
     return (
@@ -76,17 +236,18 @@ function HomeCreatorLayout() {
     );
   }
 
-  const stats = getStatistics();
-
-  const allVoluntariados = [
-    ...(voluntariados.pendientes || []),
-    ...(voluntariados.en_proceso || []),
-    ...(voluntariados.terminados || []),
-    ...(voluntariados.cancelados || []),
-  ];
-
   return (
     <div className="home-creator-container">
+      {/* Botón flotante del tour en la esquina inferior izquierda */}
+      <button 
+        className={`floating-tour-btn ${isTourActive ? 'tour-active' : ''}`}
+        onClick={startTour}
+        title="Iniciar tour guiado"
+        disabled={isTourActive}
+      >
+        <FaQuestionCircle />
+      </button>
+
       <div className="home-creator-layout">
         {/* Header Section */}
         <div className="creator-header">
@@ -95,14 +256,23 @@ function HomeCreatorLayout() {
             <p>Gestiona tus voluntariados y conecta con la comunidad</p>
           </div>
 
-          <button className="create-new-btn" onClick={handleCreateNew}>
+          <button 
+            className="create-new-btn" 
+            onClick={handleCreateNew}
+            data-intro="Haz clic aquí para crear un nuevo voluntariado. Podrás agregar título, descripción, ubicación, fechas y toda la información necesaria." 
+            data-step="4"
+          >
             <FaPlus />
             <span>Crear Nuevo Voluntariado</span>
           </button>
         </div>
 
         {/* Statistics Cards */}
-        <div className="stats-section">
+        <div 
+          className="stats-section" 
+          data-intro="Aquí puedes ver las estadísticas generales de tus voluntariados: total creados, voluntariados activos en proceso, e inscripciones pendientes por revisar." 
+          data-step="5"
+        >
           <div className="stat-card">
             <div className="stat-icon total">
               <FaCalendarAlt />
@@ -135,7 +305,11 @@ function HomeCreatorLayout() {
         </div>
 
         {/* Content Section */}
-        <div className="creator-content">
+        <div 
+          className="creator-content" 
+          data-intro="Esta es la lista de todos tus voluntariados. Puedes hacer clic en cualquier tarjeta para ver los detalles, gestionar inscripciones y realizar otras acciones." 
+          data-step="6"
+        >
           <div className="content-header">
             <h2>Mis Voluntariados</h2>
             {allVoluntariados.length > 0 && (
@@ -173,10 +347,12 @@ function HomeCreatorLayout() {
 
           {!error && allVoluntariados.length > 0 && (
             <div className="voluntariados-grid">
-              {allVoluntariados.map((voluntariado) => (
+              {allVoluntariados.map((voluntariado, index) => (
                 <VolunteeringCard
                   key={voluntariado.id_voluntariado}
                   volunteering={voluntariado}
+                  data-intro={index === 0 ? "Haz clic en cualquier voluntariado para ver los detalles completos, gestionar inscripciones de voluntarios, editar información o realizar otras acciones." : ""}
+                  data-step={index === 0 ? "7" : ""}
                 />
               ))}
             </div>

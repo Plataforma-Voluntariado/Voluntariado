@@ -50,6 +50,7 @@ function PasswordRecoveryPage() {
         });
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error al solicitar recuperación:", error);
 
       if (error.response?.status === 404) {

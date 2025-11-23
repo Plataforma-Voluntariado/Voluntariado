@@ -7,6 +7,7 @@ export const isAuthenticated = async () => {
     } catch (error) {
         if (error.response?.status === 401) {
         }
+        // eslint-disable-next-line no-console
         console.error("Error comprobando autenticación: ", error);
         return false;
     }
@@ -18,8 +19,10 @@ export const getUserData = async () => {
         return response.data;
     } catch (error) {
         if (error.response?.status === 401) {
+            // eslint-disable-next-line no-console
             console.log("Usuario no autenticado");
         }
+        // eslint-disable-next-line no-console
         console.error("Error obteniendo datos del usuario: ", error);
         return null;
     }
@@ -41,6 +44,7 @@ export const logout = async () => {
         const response = await api.post("/auth/logout");
         return response.status === 200;
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Error cerrando sesión:", error);
         return false;
     }

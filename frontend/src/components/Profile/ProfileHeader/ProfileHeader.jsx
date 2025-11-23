@@ -17,7 +17,11 @@ function ProfileHeader({ user }) {
 
   return (
     <>
-      <header className="profile-header">
+      <header 
+        className="profile-header"
+        data-intro="Esta es tu foto de perfil y la información básica de tu cuenta. Haz clic en la foto para cambiarla."
+        data-step="1"
+      >
         <div className="profile-avatar-container" onClick={handleAvatarClick}>
           <img
             src={user.urlImage || "/placeholder.svg"}

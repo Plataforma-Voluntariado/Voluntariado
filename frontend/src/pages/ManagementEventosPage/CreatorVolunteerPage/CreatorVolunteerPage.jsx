@@ -4,6 +4,9 @@ import { useAuth } from "../../../context/AuthContext";
 import CreatorVolunteerLayout from "../../../layouts/Creador/ManagementeEventsLayout/CreatorVolunteerLayout/CreatorVolunteerLayout";
 import { Tabs } from "../../../components/Inscription/Tabs/Tabs";
 import { getEventsByCreatorId } from "../../../services/voluntariado/voluntariadoService";
+import introJs from "intro.js";
+import "intro.js/introjs.css";
+import { FaQuestionCircle } from "react-icons/fa";
 
 const tabsConfig = [
   { key: "pendientes", label: "Pendientes" },
@@ -18,6 +21,70 @@ function CreatorVolunteerPage() {
   const [voluntariados, setVoluntariados] = useState({});
   const [loading, setLoading] = useState(true);
   const [tabAlerts, setTabAlerts] = useState([]);
+
+  // Función auxiliar para inicializar el tour
+  const initTour = () => {
+    const tourInstance = introJs();
+    
+    tourInstance.setOptions({
+      prevLabel: 'Anterior',
+      nextLabel: 'Siguiente', 
+      skipLabel: 'Salir',
+      doneLabel: 'Finalizar',
+      showProgress: true,
+      showBullets: true,
+      exitOnOverlayClick: false,
+      exitOnEsc: true,
+      disableInteraction: true,
+      scrollToElement: true,
+      scrollPadding: 80,
+      overlayOpacity: 0.8,
+      tooltipClass: 'modern-gray-tooltip',
+      helperElementPadding: 10,
+      highlightClass: 'modern-gray-highlight',
+      scrollTo: 'tooltip'
+    });
+    
+    tourInstance.onbeforechange(() => {
+      return true;
+    });
+    
+    tourInstance.oncomplete(() => {
+      localStorage.setItem('creatorEventsPageTourCompleted', 'true');
+    });
+    
+    tourInstance.onexit(() => {
+      localStorage.setItem('creatorEventsPageTourCompleted', 'true');
+    });
+    
+    tourInstance.start();
+  };
+
+  // Función para iniciar el tour manualmente
+  const startTour = () => {
+    const pageContainer = document.querySelector('.creator-volunteer-page');
+    if (pageContainer) {
+      pageContainer.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+    
+    setTimeout(() => {
+      initTour();
+    }, 700);
+  };
+
+  // Auto-iniciar el tour en la primera visita
+  useEffect(() => {
+    const tourCompleted = localStorage.getItem('creatorEventsPageTourCompleted');
+    if (!tourCompleted) {
+      setTimeout(() => {
+        startTour();
+      }, 1000);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   useEffect(() => {
     const fetchVoluntariados = async () => {
@@ -26,6 +93,7 @@ function CreatorVolunteerPage() {
         const data = await getEventsByCreatorId();
         setVoluntariados(data);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error(error);
       } finally {
         setLoading(false);
@@ -91,6 +159,24 @@ function CreatorVolunteerPage() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         tabAlerts={tabAlerts}
+        tourSteps={{
+          pendientes: {
+            step: "1",
+            intro: "Aquí verás todos los voluntariados que aún no han comenzado. Puedes gestionar las incripciones pendientes de estos voluntariados."
+          },
+          en_proceso: {
+            step: "2",
+            intro: "Esta sección muestra los voluntariados que están actualmente en curso. Puedes ver cuántos voluntarios están participando "
+          },
+          terminados: {
+            step: "3",
+            intro: "Aquí encontrarás los voluntariados completados. Puedes marcar la asistencia de los voluntarios y revisar inscripciones del evento."
+          },
+          cancelados: {
+            step: "4",
+            intro: "Esta pestaña contiene todos los voluntariados que fueron cancelados. Puedes revisar el historial de las inscripciones que estaban en ese voluntariado"
+          }
+        }}
       />
 
       <CreatorVolunteerLayout
@@ -101,6 +187,16 @@ function CreatorVolunteerPage() {
         onCancelarGlobal={handleCancelarVoluntariado}
         pendingAsistenciaIds={pendingAsistenciaIds}
       />
+
+      {/* Botón flotante para iniciar el tour */}
+      <button 
+        className="floating-tour-btn"
+        onClick={startTour}
+        title="Iniciar tour guiado"
+        aria-label="Iniciar tour guiado"
+      >
+        <FaQuestionCircle />
+      </button>
     </section>
   );
 }

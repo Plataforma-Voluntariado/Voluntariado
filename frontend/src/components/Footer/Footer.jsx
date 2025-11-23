@@ -2,6 +2,7 @@ import React from "react";
 import "./Footer.css";
 import { useNavigate } from "react-router-dom";
 import VoluntariadoLogo from "../../assets/photos/logo.png";
+import UniPutumayoLogo from "../../assets/photos/uniputumayo_logo.png";
 import { MdEmail, MdPhone, MdLocationOn } from "react-icons/md";
 import { FaXTwitter, FaWhatsapp, FaFacebookF, FaInstagram } from "react-icons/fa6";
 
@@ -12,9 +13,15 @@ function Footer({ showUserLinks = false, showAuthLinks = false }) {
     <footer className="footer">
       <div className="footer-content">
         <div className="footer-section">
-          <img 
-            src={VoluntariadoLogo} 
-            alt="Logo Voluntariado" 
+          <img
+            src={VoluntariadoLogo}
+            alt="Logo Voluntariado"
+            className="footer-logo"
+            onClick={() => navigate("/home")}
+          />
+          <img
+            src={UniPutumayoLogo}
+            alt="Logo UniPutumayo"
             className="footer-logo"
             onClick={() => navigate("/home")}
           />
@@ -50,21 +57,21 @@ function Footer({ showUserLinks = false, showAuthLinks = false }) {
           <h3>Contacto</h3>
           <ul className="contact-list">
             <li className="contact-item">
-              <MdEmail className="contact-icon"/>
+              <MdEmail className="contact-icon" />
               contacto@voluntariado.com
             </li>
             <li className="contact-item">
-              <MdPhone className="contact-icon"/>
+              <MdPhone className="contact-icon" />
               (123) 456-7890
             </li>
             <li className="contact-item">
-              <MdLocationOn className="contact-icon"/>
+              <MdLocationOn className="contact-icon" />
               Carrera 48 # 37-12
             </li>
           </ul>
         </div>
       </div>
-      
+
       <div className="footer-bottom">
         <p>&copy; 2025 Plataforma de Voluntariado. Todos los derechos reservados.</p>
       </div>

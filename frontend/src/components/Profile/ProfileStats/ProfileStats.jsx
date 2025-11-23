@@ -20,6 +20,7 @@ function ProfileStats({ user }) {
         }
       } catch (err) {
         // Silenciar por ahora; podrías agregar un toast si fuese necesario
+        // eslint-disable-next-line no-console
         console.error("Error cargando estadísticas de voluntario:", err);
       }
     };

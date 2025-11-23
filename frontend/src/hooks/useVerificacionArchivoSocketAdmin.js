@@ -20,15 +20,18 @@ export const useVerificacionArchivoAdminSocket = (adminId, onAdminEvent) => {
     socketRef.current = socket;
 
     socket.on("connect", () => {
+      // eslint-disable-next-line no-console
       console.log("✅ [AdminSocket] Conectado a /verificacion-archivo-admin");
     });
 
     socket.on("actualizacion-verificacion-admin", (data) => {
+      // eslint-disable-next-line no-console
       console.log("📡 [AdminSocket] Evento recibido:", data);
       eventRef.current?.(data);
     });
 
     socket.on("disconnect", (reason) => {
+      // eslint-disable-next-line no-console
       console.log(`❌ [AdminSocket] Desconectado (${reason})`);
     });
 

@@ -40,6 +40,7 @@ function RegisterFormVolunteer() {
         const data = await GetDepartments();
         setDepartments(data.data);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Error al obtener departamentos:", error);
       }
     };
@@ -54,6 +55,7 @@ function RegisterFormVolunteer() {
         const data = await GetCities(selectedDepartment);
         setCities(data.data);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Error al obtener ciudades:", error);
       }
     };

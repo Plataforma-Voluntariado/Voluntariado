@@ -57,11 +57,18 @@ function NavigationBar() {
           {!isMobile && (
             <ul className="navigation-bar-list">
               {renderRoleSpecificItems()}
-              <li>
+              <li
+                data-intro="Aquí puedes ver y gestionar todas tus notificaciones en tiempo real."
+                data-step="2"
+              >
                 <NotificationButton />
               </li>
               {user && (
-                <li className="navigation-bar-list-item">
+                <li 
+                  className="navigation-bar-list-item"
+                  data-intro="Haz clic en tu foto de perfil para acceder a tu información personal y configuración."
+                  data-step="3"
+                >
                   <img
                     className="navigation-bar-user-photo"
                     src={user.urlImage}

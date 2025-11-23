@@ -40,6 +40,7 @@ function RegisterFormCreator() {
         const data = await GetDepartments();
         setDepartments(data.data);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Error al obtener departamentos:", error);
       }
     };
@@ -54,6 +55,7 @@ function RegisterFormCreator() {
         const data = await GetCities(selectedDepartment);
         setCities(data.data);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Error al obtener ciudades:", error);
       }
     };
@@ -267,7 +269,7 @@ function RegisterFormCreator() {
         />
       </div>
 
-      {passwordFields.map((field, index) => (
+      {passwordFields.map((field) => (
         <div key={field.name} className="register-form-input-container">
           <label className="register-form-label">{field.label}</label>
           <div className="password-wrapper">

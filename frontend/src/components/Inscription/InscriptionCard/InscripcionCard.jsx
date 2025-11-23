@@ -22,6 +22,7 @@ const InscripcionCard = ({
 
   const mostrarBotonesAceptarRechazar = ESTADO_VOLUNTARIADO === "PENDIENTE" && ESTADO_INSCRIPCION === "PENDIENTE";
   const mostrarBotonAsistencia = ESTADO_VOLUNTARIADO === "TERMINADO" && ESTADO_INSCRIPCION === "TERMINADA" && inscripcion.asistencia == null;
+  // eslint-disable-next-line no-console
   console.log(ESTADO_VOLUNTARIADO, ESTADO_INSCRIPCION, inscripcion.asistencia);
   const moverInscripcion = (listaDestino, nuevoEstado = {}) => {
     setInscripciones(prev => {

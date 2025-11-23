@@ -14,10 +14,6 @@ const CertificadosVoluntario = () => {
   const [loading, setLoading] = useState(true);
   const [generando, setGenerando] = useState(null);
 
-  useEffect(() => {
-    cargarDatos();
-  }, []);
-
   const cargarDatos = async () => {
     setLoading(true);
     try {
@@ -28,12 +24,17 @@ const CertificadosVoluntario = () => {
       setCertificados(certData);
       setElegibles(elegiblesData);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error cargando datos de certificados:', error);
       WrongAlert({ message: 'Error cargando certificados' });
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    cargarDatos();
+  }, []);
 
   const handleGenerarCertificado = async (inscripcionId) => {
     setGenerando(inscripcionId);
@@ -46,6 +47,7 @@ const CertificadosVoluntario = () => {
       setCertificados((prev) => [nuevoCertificado, ...prev]);
       setElegibles((prev) => prev.filter((e) => e.id_inscripcion !== inscripcionId));
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error generando certificado:', error);
       const mensaje = error.response?.data?.message || 'Error generando el certificado';
       WrongAlert({ message: mensaje });
