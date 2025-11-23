@@ -28,7 +28,7 @@
 }
 .home-volunteer-layout-title {
   text-align: center;
-  font-size: 1.6rem; /* reducido */
+  font-size: 1rem; /* reducido */
   color: var(--color-primary);
   background: var(--color-surface);
   padding: 0.6rem 1.2rem;

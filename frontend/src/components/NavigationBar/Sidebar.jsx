@@ -89,7 +89,7 @@ function Sidebar({ isOpen, onClose }) {
             </li>
             <li
               className="sidebar-item sidebar-create-button"
-              onClick={() => handleNavigate("/create-event")}
+              onClick={() => handleNavigate("/crear-voluntariado")}
               role="menuitem"
               tabIndex="0"
             >

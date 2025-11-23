@@ -1,5 +1,5 @@
 .volunteering-map-info {
-  width: 30%; /* mantenemos porcentaje para layout */
+  width: 40%; /* mantenemos porcentaje para layout */
   background: var(--color-surface);
   border-radius: var(--radius-large);
   padding: 1.5rem 1rem; /* mitad de 3rem 2rem */
@@ -78,7 +78,7 @@
 }
 
 .volunteering-map-info-step-content p {
-  font-size: 0.5rem; /* mitad */
+  font-size: 0.7rem; /* mitad */
   color: var(--color-text);
   margin: 0;
   line-height: 1.2; /* ajustado para legibilidad */
@@ -122,7 +122,7 @@
 }
 
 .volunteering-map-info-highlight-text {
-  font-size: 0.48rem; /* mitad */
+  font-size: 0.7rem; /* mitad */
   font-weight: 600;
   color: var(--color-primary);
   margin: 0;
@@ -161,4 +161,8 @@
   .volunteering-map-info-step { gap: 0.375rem; }
   .volunteering-map-info-step-number { width: 16px; height: 16px; font-size: 0.45rem; }
   .volunteering-map-info-marker-image { width: 20px; height: 20px; }
+  .volunteering-map-info-step-content p {font-size: 0.7rem; }
+  .volunteering-map-info-step-content h3 {font-size: 0.8rem;}
+  .volunteering-map-info-highlight-text {font-size: 0.7rem;}
+  .volunteering-map-info-title {font-size: 0.7rem;}
 }
