@@ -8,6 +8,7 @@ export const obtenerInscripcionesElegibles = async () => {
     const response = await api.get('/certificados/elegibles');
     return response.data;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error obteniendo inscripciones elegibles:', error);
     throw error;
   }
@@ -21,6 +22,7 @@ export const obtenerMisCertificados = async () => {
     const response = await api.get('/certificados/mis-certificados');
     return response.data;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error obteniendo certificados:', error);
     throw error;
   }
@@ -34,6 +36,7 @@ export const generarCertificado = async (inscripcionId) => {
     const response = await api.post(`/certificados/generar/${inscripcionId}`);
     return response.data;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error generando certificado:', error);
     throw error;
   }
@@ -47,6 +50,7 @@ export const verificarCertificado = async (hash) => {
     const response = await api.get(`/certificados/verificar/${hash}`);
     return response.data;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error verificando certificado:', error);
     throw error;
   }
@@ -69,6 +73,7 @@ export const descargarCertificadoPDF = async (url, filename) => {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(blobUrl);
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error descargando certificado:', error);
     throw error;
   }

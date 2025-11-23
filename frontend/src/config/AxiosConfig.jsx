@@ -17,6 +17,7 @@ api.interceptors.response.use(
       try {
         await logout();
       } catch (logoutError) {
+        // eslint-disable-next-line no-console
         console.error("Error during logout:", logoutError);
       }
     }

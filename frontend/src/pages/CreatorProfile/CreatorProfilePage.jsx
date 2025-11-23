@@ -40,6 +40,7 @@ function CreatorProfilePage() {
         const data = await getUserProfileById(id);
         setCreator(data);
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error("Error cargando perfil: ", e);
       }
 
@@ -49,6 +50,7 @@ function CreatorProfilePage() {
         const terminadosList = res?.terminados || [];
         setTerminados(terminadosList);
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error("Error cargando voluntariados del creador: ", e);
       } finally {
         setLoading(false);

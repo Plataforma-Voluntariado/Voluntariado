@@ -38,6 +38,7 @@ const VolunteerInscripcionPage = () => {
       const data = await getMisInscripciones();
       setInscripciones(data);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error al cargar mis inscripciones:", error);
       WrongAlert({ message: "No se pudieron cargar tus inscripciones" });
     } finally {
@@ -52,7 +53,7 @@ const VolunteerInscripcionPage = () => {
   useInscripcionSocket();
 
   useEffect(() => {
-    const handler = (e) => {
+    const handler = () => {
       fetchInscripciones();
     };
 

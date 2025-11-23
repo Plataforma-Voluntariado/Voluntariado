@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
-
 import { GetVoluntarioById } from '../../services/voluntariado/voluntariadoService';
-import { useParams, useNavigate } from 'react-router-dom';
-
+import { useParams } from 'react-router-dom';
 import { MdEmail, MdDateRange } from 'react-icons/md';
-import { FaCheckCircle, FaPhone, FaChevronDown, FaChevronUp, FaClock, FaUsers, FaPercent, FaCertificate } from 'react-icons/fa';
+import { FaCheckCircle, FaPhone, FaChevronDown, FaChevronUp, FaClock, FaUsers, FaPercent } from 'react-icons/fa';
 import './VolunteerProfile.css';
 
 const formatDate = (d) => {
@@ -20,7 +18,6 @@ const formatDate = (d) => {
 export default function VolunteerProfile({ volunteerId: propId }) {
   const { id: paramId } = useParams() || {};
   const id = propId ?? paramId;
-  const navigate = useNavigate();
   const [volunteer, setVolunteer] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -75,15 +72,6 @@ export default function VolunteerProfile({ volunteerId: propId }) {
               <div className="volunteer-profile-contact-row"><FaPhone className="volunteer-profile-ic" /><span>{usuario?.telefono || '-'}</span></div>
               <div className="volunteer-profile-contact-row"><MdDateRange className="volunteer-profile-ic" /><span>{formatDate(usuario?.fecha_nacimiento) || '-'}</span></div>
             </div>
-
-            <button
-              className="volunteer-profile-certificates-btn"
-              onClick={() => navigate('/mis-certificados')}
-              title="Ver mis certificados"
-            >
-              <FaCertificate /> Mis Certificados
-            </button>
-
           </aside>
 
           <main className="volunteer-profile-main-restored">

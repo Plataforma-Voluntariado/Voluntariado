@@ -1,6 +1,7 @@
 import api from "../../config/AxiosConfig";
 
 const handleError = (error, defaultMsg = "Ocurrió un error") => {
+  // eslint-disable-next-line no-console
   console.error(error);
   return error.response?.data?.message || defaultMsg;
 };
@@ -95,6 +96,7 @@ export const updateVoluntariado = async (id, voluntariadoData, fotos = [], fotos
     fotos.forEach(foto => formData.append("nuevasFotos", foto));
 
     for (let pair of formData.entries()) {
+      // eslint-disable-next-line no-console
       console.log(pair[0] + ':', pair[1]);
     }
 

@@ -6,6 +6,7 @@ export const GetNotifications = async () => {
     const response = await api.get("/notificaciones");
     return response.data;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error al obtener las notificaciones", error);
     return false;
   }
@@ -17,6 +18,7 @@ export const MarkNotificationAsSeen = async (notificacionId) => {
     const response = await api.post(`/notificaciones/marcar-vista/${notificacionId}`);
     return response.data;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error al marcar la notificación como vista", error);
     return false;
   }
@@ -28,6 +30,7 @@ export const DeleteNotification = async (notificacionId) => {
     const response = await api.post(`/notificaciones/eliminar/${notificacionId}`);
     return response.data;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error al eliminar la notificación", error);
     return false;
   }

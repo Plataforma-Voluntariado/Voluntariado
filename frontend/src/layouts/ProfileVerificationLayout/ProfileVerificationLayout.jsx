@@ -15,6 +15,7 @@ function ProfileVerificationLayout({ user }) {
       const response = await GetUserFilesArray();
       if (response) setFiles(response);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error al obtener archivos:", error);
     }
   }, []);
@@ -23,7 +24,7 @@ function ProfileVerificationLayout({ user }) {
     fetchFiles();
   }, [fetchFiles]);
 
-  const handleArchivoEvent = useCallback((data) => {
+  const handleArchivoEvent = useCallback(() => {
     fetchFiles();
   }, [fetchFiles]);
 
@@ -56,7 +57,12 @@ function ProfileVerificationLayout({ user }) {
 
       {documentsToShow.length > 0 && (
         <>
-          <div className="profile-verification-toggle-card" onClick={toggleVerifications}>
+          <div 
+            className="profile-verification-toggle-card" 
+            onClick={toggleVerifications}
+            data-intro="En esta sección puedes subir y gestionar tus documentos de verificación de identidad (Cédula y RUT si eres creador). Los documentos serán revisados por un administrador."
+            data-step="3"
+          >
             <div className="profile-verification-toggle-content">
               <h4 className="profile-verification-toggle-title">VERIFICACIÓN DE IDENTIDAD</h4>
               <p className="profile-verification-toggle-subtitle">

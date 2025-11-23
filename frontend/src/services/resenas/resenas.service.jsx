@@ -1,6 +1,7 @@
 import api from "../../config/AxiosConfig";
 
 const handleError = (error, defaultMsg = "Ocurrió un error") => {
+  // eslint-disable-next-line no-console
   console.error(error);
   return error.response?.data?.message || defaultMsg;
 };

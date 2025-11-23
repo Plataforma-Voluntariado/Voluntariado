@@ -54,6 +54,7 @@ function UserUploadFileModal({ tipoDocumento, onClose }) {
       });
       onClose();
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error subiendo archivo:", error);
       WrongAlert({
         title: "Error",

@@ -36,6 +36,7 @@ const useAuthSockets = (userId,handleUserUpdate,handleNotifications,handleNotifi
           const message = event.mensaje || "";
           SuccessAlert({ title, message, timer: 2500 });
         } catch (e) {
+          // eslint-disable-next-line no-console
           console.error('Error mostrando SuccessAlert para notificación entrante', e);
         }
         setNotifications((prev) => ({
@@ -96,6 +97,7 @@ export const AuthProvider = ({ children }) => {
         noVistas: data.noVistas || [],
       });
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("Error al obtener notificaciones:", err);
       setNotifications({ vistas: [], noVistas: [] });
     }
@@ -159,10 +161,12 @@ export const AuthProvider = ({ children }) => {
         try {
           await fetchNotifications();
         } catch (notifError) {
+          // eslint-disable-next-line no-console
           console.error("Error loading notifications:", notifError);
         }
         
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.error("Error in fetchUserProfile:", err);
         if (isMounted) {
           setUser(null);

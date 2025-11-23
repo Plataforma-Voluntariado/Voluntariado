@@ -43,6 +43,7 @@ function Sidebar({ isOpen, onClose }) {
 
       navigate("/");
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("Error en handleLogout:", err);
       await WrongAlert({
         title: "Error inesperado",

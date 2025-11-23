@@ -24,6 +24,7 @@ export default function VolunteeringCardLayout({ filters = {}, mapApiRef = null,
       setPage(1);
       onChangeRef.current?.(list);
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error("Error cargando voluntariados", e);
       setVolunteerings([]);
       setPage(1);

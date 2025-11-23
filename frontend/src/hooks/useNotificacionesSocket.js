@@ -22,6 +22,7 @@ export const useNotificacionesSocket = (userId, onNotificationEvent) => {
     socketRef.current = socket;
 
     socket.on("connect", () => {
+      // eslint-disable-next-line no-console
       console.log("✅ WebSocket conectado al namespace /notificaciones");
     });
 
@@ -43,10 +44,12 @@ export const useNotificacionesSocket = (userId, onNotificationEvent) => {
     });
 
     socket.on("disconnect", (reason) => {
+      // eslint-disable-next-line no-console
       console.log("❌ WebSocket /notificaciones desconectado:", reason);
     });
 
     socket.on("connect_error", (error) => {
+      // eslint-disable-next-line no-console
       console.error("💥 Error de conexión:", error);
     });
 

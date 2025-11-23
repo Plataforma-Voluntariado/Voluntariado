@@ -30,6 +30,7 @@ function NotificationsModal({ vistas, noVistas }) {
       try {
         await MarkNotificationAsSeen(notificacion.id_notificacion);
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.error("Error al marcar notificación como vista:", err);
         return;
       }
@@ -45,6 +46,7 @@ function NotificationsModal({ vistas, noVistas }) {
     try {
       await DeleteNotification(notificacionId);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("Error al eliminar notificación:", err);
     }
   };

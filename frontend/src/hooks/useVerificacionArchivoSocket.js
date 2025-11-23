@@ -21,6 +21,7 @@ export const useVerificacionArchivoSocket = (userId, onArchivoEvent,rol) => {
         socketRef.current = socket;
 
         socket.on("connect", () => {
+            // eslint-disable-next-line no-console
             console.log("✅ WebSocket conectado a /verificacion-archivo");
         });
 
@@ -29,6 +30,7 @@ export const useVerificacionArchivoSocket = (userId, onArchivoEvent,rol) => {
         });
 
         socket.on("disconnect", () => {
+            // eslint-disable-next-line no-console
             console.log("❌ Desconectado de /verificacion-archivo");
         });
 

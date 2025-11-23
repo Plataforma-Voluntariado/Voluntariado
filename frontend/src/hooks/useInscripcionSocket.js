@@ -16,10 +16,12 @@ const useInscripcionSocket = (enabled = true) => {
 		socketRef.current = socket;
 
 		const onConnect = () => {
+			// eslint-disable-next-line no-console
 			console.log("✅ WebSocket conectado al namespace /inscripcion");
 		};
 
 		const onDisconnect = (reason) => {
+			// eslint-disable-next-line no-console
 			console.log("⚠️ WebSocket desconectado /inscripcion", reason);
 		};
 
@@ -28,6 +30,7 @@ const useInscripcionSocket = (enabled = true) => {
 				const evt = new CustomEvent("inscripcion.changed", { detail: data });
 				window.dispatchEvent(evt);
 			} catch (e) {
+				// eslint-disable-next-line no-console
 				console.error("Error al despachar evento global inscripcion.changed", e);
 			}
 		};
@@ -45,6 +48,7 @@ const useInscripcionSocket = (enabled = true) => {
 			try {
 				socket.disconnect();
 			} catch (e) {
+				// eslint-disable-next-line no-console
 				console.warn("Error al desconectar socket /inscripcion", e);
 			}
 			socketRef.current = null;

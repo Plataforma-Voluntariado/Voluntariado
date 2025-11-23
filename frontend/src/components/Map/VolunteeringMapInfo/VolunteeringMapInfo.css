@@ -148,10 +148,10 @@
 
 @media (max-width: 768px) {
   .volunteering-map-info { padding: 0.625rem; border-radius: 20px; }
-  .volunteering-map-info-title { font-size: 0.5625rem; }
-  .volunteering-map-info-step-content h3 { font-size: 0.475rem; }
+  .volunteering-map-info-title { font-size: 1rem; }
+  .volunteering-map-info-step-content h3 { font-size: 0.9rem; }
   .volunteering-map-info-step-content p,
-  .volunteering-map-info-highlight-text { font-size: 0.425rem; }
+  .volunteering-map-info-highlight-text { font-size: 0.8rem; }
 }
 
 @media (max-width: 480px) {

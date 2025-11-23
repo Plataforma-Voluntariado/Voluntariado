@@ -6,6 +6,7 @@ export const getCategorias = async () => {
         const response = await api.get("/categorias");
         return response.data;
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Error obteniendo categorías: ", error);
         throw error.response?.data?.message || "Error al obtener categorías";
     }

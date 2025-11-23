@@ -45,6 +45,7 @@ export const handleStyleLoad = (map) => {
     map.setLayoutProperty("poi-label", "visibility", "none");
     map.setLayoutProperty("transit-label", "visibility", "none");
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.warn("MapService.handleStyleLoad:", err);
   }
 };

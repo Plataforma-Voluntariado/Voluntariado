@@ -6,6 +6,7 @@ export const GetUserById = async (userId) => {
     const response = await api.get(`/voluntario/${userId}`);
     return response.data;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error obteniendo el usuario por ID.", error);
     return error;
   }
@@ -18,6 +19,7 @@ export const GetUsersByRole = async (rol) => {
     );
     return filteredUsers;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error obteniendo los usuarios por rol.", error);
     return error;
   }
@@ -30,6 +32,7 @@ export const GetUserByVerificationId = async (idVerificacion) => {
     );
     return response.data;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error obteniendo el usuario por ID de verificación.", error);
     return error;
   }
@@ -42,6 +45,7 @@ export const GetUserFile = async (idVerificacionArchivo) => {
     );
     return response.data;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error obteniendo el archivo PDF del usuario.", error);
     return error;
   }
@@ -57,6 +61,7 @@ export const RejectUserFile = async (idVerificacionArchivo, observacion) => {
     );
     return response;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error rechazando el archivo del usuario.", error);
     return error;
   }
@@ -69,6 +74,7 @@ export const AcceptUserFile = async (idVerificacionArchivo) => {
     );
     return response;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error aceptando el archivo del usuario.", error);
     return error;
   }
@@ -79,6 +85,7 @@ export const GetUserFilesArray = async () => {
     const response = await api.get("verificacion/mis-archivos");
     return response.data.archivos;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error obteniendo los archivos del usuario.", error);
     return error;
   }
@@ -106,6 +113,7 @@ export const UploadUserFile = async (fileData, fileType) => {
     return { ok: true, status: response.status, data: response.data };
   } catch (error) {
     const serverDetail = error?.response?.data?.message || error?.response?.data?.detail || error?.response?.data || error.message;
+    // eslint-disable-next-line no-console
     console.error("Error subiendo el archivo del usuario:", serverDetail);
     return { ok: false, status: error?.response?.status || 500, message: serverDetail };
   }
@@ -122,6 +130,7 @@ export const UploadProfilePhoto = async (photoFile) => {
     });
     return response;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error subiendo la foto de perfil:", error);
     return error || { error: "Error al subir foto de perfil" };
   }
@@ -132,6 +141,7 @@ export const DeleteProfilePhoto = async () => {
     const response = await api.delete("/usuarios/imagen-perfil");
     return response;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error eliminando la foto de perfil:", error);
     return error || { error: "Error al eliminar foto de perfil" };
   }

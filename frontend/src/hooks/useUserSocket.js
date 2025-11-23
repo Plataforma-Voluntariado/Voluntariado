@@ -17,6 +17,7 @@ export const useUserSocket = (userId, onUserUpdate) => {
     socketRef.current = socket;
 
     socket.on('connect', () => {
+      // eslint-disable-next-line no-console
       console.log('✅ WebSocket conectado al namespace /usuario');
     });
 
@@ -25,14 +26,17 @@ export const useUserSocket = (userId, onUserUpdate) => {
     });
 
     socket.on('disconnect', (reason) => {
+      // eslint-disable-next-line no-console
       console.log('❌ WebSocket desconectado:', reason);
     });
 
     socket.on('connect_error', (error) => {
+      // eslint-disable-next-line no-console
       console.error('💥 Error de conexión:', error);
     });
 
     return () => {
+      // eslint-disable-next-line no-console
       console.log('🧹 Cerrando conexión WebSocket...');
       socket.disconnect();
       socketRef.current = null;

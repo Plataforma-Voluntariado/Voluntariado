@@ -31,6 +31,7 @@ function VoluntariadoDetailPage() {
       const data = await getVoluntariadoById(id);
       setVoluntariado(data);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error al cargar voluntariado:", error);
       await WrongAlert({
         title: "Error",

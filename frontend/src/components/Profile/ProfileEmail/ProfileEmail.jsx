@@ -25,6 +25,7 @@ function ProfileEmail({ user }) {
         });
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error al enviar el código:", error);
       await WrongAlert({
         message:
@@ -40,7 +41,11 @@ function ProfileEmail({ user }) {
     user.correo_verificado === "1";
 
   return (
-    <div className="profile-email-card">
+    <div 
+      className="profile-email-card"
+      data-intro="Aquí puedes verificar tu correo electrónico. Es importante tener el correo verificado para recibir notificaciones importantes."
+      data-step="2"
+    >
       <FaMailBulk
         className="profile-email-icon"
       />

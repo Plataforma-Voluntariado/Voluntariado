@@ -55,6 +55,7 @@ function UserVerificationItem({ data }) {
         });
       } else throw new Error(response?.response?.data?.message || "Error desconocido");
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(`Error ${tipo}ndo el archivo:`, error);
       WrongAlert({ title: "Error", message: error.message || error });
     } finally {

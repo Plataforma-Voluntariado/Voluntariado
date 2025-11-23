@@ -8,19 +8,20 @@ export default function SearchVolunteerings({ onApplyFilters }) {
   const [selectedCategoria, setSelectedCategoria] = useState("");
   const [openTags, setOpenTags] = useState(false);
 
-  useEffect(() => {
-    loadCategorias();
-  }, []);
-
   const loadCategorias = async () => {
     try {
       const data = await getCategorias();
       setCategorias(Array.isArray(data) ? data : []);
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error("Error cargando categorias", e);
       setCategorias([]);
     }
   };
+
+  useEffect(() => {
+    loadCategorias();
+  }, []);
 
   const apply = () => {
     const filters = {};

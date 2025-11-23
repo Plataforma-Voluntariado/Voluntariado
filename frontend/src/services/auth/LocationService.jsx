@@ -7,6 +7,7 @@ export const GetCities = async (id) => {
     const response = axios.get(url + "/ciudades/por-departamento/" + id);
     return response;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error al obtener las ciudades", error);
     return false;
   }
@@ -17,6 +18,7 @@ export const GetDepartments = async () => {
     const response = await axios.get(url + "/departamentos");
     return response;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error obteniendo los departamentos.");
     return false;
   }

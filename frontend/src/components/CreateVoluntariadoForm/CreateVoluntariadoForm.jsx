@@ -171,6 +171,7 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
           setDepartamentos(departamentosData || []);
         }
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Error al cargar datos iniciales", error);
       }
     };
@@ -195,6 +196,7 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
           setCiudades(data || []);
         }
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Error al cargar ciudades", error);
       }
     };
@@ -235,6 +237,7 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
         setPreviewImages((prev) => [...prev, ...previews]);
         clearError("fotos");
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Error al procesar imágenes", error);
         await WrongAlert({
           title: "Error",
@@ -403,6 +406,7 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
           }
         };
 
+        // eslint-disable-next-line no-console
         console.log("Payload de creación de voluntariado:", payload);
         const result = await createVoluntariado(payload, fotos);
         await SuccessAlert({
@@ -413,6 +417,7 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
         resetForm();
         if (onSuccess) onSuccess(result);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Error al crear voluntariado", error);
         await WrongAlert({
           title: "Error al crear voluntariado",
@@ -484,6 +489,7 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
             }
             return;
           } catch (error) {
+            // eslint-disable-next-line no-console
             console.error("Error autocompletando ciudad", error);
           }
         }
@@ -504,6 +510,7 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
               break;
             }
           } catch (error) {
+            // eslint-disable-next-line no-console
             console.error("Error buscando ciudad por departamento", error);
           }
         }
@@ -528,6 +535,7 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
 
       const parsed = parseAddressString(direccion, departamentos);
 
+      // eslint-disable-next-line no-console
       console.log("Dirección parseada:", parsed);
 
       setFormData((prev) => {
@@ -557,6 +565,7 @@ function CreateVoluntariadoForm({ onSuccess, onCancel }) {
       try {
         await autoSelectLocationFromParsed(parsed);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Error auto-seleccionando ubicación", error);
       }
     },

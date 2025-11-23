@@ -153,11 +153,6 @@ function EditVoluntariadoModal({ voluntariado, onClose, onSuccess }) {
 
   const [selectedDepartamento, setSelectedDepartamento] = useState("");
 
-  useEffect(() => {
-    loadInitialData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const loadInitialData = async () => {
     try {
       const [categoriasData, departamentosData] = await Promise.all([
@@ -184,9 +179,15 @@ function EditVoluntariadoModal({ voluntariado, onClose, onSuccess }) {
       }));
       setPreviewImages(existingPreviews);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error cargando datos:", error);
     }
   };
+
+  useEffect(() => {
+    loadInitialData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // No mostramos selects de ciudad/departamento en UI, pero mantenemos datos
   useEffect(() => {
@@ -199,6 +200,7 @@ function EditVoluntariadoModal({ voluntariado, onClose, onSuccess }) {
         const data = await getCiudadesByDepartamento(selectedDepartamento);
         setCiudades(data);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Error cargando ciudades:", error);
       }
     })();
@@ -257,6 +259,7 @@ function EditVoluntariadoModal({ voluntariado, onClose, onSuccess }) {
         setPreviewImages((prev) => [...prev, ...marked]);
         clearError("fotos");
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Error al procesar imágenes", error);
         await WrongAlert({
           title: "Error",
@@ -345,6 +348,7 @@ function EditVoluntariadoModal({ voluntariado, onClose, onSuccess }) {
             }));
           }
         } catch (e) {
+          // eslint-disable-next-line no-console
           console.error("Error buscando ciudad por departamento", e);
         }
       };
@@ -408,6 +412,7 @@ function EditVoluntariadoModal({ voluntariado, onClose, onSuccess }) {
         try {
           await autoSelectLocationFromParsed(parsed);
         } catch (e) {
+          // eslint-disable-next-line no-console
           console.error("No se pudo autoseleccionar la ciudad", e);
         }
       }
@@ -457,6 +462,7 @@ function EditVoluntariadoModal({ voluntariado, onClose, onSuccess }) {
       });
       onSuccess();
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error actualizando voluntariado:", error);
       await WrongAlert({
         title: "Error",
