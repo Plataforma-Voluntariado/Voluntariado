@@ -1,5 +1,5 @@
 .volunteering-map-layout {
-  width: 70%;
+  width: 80%;
   display: flex;
   gap: 1rem; /* compacted */
   border-radius: calc(var(--radius-large) - 4px); /* slightly smaller */
