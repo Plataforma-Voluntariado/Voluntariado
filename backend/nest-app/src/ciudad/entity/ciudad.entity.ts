@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColum
 import { Departamento } from '../../departamento/entity/departamento.entity';
 import { Usuario } from '../../usuario/entity/usuario.entity';
 
-@Entity('Ciudad')
+@Entity('ciudad')
 export class Ciudad {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id_ciudad: number;

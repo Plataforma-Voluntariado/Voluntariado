@@ -2,7 +2,7 @@ import { Entity, PrimaryColumn, OneToOne, JoinColumn } from 'typeorm';
 import { Usuario } from '../../usuario/entity/usuario.entity';
 import { EstadisticasVoluntario } from 'src/estadisticas_voluntario/entity/estadisticas_voluntario.entity';
 
-@Entity('Voluntario')
+@Entity('voluntario')
 export class Voluntario {
   @PrimaryColumn({ type: 'bigint', unsigned: true })
   id_usuario: number;

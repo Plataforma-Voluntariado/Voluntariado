@@ -1,0 +1,6 @@
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+pysentimiento==0.8.1
+torch==2.5.1
+transformers==4.46.3
+pydantic==2.10.3

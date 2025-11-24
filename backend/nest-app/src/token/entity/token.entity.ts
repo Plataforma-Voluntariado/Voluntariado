@@ -12,7 +12,7 @@ export enum EstadoToken {
   USADO = 'USADO',
 }
 
-@Entity({ name: 'Token' })
+@Entity('token')
 export class Token {
   @PrimaryGeneratedColumn({ name: 'id_token', type: 'bigint', unsigned: true })
   idToken: number;

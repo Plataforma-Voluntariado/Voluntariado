@@ -69,12 +69,21 @@ async def analizar_pdf(file: UploadFile = File(...)):
         for idx, img in enumerate(images, start=1):
             clase, confianza = classify_image_roboflow(img)
             texto = extract_text(img).lower()
+            
+            print(f"📄 Página {idx}:")
+            print(f"   🎯 Clasificación visual: '{clase}' (confianza: {confianza:.2%})")
+            print(f"   📝 Texto extraído (primeros 200 chars): {texto[:200]}")
 
             # Calcular puntaje OCR ponderado
+            palabras_encontradas = []
             for tipo, palabras in ocr_keywords.items():
                 for palabra, peso in palabras.items():
                     if palabra in texto:
                         ocr_scores[tipo] += peso
+                        palabras_encontradas.append(f"{palabra} ({peso}pts)")
+            
+            if palabras_encontradas:
+                print(f"   🔑 Palabras clave encontradas: {', '.join(palabras_encontradas)}")
 
             resultados.append({
                 "pagina": idx,
@@ -94,10 +103,18 @@ async def analizar_pdf(file: UploadFile = File(...)):
         total_ocr_puntaje = sum(ocr_scores.values())
 
         tipos_detectados = set([r["clase_visual"] for r in resultados])
+        
+        print(f"\n📊 RESUMEN DE ANÁLISIS:")
+        print(f"   📸 Visual predominante: '{clase_visual_predominante}'")
+        print(f"   📝 OCR predominante: '{clase_ocr_predominante}' (puntaje: {puntaje_ocr_max})")
+        print(f"   📈 Puntajes OCR: {ocr_scores}")
+        print(f"   🎯 Tipos detectados: {tipos_detectados}")
 
         # ====================================================
         # 🧩 Decisión combinada (Visual + OCR)
         # ====================================================
+        print(f"\n🧩 LÓGICA DE DECISIÓN:")
+        
         if len(tipos_detectados) > 1:
             tipo_final = "mixto"
             confianza_final = "media"
@@ -105,22 +122,26 @@ async def analizar_pdf(file: UploadFile = File(...)):
                 "El PDF contiene múltiples tipos de documentos. "
                 "Por favor sube un archivo PDF que contenga únicamente el documento requerido."
             )
+            print(f"   ❌ Múltiples tipos detectados → tipo_final: '{tipo_final}'")
 
         else:
             if clase_visual_predominante == clase_ocr_predominante and puntaje_ocr_max >= 3:
                 tipo_final = clase_visual_predominante
                 confianza_final = "alta"
                 mensaje = None
+                print(f"   ✅ Coincidencia perfecta (puntaje >= 3) → tipo_final: '{tipo_final}' (confianza: alta)")
 
             elif clase_visual_predominante == clase_ocr_predominante:
                 tipo_final = clase_visual_predominante
                 confianza_final = "media"
                 mensaje = "Coincidencia entre OCR y análisis visual, pero con baja evidencia textual."
+                print(f"   ⚠️ Coincidencia con bajo puntaje → tipo_final: '{tipo_final}' (confianza: media)")
 
             elif clase_visual_predominante == "otro" and puntaje_ocr_max > 0:
                 tipo_final = clase_ocr_predominante
                 confianza_final = "media"
                 mensaje = "El tipo de documento fue reconocido principalmente por su contenido textual."
+                print(f"   📝 Visual='otro' pero OCR tiene puntaje → tipo_final: '{tipo_final}' (confianza: media)")
 
             elif clase_visual_predominante != clase_ocr_predominante and puntaje_ocr_max >= 3:
                 tipo_final = clase_ocr_predominante
@@ -130,6 +151,7 @@ async def analizar_pdf(file: UploadFile = File(...)):
                     f"pero el texto indica claramente '{clase_ocr_predominante}'. "
                     "Se da prioridad al OCR por mayor evidencia textual."
                 )
+                print(f"   🔄 Conflicto resuelto por OCR (puntaje >= 3) → tipo_final: '{tipo_final}' (confianza: media)")
 
             else:
                 tipo_final = clase_visual_predominante
@@ -138,6 +160,7 @@ async def analizar_pdf(file: UploadFile = File(...)):
                     "El documento no tiene coincidencias claras. "
                     "Por favor sube un archivo PDF que contenga únicamente el documento requerido."
                 )
+                print(f"   ⚠️ Sin coincidencias claras → tipo_final: '{tipo_final}' (confianza: baja)")
 
         # ====================================================
         # 📦 Resultado final
@@ -147,6 +170,8 @@ async def analizar_pdf(file: UploadFile = File(...)):
             "confianza": confianza_final,
             **({"mensaje": mensaje} if mensaje else {})
         }
+        
+        print(f"\n✅ RESULTADO FINAL: {resultado_final}\n")
 
         return {
             "archivo": file.filename,
