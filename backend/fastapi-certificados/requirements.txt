@@ -4,3 +4,4 @@ requests
 Jinja2
 qrcode
 python-dotenv
+Pillow

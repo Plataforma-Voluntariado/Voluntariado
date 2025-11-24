@@ -34,7 +34,7 @@ export const GetUserByVerificationId = async (idVerificacion) => {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Error obteniendo el usuario por ID de verificación.", error);
-    return error;
+    return [];
   }
 };
 

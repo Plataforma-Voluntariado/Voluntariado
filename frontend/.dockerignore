@@ -1,0 +1,45 @@
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+.npm/
+
+# Build
+build/
+dist/
+
+# Testing
+coverage/
+.nyc_output/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Environment (se pasan como build args)
+.env.local
+.env.development
+.env.test
+
+# Logs
+*.log
+logs/
+
+# Misc
+*.md
+README.md
+LICENSE
+.prettierrc
+.eslintrc*

@@ -1,0 +1,188 @@
+# ================================
+# Docker Compose - Backend Voluntariado
+# ================================
+# Este archivo orquesta todos los servicios del backend:
+# - NestJS (API principal)
+# - 3 FastAPI (sentimiento, verificador, certificados)
+# - Redis (para colas y WebSockets)
+# ================================
+
+services:
+  # ================================
+  # Redis - Colas y Cache
+  # ================================
+  redis:
+    image: redis:latest
+    container_name: voluntariado-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - voluntariado-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redis-data:/data
+
+  # ================================
+  # NestJS - Backend Principal
+  # ================================
+  nest-app:
+    image: nest-app:latest
+    container_name: voluntariado-nest
+    restart: unless-stopped
+    ports:
+      - "5560:5560"
+    environment:
+      # Server
+      SERVER_PORT: 5560
+      NODE_ENV: production
+      
+      # Database (MySQL en la nube - PlanetScale/Railway)
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      
+      # Redis (contenedor interno)
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      
+      # FastAPI URLs (nombres de servicios internos)
+      FASTAPI_URL: http://api-verificador:8001/analizar-pdf
+      FASTAPISENTIMIENTO_URL: http://api-sentimiento:8077/upload-comment
+      CERTIFICADOS_FASTAPI_URL: http://api-certificados:8002
+      
+      # JWT
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_RECOVERY_SECRET: ${JWT_RECOVERY_SECRET}
+      EXPIRES_IN: ${EXPIRES_IN:-1h}
+      EXPIRES_TEMPORAL_IN: ${EXPIRES_TEMPORAL_IN:-5m}
+      
+      # Cloudinary
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      
+      # Mail
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USER: ${MAIL_USER}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      
+      # Frontend
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      EXPIRES_CODE: ${EXPIRES_CODE:-10}
+      
+      # Backend URL
+      BACKEND_URL: ${BACKEND_URL:-http://localhost:5560}
+    
+    depends_on:
+      redis:
+        condition: service_healthy
+      api-verificador:
+        condition: service_started
+      api-sentimiento:
+        condition: service_started
+      api-certificados:
+        condition: service_started
+    
+    networks:
+      - voluntariado-network
+    
+    volumes:
+      - ./nest-app/uploads:/app/uploads
+    
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:5560', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ================================
+  # FastAPI - Verificador de Documentos (OCR + IA)
+  # ================================
+  api-verificador:
+    image: api-verificador:latest
+    container_name: voluntariado-verificador
+    restart: unless-stopped
+    expose:
+      - "8001"
+    environment:
+      PYTHONUNBUFFERED: 1
+      ROBOFLOW_API_KEY: ${ROBOFLOW_API_KEY:-}
+    networks:
+      - voluntariado-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/').getcode()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ================================
+  # FastAPI - Análisis de Sentimientos (ML)
+  # ================================
+  api-sentimiento:
+    image: api-sentimiento:latest
+    container_name: voluntariado-sentimiento
+    restart: unless-stopped
+    expose:
+      - "8077"
+    environment:
+      PYTHONUNBUFFERED: 1
+      TF_CPP_MIN_LOG_LEVEL: 3
+    networks:
+      - voluntariado-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8077').getcode()"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 2G  # Limitar RAM para ML
+
+  # ================================
+  # FastAPI - Generador de Certificados PDF
+  # ================================
+  api-certificados:
+    image: api-certificados:latest
+    container_name: voluntariado-certificados
+    restart: unless-stopped
+    expose:
+      - "8002"
+    environment:
+      PYTHONUNBUFFERED: 1
+      PDFLAYER_ACCESS_KEY: ${PDFLAYER_ACCESS_KEY}
+    networks:
+      - voluntariado-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8002/docs').getcode()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+# ================================
+# Networks
+# ================================
+networks:
+  voluntariado-network:
+    driver: bridge
+    name: voluntariado-network
+
+# ================================
+# Volumes
+# ================================
+volumes:
+  redis-data:
+    driver: local
+    name: voluntariado-redis-data
