@@ -11,11 +11,12 @@ async function bootstrap() {
 
   // Obtener ConfigService
   const configService = app.get(ConfigService);
-  const frontendUrl = configService.get<string>('FRONTEND_URL_ORIGIN');
+  const frontendUrl = configService.get<string>('FRONTEND_URL_ORIGIN'); // lee del .env
+  const port = Number(configService.get<string>(SERVER_PORT)) || 5560;
 
-  // Configuracion de CORS
+  // Configuración de CORS
   app.enableCors({
-    origin: [frontendUrl],
+    origin: frontendUrl,  // usa la URL del .env
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   });
@@ -38,9 +39,6 @@ async function bootstrap() {
       },
     }),
   );
-
-  // Puerto desde .env
-  const port = Number(configService.get<string>(SERVER_PORT)) || 3000;
 
   await app.listen(port);
   console.log(`Servidor corriendo en ${frontendUrl}:${port}`);

@@ -1,3 +1,12 @@
+/* Contenedores del tour: no afectan el layout */
+.volunteer-map-tour-container,
+.volunteer-filter-tour-container {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+}
 .home-volunteer-layout {
   margin-top: 1.6rem; /* reducido */
   display: flex;

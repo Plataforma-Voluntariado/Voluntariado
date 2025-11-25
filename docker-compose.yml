@@ -1,13 +1,6 @@
-# ================================
-# Docker Compose - Stack Completo Voluntariado
-# ================================
-# Backend (NestJS + 3 FastAPIs + Redis) + Frontend (React)
-# ================================
+version: "3.8"
 
 services:
-  # ================================
-  # Redis - Colas y Cache
-  # ================================
   redis:
     image: redis:latest
     container_name: voluntariado-redis
@@ -24,9 +17,6 @@ services:
     volumes:
       - redis-data:/data
 
-  # ================================
-  # NestJS - Backend Principal
-  # ================================
   nest-app:
     build:
       context: ./backend/nest-app
@@ -36,49 +26,8 @@ services:
     restart: unless-stopped
     ports:
       - "5560:5560"
-    environment:
-      SERVER_PORT: 5560
-      NODE_ENV: production
-      
-      # Database
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT:-3306}
-      DB_DATABASE: ${DB_DATABASE}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      
-      # Redis
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      
-      # FastAPI URLs
-      FASTAPI_URL: http://api-verificador:8001/analizar-pdf
-      FASTAPISENTIMIENTO_URL: http://api-sentimiento:8077/upload-comment
-      CERTIFICADOS_FASTAPI_URL: http://api-certificados:8002
-      
-      # JWT
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_RECOVERY_SECRET: ${JWT_RECOVERY_SECRET}
-      EXPIRES_IN: ${EXPIRES_IN:-1h}
-      EXPIRES_TEMPORAL_IN: ${EXPIRES_TEMPORAL_IN:-5m}
-      
-      # Cloudinary
-      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
-      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
-      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
-      
-      # Mail
-      MAIL_HOST: ${MAIL_HOST}
-      MAIL_PORT: ${MAIL_PORT:-587}
-      MAIL_USER: ${MAIL_USER}
-      MAIL_PASSWORD: ${MAIL_PASSWORD}
-      
-      # URLs
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
-      BACKEND_URL: ${BACKEND_URL:-http://localhost:5560}
-      EXPIRES_CODE: ${EXPIRES_CODE:-10}
-      AES_SECRET_KEY: ${AES_SECRET_KEY}
-    
+    env_file:
+      - .env
     depends_on:
       redis:
         condition: service_healthy
@@ -88,13 +37,10 @@ services:
         condition: service_started
       api-certificados:
         condition: service_started
-    
     networks:
       - voluntariado-network
-    
     volumes:
       - ./backend/nest-app/uploads:/app/uploads
-    
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:5560', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
       interval: 30s
@@ -102,18 +48,17 @@ services:
       retries: 3
       start_period: 40s
 
-  # ================================
-  # FastAPI - Verificador
-  # ================================
   api-verificador:
+    build:
+      context: ./backend/fastapi-verificador
+      dockerfile: Dockerfile
     image: api-verificador:latest
     container_name: voluntariado-verificador
     restart: unless-stopped
     expose:
       - "8001"
-    environment:
-      PYTHONUNBUFFERED: 1
-      ROBOFLOW_API_KEY: ${ROBOFLOW_API_KEY:-}
+    env_file:
+      - .env
     networks:
       - voluntariado-network
     healthcheck:
@@ -123,18 +68,17 @@ services:
       retries: 3
       start_period: 40s
 
-  # ================================
-  # FastAPI - Sentimiento
-  # ================================
   api-sentimiento:
+    build:
+      context: ./backend/api-sentimiento
+      dockerfile: Dockerfile
     image: api-sentimiento:latest
     container_name: voluntariado-sentimiento
     restart: unless-stopped
     expose:
       - "8077"
-    environment:
-      PYTHONUNBUFFERED: 1
-      TF_CPP_MIN_LOG_LEVEL: 3
+    env_file:
+      - .env
     networks:
       - voluntariado-network
     healthcheck:
@@ -143,14 +87,7 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
-    deploy:
-      resources:
-        limits:
-          memory: 2G
 
-  # ================================
-  # FastAPI - Certificados
-  # ================================
   api-certificados:
     build:
       context: ./backend/fastapi-certificados
@@ -160,9 +97,8 @@ services:
     restart: unless-stopped
     expose:
       - "8002"
-    environment:
-      PYTHONUNBUFFERED: 1
-      PDFLAYER_ACCESS_KEY: ccc099c301df37221f5d413db7e24228
+    env_file:
+      - .env
     networks:
       - voluntariado-network
     healthcheck:
@@ -172,15 +108,12 @@ services:
       retries: 3
       start_period: 30s
 
-  # ================================
-  # Frontend React con Nginx
-  # ================================
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        REACT_APP_URL_SERVER_VOLUNTARIADO: ${REACT_APP_URL_SERVER_VOLUNTARIADO:-http://localhost:5560}
+        REACT_APP_URL_SERVER_VOLUNTARIADO: ${REACT_APP_URL_SERVER_VOLUNTARIADO}
         REACT_APP_MAPBOX_TOKEN: ${REACT_APP_MAPBOX_TOKEN}
     image: frontend-voluntariado:latest
     container_name: voluntariado-frontend
@@ -191,25 +124,11 @@ services:
       - nest-app
     networks:
       - voluntariado-network
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
 
-# ================================
-# Networks
-# ================================
 networks:
   voluntariado-network:
     driver: bridge
-    name: voluntariado-network
 
-# ================================
-# Volumes
-# ================================
 volumes:
   redis-data:
     driver: local
-    name: voluntariado-redis-data
