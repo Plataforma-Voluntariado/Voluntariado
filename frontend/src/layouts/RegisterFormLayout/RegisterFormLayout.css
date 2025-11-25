@@ -211,8 +211,8 @@
 }
 
 .register-form-button:hover {
-  background-color: #0051d5;
-  box-shadow: 0 6px 24px rgba(0, 122, 255, 0.4);
+ background-color: #122c4e;
+  box-shadow: 0 6px 24px rgba(11, 45, 82, 0.4);
   transform: translateY(-2px);
 }
 

@@ -105,9 +105,7 @@ textarea:focus {
   transition: 0.2s;
 }
 
-.btn-submit:hover {
-  background: #1d4ed8;
-}
+
 
 .btn-cancel {
   background: #ef4444;
@@ -148,14 +146,7 @@ textarea:focus {
   transition: .2s;
 }
 
-.btn-submit {
-  background: #2563eb;
-  color: #fff;
-}
 
-.btn-submit:hover {
-  background: #1d4ed8;
-}
 
 .btn-cancel {
   background: #ef4444;

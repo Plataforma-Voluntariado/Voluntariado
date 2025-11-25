@@ -33,7 +33,7 @@ RUN npm run build
 # ================================
 FROM nginx:alpine
 
-# Copiar configuración de nginx
+# Copiar build de React
 COPY --from=builder /app/build /usr/share/nginx/html
 
 # Copiar configuración personalizada de nginx

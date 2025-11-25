@@ -1,7 +1,7 @@
 :root {
-  --color-primary: #007aff;
+  --color-primary: #186790;
   --color-primary-light: #e3f2ff;
-  --color-primary-light-glass: rgba(0, 123, 255, 0.447);
+  --color-primary-light-glass: Rgba( 50, 120, 130, 0.4);
   --color-secondary: #8e8e93;
   --color-bg: #f2f2f7;
   --color-warning: #f59e0b;
