@@ -11,12 +11,15 @@ async function bootstrap() {
 
   // Obtener ConfigService
   const configService = app.get(ConfigService);
-  const frontendUrl = configService.get<string>('FRONTEND_URL_ORIGIN'); // lee del .env
+  const frontendUrl = configService.get<string>('FRONTEND_URL'); // lee del .env
   const port = Number(configService.get<string>(SERVER_PORT)) || 5560;
 
   // Configuración de CORS
   app.enableCors({
-    origin: frontendUrl,  // usa la URL del .env
+    origin: [
+      'http://localhost:3000',
+      'http://165.232.134.100:3000'
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   });
