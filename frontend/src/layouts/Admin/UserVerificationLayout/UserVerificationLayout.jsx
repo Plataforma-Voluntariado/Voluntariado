@@ -10,8 +10,6 @@ function UserVerificationLayout({ verificationId, admin }) {
 
   const fetchFiles = useCallback(async () => {
     const filesData = await GetUserByVerificationId(verificationId);
-    console.log("📦 Archivos recibidos:", filesData);
-    console.log("📦 Tipo de dato:", Array.isArray(filesData) ? "Array" : typeof filesData);
     setFiles(filesData);
   }, [verificationId]);
 

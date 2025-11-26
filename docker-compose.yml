@@ -18,10 +18,7 @@ services:
       - redis-data:/data
 
   nest-app:
-    build:
-      context: ./backend/nest-app
-      dockerfile: Dockerfile
-    image: nest-app:latest
+    image: davidshtp2207/backend-nest:latest
     container_name: voluntariado-nest
     restart: unless-stopped
     ports:
@@ -109,19 +106,23 @@ services:
       start_period: 30s
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        REACT_APP_URL_SERVER_VOLUNTARIADO: ${REACT_APP_URL_SERVER_VOLUNTARIADO}
-        REACT_APP_MAPBOX_TOKEN: ${REACT_APP_MAPBOX_TOKEN}
-    image: frontend-voluntariado:latest
+    image: davidshtp2207/frontend-voluntariado:latest
     container_name: voluntariado-frontend
     restart: unless-stopped
     ports:
       - "3000:80"
     depends_on:
       - nest-app
+    networks:
+      - voluntariado-network
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30 voluntariado-nest voluntariado-frontend
     networks:
       - voluntariado-network
 
