@@ -67,6 +67,10 @@ function HomeVolunteerLayout() {
           element: '.home-volunteer-certificates-btn',
           intro: 'Accede a tus certificados obtenidos por tu participación en voluntariados.',
           position: 'left'
+        },
+        {
+          tooltipClass: 'modern-gray-tooltip video-tour-tooltip',
+          intro: '<div class="video-tour-content"><h4>Conoce más sobre nosotros</h4><div class="video-tour-iframe-container"><iframe src="https://www.youtube.com/embed/tggpSv-l6fY" title="Video introductorio" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div><p>Puedes ver el video o finalizar el tour.</p></div>'
         }
       ]
     });
@@ -120,6 +124,10 @@ function HomeVolunteerLayout() {
               element: '.home-volunteer-certificates-btn',
               intro: 'Accede a tus certificados obtenidos por tu participación en voluntariados.',
               position: 'left'
+            },
+            {
+              tooltipClass: 'modern-gray-tooltip video-tour-tooltip',
+              intro: '<div class="video-tour-content"><h4>Conoce más sobre nosotros</h4><div class="video-tour-iframe-container"><iframe src="https://www.youtube.com/embed/tggpSv-l6fY" title="Video introductorio" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div><p>Puedes ver el video o finalizar el tour.</p></div>'
             }
           ]
         });
