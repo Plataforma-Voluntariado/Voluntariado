@@ -52,18 +52,39 @@ function HomeCreatorLayout() {
     const tourInstance = introJs();
     
     // Configurar los pasos según si es móvil o no
-    const steps = isMobileWithSidebar ? [
-      {
-        element: '.sidebar-list-item:nth-child(1)',
-        intro: 'Aquí puedes gestionar todos tus eventos y ver las inscripciones pendientes.',
-        position: 'right'
-      },
-      {
-        element: '.sidebar-user-profile',
-        intro: 'Accede a tu perfil para editar tu información y ver tus estadísticas.',
-        position: 'right'
-      }
-    ] : [];
+    let steps = [];
+    
+    if (isMobileWithSidebar) {
+      steps = [
+        {
+          element: '.sidebar-list-item:nth-child(1)',
+          intro: 'Aquí puedes gestionar todos tus eventos y ver las inscripciones pendientes.',
+          position: 'right'
+        },
+        {
+          element: '.sidebar-user-profile',
+          intro: 'Accede a tu perfil para editar tu información y ver tus estadísticas.',
+          position: 'right'
+        }
+      ];
+    } else {
+      // Recolectar pasos de data-intro para escritorio
+      const elements = document.querySelectorAll('*[data-intro]');
+      const domSteps = Array.from(elements).map(el => ({
+        element: el,
+        intro: el.getAttribute('data-intro'),
+        position: el.getAttribute('data-position') || 'bottom',
+        step: parseInt(el.getAttribute('data-step') || '0')
+      })).sort((a, b) => a.step - b.step);
+      
+      steps = domSteps;
+    }
+
+    // Agregar paso del video al final
+    steps.push({
+      tooltipClass: 'modern-gray-tooltip video-tour-tooltip',
+      intro: '<div class="video-tour-content"><h4>Conoce más sobre nosotros</h4><div class="video-tour-iframe-container"><iframe src="https://www.youtube.com/embed/t418TsJEjf8" title="Video introductorio" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div><p>Puedes ver el video o finalizar el tour.</p></div>'
+    });
 
     tourInstance.setOptions({
       prevLabel: 'Anterior',
@@ -82,7 +103,7 @@ function HomeCreatorLayout() {
       helperElementPadding: 10,
       highlightClass: 'modern-gray-highlight',
       scrollTo: 'tooltip',
-      steps: steps.length > 0 ? steps : undefined
+      steps: steps
     });
     
     tourInstance.onbeforechange(() => {
